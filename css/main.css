@@ -67,15 +67,6 @@ body {
   padding-top: 70px;
 }
 
-/* لما يكون في notif bar */
-body:has(.notif-bar:not([style*="display:none"]):not([style*="display: none"])) {
-  padding-top: calc(70px + 38px);
-}
-
-body:has(.notif-bar:not([style*="display:none"]):not([style*="display: none"])) .navbar {
-  top: 38px;
-}
-
 [lang="en"] body, [lang="en"] * { font-family: 'Cormorant Garamond', serif; }
 [lang="ar"] body, [lang="ar"] * { font-family: 'Cairo', sans-serif; }
 
@@ -135,6 +126,29 @@ h1, h2, h3, h4 {
   border-bottom: 1px solid var(--border);
   transition: all var(--transition);
 }
+
+/* Notif bar داخل الـ navbar */
+.notif-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1001;
+  background: var(--gold);
+  color: #fff;
+  text-align: center;
+  padding: 0.5rem;
+  font-size: 0.82rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.navbar.with-notif { top: 36px; }
+body.with-notif { padding-top: calc(70px + 36px); }
 
 .navbar.scrolled {
   box-shadow: var(--shadow);

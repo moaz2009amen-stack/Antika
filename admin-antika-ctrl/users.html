@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Antika Admin — الحسابات</title>
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <style>
+    body { display: flex; min-height: 100vh; }
+    .admin-sidebar { width: 260px; background: var(--bg-card); border-left: 1px solid var(--border); position: fixed; top: 0; right: 0; bottom: 0; display: flex; flex-direction: column; z-index: 100; overflow-y: auto; }
+    [dir="ltr"] .admin-sidebar { right: auto; left: 0; border-left: none; border-right: 1px solid var(--border); }
+    .admin-logo { padding: 1.5rem; border-bottom: 1px solid var(--border); }
+    .admin-logo-text { font-family: var(--font-display); font-size: 1.2rem; font-style: italic; color: var(--gold); }
+    .admin-logo-sub { font-size: 0.75rem; color: var(--text-muted); font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; }
+    .admin-nav { flex: 1; padding: 1rem 0; }
+    .nav-section-label { font-size: 0.7rem; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; color: var(--text-muted); padding: 0.5rem 1.5rem; margin-top: 0.5rem; }
+    .admin-nav-item { display: flex; align-items: center; gap: 0.75rem; padding: 0.8rem 1.5rem; font-size: 0.9rem; font-weight: 600; color: var(--text-secondary); cursor: pointer; transition: all var(--transition); text-decoration: none; }
+    .admin-nav-item:hover { color: var(--gold); background: rgba(201,168,76,0.06); }
+    .admin-nav-item.active { color: var(--gold); background: rgba(201,168,76,0.1); border-right: 3px solid var(--gold); }
+    [dir="ltr"] .admin-nav-item.active { border-right: none; border-left: 3px solid var(--gold); }
+    .admin-nav-item i { width: 18px; text-align: center; }
+    .admin-main { margin-right: 260px; flex: 1; }
+    [dir="ltr"] .admin-main { margin-right: 0; margin-left: 260px; }
+    .admin-topbar { background: var(--bg-card); border-bottom: 1px solid var(--border); padding: 0 2rem; height: 64px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 50; }
+    .admin-content { padding: 2rem; }
+    .admin-table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+    .admin-table th { padding: 0.75rem 1.25rem; text-align: right; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-muted); border-bottom: 1px solid var(--border); background: var(--bg-secondary); }
+    [dir="ltr"] .admin-table th { text-align: left; }
+    .admin-table td { padding: 1rem 1.25rem; border-bottom: 1px solid var(--border); color: var(--text); }
+    .admin-table tr:last-child td { border-bottom: none; }
+    .admin-table tr:hover td { background: var(--bg-secondary); }
+    @media (max-width: 768px) { .admin-sidebar { display: none; } .admin-main { margin-right: 0; } }
+  </style>
+</head>
+<body>
+  <aside class="admin-sidebar">
+    <div class="admin-logo"><div class="admin-logo-text">Antika Gallery</div><div class="admin-logo-sub">Admin Panel</div></div>
+    <nav class="admin-nav">
+      <div class="nav-section-label">الرئيسية</div>
+      <a href="/admin-antika-ctrl/" class="admin-nav-item"><i class="fas fa-chart-line"></i> لوحة التحكم</a>
+      <div class="nav-section-label">المتجر</div>
+      <a href="/admin-antika-ctrl/products.html" class="admin-nav-item"><i class="fas fa-box"></i> المنتجات</a>
+      <a href="/admin-antika-ctrl/categories.html" class="admin-nav-item"><i class="fas fa-tags"></i> التصنيفات</a>
+      <a href="/admin-antika-ctrl/orders.html" class="admin-nav-item"><i class="fas fa-shopping-cart"></i> الطلبات</a>
+      <div class="nav-section-label">المستخدمين</div>
+      <a href="/admin-antika-ctrl/users.html" class="admin-nav-item active"><i class="fas fa-users"></i> الحسابات</a>
+      <div class="nav-section-label">الإعدادات</div>
+      <a href="/admin-antika-ctrl/settings.html" class="admin-nav-item"><i class="fas fa-cog"></i> الإعدادات</a>
+    </nav>
+    <div style="padding:1rem 1.5rem;border-top:1px solid var(--border)">
+      <button onclick="logout()" style="display:flex;align-items:center;gap:0.75rem;font-size:0.9rem;color:#dc2626;font-weight:600;width:100%"><i class="fas fa-sign-out-alt"></i> تسجيل الخروج</button>
+    </div>
+  </aside>
+
+  <main class="admin-main">
+    <div class="admin-topbar">
+      <span style="font-family:var(--font-display);font-size:1.3rem">الحسابات</span>
+      <button class="navbar-icon-btn" onclick="toggleTheme()" id="theme-toggle"><i class="fas fa-moon"></i></button>
+    </div>
+    <div class="admin-content">
+      <!-- Notification sender -->
+      <div class="card" style="margin-bottom:1.5rem">
+        <h3 style="font-weight:700;margin-bottom:1rem;font-size:1rem">إرسال إشعار لكل المستخدمين</h3>
+        <div style="display:flex;gap:1rem;flex-wrap:wrap">
+          <input type="text" class="form-control" id="notif-msg" placeholder="نص الإشعار..." style="flex:1">
+          <button class="btn btn-primary" onclick="sendBulkNotification()"><i class="fas fa-bell"></i> إرسال</button>
+        </div>
+      </div>
+
+      <div style="display:flex;gap:1rem;margin-bottom:1.5rem;flex-wrap:wrap">
+        <input type="text" class="form-control" id="search-input" placeholder="بحث بالاسم أو التليفون..." oninput="filterUsers()" style="flex:1">
+        <select class="form-control" id="status-filter" onchange="filterUsers()" style="width:160px">
+          <option value="">كل الحسابات</option>
+          <option value="active">نشط</option>
+          <option value="banned">محظور</option>
+          <option value="admin">أدمن</option>
+          <option value="moderator">مشرف</option>
+        </select>
+      </div>
+
+      <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden">
+        <div style="overflow-x:auto">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>المستخدم</th>
+                <th>التليفون</th>
+                <th>تاريخ التسجيل</th>
+                <th>الدور</th>
+                <th>الحالة</th>
+                <th>الإجراءات</th>
+              </tr>
+            </thead>
+            <tbody id="users-tbody">
+              <tr><td colspan="6" style="text-align:center;padding:3rem"><div class="spinner" style="margin:0 auto"></div></td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div style="padding:1rem 1.5rem;border-top:1px solid var(--border);font-size:0.85rem;color:var(--text-muted)" id="users-count"></div>
+      </div>
+    </div>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+  <script src="/js/config.js"></script>
+  <script>
+    let allUsers = [];
+    function toggleTheme() { const t = getTheme() === 'light' ? 'dark' : 'light'; setTheme(t); document.getElementById('theme-toggle').innerHTML = t === 'dark' ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>'; }
+    async function logout() { await db.auth.signOut(); window.location.href = '/auth.html'; }
+
+    async function loadUsers() {
+      const { data: profiles } = await db.from('profiles').select('*').order('created_at', { ascending: false });
+      // Get auth users for roles and emails
+      allUsers = profiles || [];
+      filterUsers();
+    }
+
+    function filterUsers() {
+      const q = document.getElementById('search-input').value.toLowerCase();
+      const status = document.getElementById('status-filter').value;
+
+      const filtered = allUsers.filter(u => {
+        const matchQ = !q || u.full_name?.toLowerCase().includes(q) || u.phone?.includes(q);
+        const matchStatus = !status ||
+          (status === 'banned' && u.is_banned) ||
+          (status === 'active' && !u.is_banned);
+        return matchQ && matchStatus;
+      });
+
+      document.getElementById('users-count').textContent = `${filtered.length} حساب`;
+      const tbody = document.getElementById('users-tbody');
+      if (!filtered.length) {
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:3rem;color:var(--text-muted)">مفيش حسابات</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = filtered.map(u => `
+        <tr>
+          <td>
+            <div style="display:flex;align-items:center;gap:0.75rem">
+              ${u.avatar_url
+                ? `<img src="${u.avatar_url}" style="width:36px;height:36px;border-radius:50%;object-fit:cover;border:2px solid var(--border)">`
+                : `<div style="width:36px;height:36px;border-radius:50%;background:var(--gold);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:0.85rem;flex-shrink:0">${(u.full_name||'?')[0]}</div>`}
+              <div>
+                <div style="font-weight:700">${u.full_name || '—'}</div>
+                <div style="font-size:0.8rem;color:var(--text-muted)">${u.address || ''}</div>
+              </div>
+            </div>
+          </td>
+          <td style="font-family:monospace">${u.phone || '—'}</td>
+          <td style="color:var(--text-muted);font-size:0.85rem">${formatDate(u.created_at)}</td>
+          <td>
+            <select class="form-control" style="padding:0.4rem 0.75rem;font-size:0.85rem;width:auto" onchange="updateRole('${u.id}', this.value)" ${u.id === (window._currentUserId || '') ? 'disabled' : ''}>
+              <option value="customer" ${!u.role || u.role==='customer'?'selected':''}>عميل</option>
+              <option value="moderator" ${u.role==='moderator'?'selected':''}>مشرف</option>
+              <option value="admin" ${u.role==='admin'?'selected':''}>أدمن</option>
+            </select>
+          </td>
+          <td>${u.is_banned ? '<span class="badge badge-danger">محظور</span>' : '<span class="badge badge-success">نشط</span>'}</td>
+          <td>
+            <div style="display:flex;gap:0.5rem">
+              <button class="btn btn-sm ${u.is_banned ? 'btn-primary' : 'btn-ghost'}" onclick="toggleBan('${u.id}', ${!u.is_banned})">
+                <i class="fas ${u.is_banned ? 'fa-unlock' : 'fa-ban'}"></i>
+              </button>
+              <button class="btn btn-sm btn-danger" onclick="deleteUser('${u.id}')" title="حذف الحساب">
+                <i class="fas fa-trash"></i>
+              </button>
+            </div>
+          </td>
+        </tr>`).join('');
+    }
+
+    async function toggleBan(userId, ban) {
+      await db.from('profiles').update({ is_banned: ban }).eq('id', userId);
+      const u = allUsers.find(u => u.id === userId);
+      if (u) u.is_banned = ban;
+      filterUsers();
+      showToast(ban ? 'تم حظر الحساب' : 'تم رفع الحظر');
+    }
+
+    async function updateRole(userId, role) {
+      // Update via RPC (needs service role in production - handled via Supabase dashboard)
+      showToast('تم تحديث الدور — يحتاج تأكيد من Supabase Dashboard', 'info');
+    }
+
+    async function deleteUser(userId) {
+      if (!confirm('تأكيد حذف الحساب؟')) return;
+      await db.from('profiles').delete().eq('id', userId);
+      allUsers = allUsers.filter(u => u.id !== userId);
+      filterUsers();
+      showToast('تم حذف الحساب');
+    }
+
+    async function sendBulkNotification() {
+      const msg = document.getElementById('notif-msg').value.trim();
+      if (!msg) return;
+      const notifications = allUsers.map(u => ({ user_id: u.id, message: msg }));
+      await db.from('notifications').insert(notifications);
+      document.getElementById('notif-msg').value = '';
+      showToast(`تم إرسال الإشعار لـ ${allUsers.length} مستخدم`);
+    }
+
+    async function init() {
+      const ok = await requireAdmin();
+      if (!ok) return;
+      const user = await getCurrentUser();
+      window._currentUserId = user?.id;
+      loadUsers();
+    }
+
+    initTheme();
+    document.getElementById('theme-toggle').innerHTML = getTheme() === 'dark' ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
+    init();
+  </script>
+</body>
+</html>

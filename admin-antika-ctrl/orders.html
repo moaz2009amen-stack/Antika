@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Antika Admin — الطلبات</title>
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <style>
+    body { display: flex; min-height: 100vh; }
+    .admin-sidebar { width: 260px; background: var(--bg-card); border-left: 1px solid var(--border); position: fixed; top: 0; right: 0; bottom: 0; display: flex; flex-direction: column; z-index: 100; overflow-y: auto; }
+    [dir="ltr"] .admin-sidebar { right: auto; left: 0; border-left: none; border-right: 1px solid var(--border); }
+    .admin-logo { padding: 1.5rem; border-bottom: 1px solid var(--border); }
+    .admin-logo-text { font-family: var(--font-display); font-size: 1.2rem; font-style: italic; color: var(--gold); }
+    .admin-logo-sub { font-size: 0.75rem; color: var(--text-muted); font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; }
+    .admin-nav { flex: 1; padding: 1rem 0; }
+    .nav-section-label { font-size: 0.7rem; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; color: var(--text-muted); padding: 0.5rem 1.5rem; margin-top: 0.5rem; }
+    .admin-nav-item { display: flex; align-items: center; gap: 0.75rem; padding: 0.8rem 1.5rem; font-size: 0.9rem; font-weight: 600; color: var(--text-secondary); cursor: pointer; transition: all var(--transition); text-decoration: none; }
+    .admin-nav-item:hover { color: var(--gold); background: rgba(201,168,76,0.06); }
+    .admin-nav-item.active { color: var(--gold); background: rgba(201,168,76,0.1); border-right: 3px solid var(--gold); }
+    [dir="ltr"] .admin-nav-item.active { border-right: none; border-left: 3px solid var(--gold); }
+    .admin-nav-item i { width: 18px; text-align: center; }
+    .admin-main { margin-right: 260px; flex: 1; }
+    [dir="ltr"] .admin-main { margin-right: 0; margin-left: 260px; }
+    .admin-topbar { background: var(--bg-card); border-bottom: 1px solid var(--border); padding: 0 2rem; height: 64px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 50; }
+    .admin-content { padding: 2rem; }
+    .admin-table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+    .admin-table th { padding: 0.75rem 1.25rem; text-align: right; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-muted); border-bottom: 1px solid var(--border); background: var(--bg-secondary); }
+    [dir="ltr"] .admin-table th { text-align: left; }
+    .admin-table td { padding: 1rem 1.25rem; border-bottom: 1px solid var(--border); color: var(--text); }
+    .admin-table tr:last-child td { border-bottom: none; }
+    .admin-table tr:hover td { background: rgba(201,168,76,0.03); cursor: pointer; }
+    .order-detail { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 2rem; margin-bottom: 1.5rem; display: none; }
+    .order-detail.show { display: block; animation: fadeUp 0.3s ease; }
+    .status-select { padding: 0.5rem 1rem; border: 1.5px solid var(--border); border-radius: var(--radius-sm); font-family: inherit; font-size: 0.9rem; background: var(--bg-card); color: var(--text); cursor: pointer; outline: none; }
+    .status-select:focus { border-color: var(--gold); }
+    @media (max-width: 768px) { .admin-sidebar { display: none; } .admin-main { margin-right: 0; } }
+  </style>
+</head>
+<body>
+  <aside class="admin-sidebar">
+    <div class="admin-logo"><div class="admin-logo-text">Antika Gallery</div><div class="admin-logo-sub">Admin Panel</div></div>
+    <nav class="admin-nav">
+      <div class="nav-section-label">الرئيسية</div>
+      <a href="/admin-antika-ctrl/" class="admin-nav-item"><i class="fas fa-chart-line"></i> لوحة التحكم</a>
+      <div class="nav-section-label">المتجر</div>
+      <a href="/admin-antika-ctrl/products.html" class="admin-nav-item"><i class="fas fa-box"></i> المنتجات</a>
+      <a href="/admin-antika-ctrl/categories.html" class="admin-nav-item"><i class="fas fa-tags"></i> التصنيفات</a>
+      <a href="/admin-antika-ctrl/orders.html" class="admin-nav-item active"><i class="fas fa-shopping-cart"></i> الطلبات</a>
+      <div class="nav-section-label">المستخدمين</div>
+      <a href="/admin-antika-ctrl/users.html" class="admin-nav-item"><i class="fas fa-users"></i> الحسابات</a>
+      <div class="nav-section-label">الإعدادات</div>
+      <a href="/admin-antika-ctrl/settings.html" class="admin-nav-item"><i class="fas fa-cog"></i> الإعدادات</a>
+    </nav>
+    <div style="padding:1rem 1.5rem;border-top:1px solid var(--border)">
+      <button onclick="logout()" style="display:flex;align-items:center;gap:0.75rem;font-size:0.9rem;color:#dc2626;font-weight:600;width:100%"><i class="fas fa-sign-out-alt"></i> تسجيل الخروج</button>
+    </div>
+  </aside>
+
+  <main class="admin-main">
+    <div class="admin-topbar">
+      <span style="font-family:var(--font-display);font-size:1.3rem">الطلبات</span>
+      <button class="navbar-icon-btn" onclick="toggleTheme()" id="theme-toggle"><i class="fas fa-moon"></i></button>
+    </div>
+
+    <div class="admin-content">
+      <!-- Order Detail (shown on click) -->
+      <div class="order-detail" id="order-detail"></div>
+
+      <!-- Filters -->
+      <div style="display:flex;gap:1rem;margin-bottom:1.5rem;flex-wrap:wrap;align-items:center">
+        <input type="text" class="form-control" id="search-input" placeholder="بحث برقم الطلب أو التليفون..." oninput="filterOrders()" style="flex:1;min-width:200px">
+        <select class="form-control" id="status-filter" onchange="filterOrders()" style="width:180px">
+          <option value="">كل الحالات</option>
+          <option value="pending">انتظار</option>
+          <option value="confirmed">مؤكد</option>
+          <option value="processing">تجهيز</option>
+          <option value="shipped">في الطريق</option>
+          <option value="delivered">تم التوصيل</option>
+          <option value="cancelled">ملغي</option>
+        </select>
+        <select class="form-control" id="payment-filter" onchange="filterOrders()" style="width:160px">
+          <option value="">كل طرق الدفع</option>
+          <option value="cash">كاش</option>
+          <option value="wallet">محفظة</option>
+        </select>
+      </div>
+
+      <!-- Table -->
+      <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden">
+        <div style="overflow-x:auto">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>رقم الطلب</th>
+                <th>العميل</th>
+                <th>المبلغ</th>
+                <th>الدفع</th>
+                <th>الحالة</th>
+                <th>التاريخ</th>
+                <th>تغيير الحالة</th>
+              </tr>
+            </thead>
+            <tbody id="orders-tbody">
+              <tr><td colspan="7" style="text-align:center;padding:3rem"><div class="spinner" style="margin:0 auto"></div></td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div style="padding:1rem 1.5rem;border-top:1px solid var(--border);font-size:0.85rem;color:var(--text-muted)" id="orders-count"></div>
+      </div>
+    </div>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+  <script src="/js/config.js"></script>
+  <script>
+    let allOrders = [];
+    const statusMap = { pending: { ar: 'انتظار', class: 'badge-warning' }, confirmed: { ar: 'مؤكد', class: 'badge-info' }, processing: { ar: 'تجهيز', class: 'badge-info' }, shipped: { ar: 'في الطريق', class: 'badge-gold' }, delivered: { ar: 'تم التوصيل', class: 'badge-success' }, cancelled: { ar: 'ملغي', class: 'badge-danger' } };
+
+    function toggleTheme() { const t = getTheme() === 'light' ? 'dark' : 'light'; setTheme(t); document.getElementById('theme-toggle').innerHTML = t === 'dark' ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>'; }
+    async function logout() { await db.auth.signOut(); window.location.href = '/auth.html'; }
+
+    async function loadOrders() {
+      const { data } = await db.from('orders').select('*, profiles(full_name, phone, address)').order('created_at', { ascending: false });
+      allOrders = data || [];
+      filterOrders();
+    }
+
+    function filterOrders() {
+      const q = document.getElementById('search-input').value.toLowerCase();
+      const status = document.getElementById('status-filter').value;
+      const payment = document.getElementById('payment-filter').value;
+
+      const filtered = allOrders.filter(o => {
+        const matchQ = !q || o.id.toLowerCase().includes(q) || o.profiles?.phone?.includes(q) || o.profiles?.full_name?.toLowerCase().includes(q);
+        const matchStatus = !status || o.status === status;
+        const matchPayment = !payment || o.payment_method === payment;
+        return matchQ && matchStatus && matchPayment;
+      });
+
+      document.getElementById('orders-count').textContent = `${filtered.length} طلب`;
+      renderOrders(filtered);
+    }
+
+    function renderOrders(orders) {
+      const tbody = document.getElementById('orders-tbody');
+      if (!orders.length) {
+        tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:3rem;color:var(--text-muted)">مفيش طلبات</td></tr>';
+        return;
+      }
+      tbody.innerHTML = orders.map(o => {
+        const s = statusMap[o.status] || statusMap.pending;
+        return `
+          <tr onclick="showOrderDetail('${o.id}')">
+            <td><span style="font-family:monospace;color:var(--gold);font-weight:700">#${o.id.slice(0,8).toUpperCase()}</span></td>
+            <td>
+              <div style="font-weight:600">${o.profiles?.full_name || '—'}</div>
+              <div style="font-size:0.8rem;color:var(--text-muted)">${o.profiles?.phone || ''}</div>
+            </td>
+            <td style="font-weight:700;color:var(--gold)">${formatPrice(o.total)}</td>
+            <td>${o.payment_method === 'cash' ? '<span class="badge badge-gray">كاش</span>' : '<span class="badge badge-info">محفظة</span>'}</td>
+            <td><span class="badge ${s.class}">${s.ar}</span></td>
+            <td style="color:var(--text-muted);font-size:0.85rem">${formatDate(o.created_at)}</td>
+            <td onclick="event.stopPropagation()">
+              <select class="status-select" onchange="updateStatus('${o.id}', this.value)">
+                <option value="pending" ${o.status==='pending'?'selected':''}>انتظار</option>
+                <option value="confirmed" ${o.status==='confirmed'?'selected':''}>مؤكد</option>
+                <option value="processing" ${o.status==='processing'?'selected':''}>تجهيز</option>
+                <option value="shipped" ${o.status==='shipped'?'selected':''}>في الطريق</option>
+                <option value="delivered" ${o.status==='delivered'?'selected':''}>تم التوصيل</option>
+                <option value="cancelled" ${o.status==='cancelled'?'selected':''}>ملغي</option>
+              </select>
+            </td>
+          </tr>`;
+      }).join('');
+    }
+
+    async function updateStatus(orderId, status) {
+      await db.from('orders').update({ status }).eq('id', orderId);
+      const order = allOrders.find(o => o.id === orderId);
+      if (order) order.status = status;
+
+      // Send notification to user
+      const statusLabels = { confirmed: 'تم تأكيد طلبك', processing: 'طلبك قيد التجهيز الآن', shipped: 'طلبك في الطريق إليك 🚚', delivered: 'تم توصيل طلبك بنجاح ✓', cancelled: 'تم إلغاء طلبك' };
+      if (statusLabels[status] && order?.profiles) {
+        await db.from('notifications').insert({ user_id: order.user_id, message: `${statusLabels[status]} — #${orderId.slice(0,8).toUpperCase()}` });
+      }
+      showToast('تم تحديث حالة الطلب');
+      filterOrders();
+    }
+
+    async function showOrderDetail(orderId) {
+      const { data: order } = await db.from('orders').select('*, profiles(*), order_items(*, products(name, name_ar, images))').eq('id', orderId).single();
+      if (!order) return;
+
+      const el = document.getElementById('order-detail');
+      el.innerHTML = `
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;flex-wrap:wrap;gap:1rem">
+          <div>
+            <div style="font-family:monospace;font-size:1.1rem;font-weight:700;color:var(--gold)">#${order.id.slice(0,8).toUpperCase()}</div>
+            <div style="font-size:0.85rem;color:var(--text-muted)">${formatDate(order.created_at)}</div>
+          </div>
+          <button onclick="document.getElementById('order-detail').classList.remove('show')" style="color:var(--text-muted)"><i class="fas fa-times"></i></button>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin-bottom:1.5rem">
+          <div>
+            <div style="font-size:0.75rem;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--text-muted);margin-bottom:0.5rem">بيانات العميل</div>
+            <div style="font-weight:700">${order.profiles?.full_name || '—'}</div>
+            <div style="color:var(--text-muted)">${order.profiles?.phone || ''}</div>
+          </div>
+          <div>
+            <div style="font-size:0.75rem;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--text-muted);margin-bottom:0.5rem">بيانات الطلب</div>
+            <div>${order.payment_method === 'cash' ? 'كاش عند الاستلام' : 'محفظة إلكترونية'}</div>
+            ${order.notes ? `<div style="font-size:0.85rem;color:var(--text-muted);margin-top:0.25rem">${order.notes}</div>` : ''}
+          </div>
+        </div>
+        ${order.payment_proof_url ? `
+          <div style="margin-bottom:1.5rem">
+            <div style="font-size:0.75rem;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--text-muted);margin-bottom:0.5rem">إيصال الدفع</div>
+            <img src="${order.payment_proof_url}" style="max-height:200px;border-radius:var(--radius-sm);border:1px solid var(--border);cursor:zoom-in" onclick="window.open('${order.payment_proof_url}','_blank')">
+          </div>` : ''}
+        <div>
+          <div style="font-size:0.75rem;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--text-muted);margin-bottom:0.75rem">المنتجات</div>
+          ${order.order_items?.map(oi => `
+            <div style="display:flex;align-items:center;gap:0.75rem;padding:0.75rem 0;border-bottom:1px solid var(--border)">
+              <img src="${oi.products?.images?.[0] || ''}" style="width:48px;height:60px;border-radius:4px;object-fit:cover;background:var(--bg-secondary)">
+              <div style="flex:1">
+                <div style="font-weight:600">${oi.products?.name_ar || oi.products?.name || '—'}</div>
+                <div style="font-size:0.85rem;color:var(--text-muted)">الكمية: ${oi.quantity} × ${formatPrice(oi.price_at_time)}</div>
+              </div>
+              <div style="font-weight:700;color:var(--gold)">${formatPrice(oi.price_at_time * oi.quantity)}</div>
+            </div>`).join('')}
+          <div style="display:flex;justify-content:space-between;padding:1rem 0;font-weight:700;font-size:1.1rem">
+            <span>الإجمالي</span>
+            <span style="color:var(--gold)">${formatPrice(order.total)}</span>
+          </div>
+        </div>`;
+
+      el.classList.add('show');
+      el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    async function init() {
+      const ok = await requireAdmin();
+      if (!ok) return;
+      loadOrders();
+      // Check URL param
+      const id = new URLSearchParams(window.location.search).get('id');
+      if (id) setTimeout(() => showOrderDetail(id), 1000);
+    }
+
+    initTheme();
+    document.getElementById('theme-toggle').innerHTML = getTheme() === 'dark' ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
+    init();
+  </script>
+</body>
+</html>

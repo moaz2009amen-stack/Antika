@@ -246,8 +246,8 @@
 </head>
 <body>
 
-  <!-- Notification Bar -->
-  <div class="notif-bar" id="notif-bar" style="display:none"></div>
+  <!-- Notification Bar (hidden by default, shown by JS if announcement exists) -->
+  <div id="notif-bar"></div>
 
   <!-- Navbar -->
   <nav class="navbar" id="navbar">
@@ -573,10 +573,12 @@
     // Notification bar
     async function initNotifBar() {
       const msg = await getSetting('announcement');
-      if (msg) {
+      if (msg && msg.trim()) {
         const bar = document.getElementById('notif-bar');
+        bar.className = 'notif-bar';
         bar.textContent = msg;
-        bar.style.display = 'block';
+        document.getElementById('navbar').classList.add('with-notif');
+        document.body.classList.add('with-notif');
       }
     }
 

@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Antika Gallery — أنتيكا جاليري</title>
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <style>
+    /* Hero */
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      position: relative;
+      overflow: hidden;
+      padding-top: 70px;
+    }
+
+    .hero-bg {
+      position: absolute;
+      inset: 0;
+      background: var(--bg-secondary);
+      z-index: 0;
+    }
+
+    .hero-bg::before {
+      content: '';
+      position: absolute;
+      top: -20%;
+      right: -10%;
+      width: 600px;
+      height: 600px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(201,168,76,0.10) 0%, transparent 70%);
+    }
+
+    .hero-bg::after {
+      content: '';
+      position: absolute;
+      bottom: -20%;
+      left: -10%;
+      width: 500px;
+      height: 500px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(201,168,76,0.07) 0%, transparent 70%);
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 1;
+      max-width: 620px;
+    }
+
+    .hero-eyebrow {
+      font-size: 0.8rem;
+      font-weight: 700;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 1.5rem;
+    }
+
+    .hero-title {
+      font-family: var(--font-display);
+      font-size: clamp(3rem, 7vw, 5.5rem);
+      font-style: italic;
+      color: var(--text);
+      line-height: 1.1;
+      margin-bottom: 1.5rem;
+    }
+
+    .hero-title span { color: var(--gold); }
+
+    .hero-desc {
+      font-size: 1.05rem;
+      color: var(--text-secondary);
+      margin-bottom: 2.5rem;
+      max-width: 480px;
+      line-height: 1.9;
+    }
+
+    .hero-actions { display: flex; gap: 1rem; flex-wrap: wrap; }
+
+    .hero-stats {
+      display: flex;
+      gap: 2.5rem;
+      margin-top: 3rem;
+      padding-top: 2rem;
+      border-top: 1px solid var(--border);
+    }
+
+    .hero-stat-num {
+      font-family: var(--font-display);
+      font-size: 2rem;
+      font-weight: 600;
+      color: var(--gold);
+    }
+
+    .hero-stat-label {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      letter-spacing: 0.05em;
+    }
+
+    /* Categories */
+    .categories-section { padding: 5rem 0; }
+
+    .categories-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 1rem;
+      margin-top: 2.5rem;
+    }
+
+    .category-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.75rem 1.25rem;
+      text-align: center;
+      cursor: pointer;
+      transition: all var(--transition);
+      text-decoration: none;
+      color: var(--text);
+      display: block;
+    }
+
+    .category-card:hover {
+      border-color: var(--gold);
+      transform: translateY(-3px);
+      box-shadow: var(--shadow-lg);
+    }
+
+    .category-icon {
+      font-size: 2rem;
+      margin-bottom: 0.75rem;
+      color: var(--gold);
+    }
+
+    .category-name {
+      font-weight: 700;
+      font-size: 0.95rem;
+    }
+
+    .category-count {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-top: 0.25rem;
+    }
+
+    /* Featured */
+    .featured-section { padding: 5rem 0; background: var(--bg-secondary); }
+
+    /* New Arrivals */
+    .new-section { padding: 5rem 0; }
+
+    /* Banner */
+    .banner {
+      margin: 2rem 0;
+      padding: 3rem 2.5rem;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 2rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .banner::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--gold-dark), var(--gold), var(--gold-light), var(--gold));
+    }
+
+    .banner-title {
+      font-family: var(--font-display);
+      font-size: 1.6rem;
+      font-style: italic;
+      color: var(--text);
+      margin-bottom: 0.5rem;
+    }
+
+    .banner-desc { color: var(--text-secondary); font-size: 0.95rem; }
+
+    /* Notification bar */
+    .notif-bar {
+      background: var(--gold);
+      color: #fff;
+      text-align: center;
+      padding: 0.6rem;
+      font-size: 0.85rem;
+      font-weight: 600;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 1001;
+      letter-spacing: 0.03em;
+    }
+
+    body:has(.notif-bar) .navbar { top: 38px; }
+
+    /* Features */
+    .features-section { padding: 4rem 0; }
+
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 1.5rem;
+      margin-top: 2.5rem;
+    }
+
+    .feature-card {
+      text-align: center;
+      padding: 2rem 1.5rem;
+    }
+
+    .feature-icon {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background: rgba(201,168,76,0.12);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 1rem;
+      font-size: 1.4rem;
+      color: var(--gold);
+    }
+
+    .feature-title {
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+      font-size: 0.95rem;
+    }
+
+    .feature-desc { font-size: 0.85rem; color: var(--text-muted); line-height: 1.7; }
+  </style>
+</head>
+<body>
+
+  <!-- Notification Bar -->
+  <div class="notif-bar" id="notif-bar" style="display:none"></div>
+
+  <!-- Navbar -->
+  <nav class="navbar" id="navbar">
+    <a href="/" class="navbar-brand">Antika Gallery</a>
+
+    <ul class="navbar-nav" id="nav-menu">
+      <li><a href="/" data-ar="الرئيسية" data-en="Home">الرئيسية</a></li>
+      <li><a href="/shop.html" data-ar="المتجر" data-en="Shop">المتجر</a></li>
+      <li><a href="/track.html" data-ar="تتبع طلبك" data-en="Track Order">تتبع طلبك</a></li>
+    </ul>
+
+    <div class="navbar-actions">
+      <button class="navbar-icon-btn" onclick="toggleTheme()" id="theme-toggle" title="Theme">
+        <i class="fas fa-moon"></i>
+      </button>
+      <button class="navbar-icon-btn" onclick="toggleLang()" style="font-size:0.75rem;font-weight:700" id="lang-toggle">EN</button>
+      <a href="/cart.html" class="navbar-icon-btn">
+        <i class="fas fa-shopping-bag"></i>
+        <span class="cart-count" style="display:none">0</span>
+      </a>
+      <div id="user-area"></div>
+      <button class="hamburger" onclick="toggleMenu()" id="hamburger">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="hero-bg"></div>
+    <div class="container">
+      <div class="hero-content page-enter">
+        <div class="hero-eyebrow" data-ar="✦ أنتيكا جاليري — كولكشن حصري" data-en="✦ Antika Gallery — Exclusive Collection">✦ أنتيكا جاليري — كولكشن حصري</div>
+        <h1 class="hero-title">
+          <span data-ar="أجمل" data-en="The Most">أجمل</span>
+          <br>
+          <span data-ar="التريندات" data-en="Trending">التريندات</span>
+          <br>
+          <span style="color:var(--gold)" data-ar="بأقل الأسعار" data-en="Styles">بأقل الأسعار</span>
+        </h1>
+        <p class="hero-desc" data-ar="من ملابس حريمي لأنتيكات وهوم وير — كل حاجة مصورة على الطبيعة بعناية واهتمام 🩷" data-en="From women's fashion to antiques and homewear — everything carefully photographed in real life 🩷">
+          من ملابس حريمي لأنتيكات وهوم وير — كل حاجة مصورة على الطبيعة بعناية واهتمام 🩷
+        </p>
+        <div class="hero-actions">
+          <a href="/shop.html" class="btn btn-primary btn-lg" data-ar="تسوقي الآن" data-en="Shop Now">تسوقي الآن</a>
+          <a href="/shop.html?cat=new" class="btn btn-outline btn-lg" data-ar="الوصول الجديد" data-en="New Arrivals">الوصول الجديد</a>
+        </div>
+        <div class="hero-stats">
+          <div>
+            <div class="hero-stat-num" id="stat-products">—</div>
+            <div class="hero-stat-label" data-ar="منتج متاح" data-en="Products">منتج متاح</div>
+          </div>
+          <div>
+            <div class="hero-stat-num" id="stat-orders">—</div>
+            <div class="hero-stat-label" data-ar="طلب تم توصيله" data-en="Orders Delivered">طلب تم توصيله</div>
+          </div>
+          <div>
+            <div class="hero-stat-num" id="stat-customers">—</div>
+            <div class="hero-stat-label" data-ar="عميل سعيد" data-en="Happy Customers">عميل سعيد</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Categories -->
+  <section class="categories-section">
+    <div class="container">
+      <h2 class="section-title" data-ar="تصفح حسب التصنيف" data-en="Browse by Category">تصفح حسب التصنيف</h2>
+      <div class="categories-grid" id="categories-grid">
+        <!-- Loaded dynamically -->
+        <div class="category-card skeleton" style="height:120px"></div>
+        <div class="category-card skeleton" style="height:120px"></div>
+        <div class="category-card skeleton" style="height:120px"></div>
+        <div class="category-card skeleton" style="height:120px"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Featured -->
+  <section class="featured-section">
+    <div class="container">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:2.5rem;flex-wrap:wrap;gap:1rem">
+        <h2 class="section-title" data-ar="منتجات مميزة" data-en="Featured Products">منتجات مميزة</h2>
+        <a href="/shop.html" class="btn btn-ghost btn-sm" data-ar="عرض الكل" data-en="View All">عرض الكل</a>
+      </div>
+      <div class="products-grid" id="featured-grid">
+        <div class="product-card skeleton" style="height:380px"></div>
+        <div class="product-card skeleton" style="height:380px"></div>
+        <div class="product-card skeleton" style="height:380px"></div>
+        <div class="product-card skeleton" style="height:380px"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Banner -->
+  <div class="container">
+    <div class="banner">
+      <div>
+        <div class="banner-title" data-ar="توصيل لكل مكان 🚚" data-en="Delivery Everywhere 🚚">توصيل لكل مكان 🚚</div>
+        <p class="banner-desc" data-ar="من منزلنا لبيتك — كاش عند الاستلام أو دفع إلكتروني" data-en="From our home to yours — cash on delivery or digital payment">من منزلنا لبيتك — كاش عند الاستلام أو دفع إلكتروني</p>
+      </div>
+      <a href="/shop.html" class="btn btn-primary" data-ar="تسوقي الآن" data-en="Shop Now">تسوقي الآن</a>
+    </div>
+  </div>
+
+  <!-- New Arrivals -->
+  <section class="new-section">
+    <div class="container">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:2.5rem;flex-wrap:wrap;gap:1rem">
+        <h2 class="section-title" data-ar="وصل حديثاً" data-en="New Arrivals">وصل حديثاً</h2>
+        <a href="/shop.html?sort=newest" class="btn btn-ghost btn-sm" data-ar="عرض الكل" data-en="View All">عرض الكل</a>
+      </div>
+      <div class="products-grid" id="new-grid">
+        <div class="product-card skeleton" style="height:380px"></div>
+        <div class="product-card skeleton" style="height:380px"></div>
+        <div class="product-card skeleton" style="height:380px"></div>
+        <div class="product-card skeleton" style="height:380px"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Features -->
+  <section class="features-section">
+    <div class="container">
+      <div class="features-grid">
+        <div class="feature-card">
+          <div class="feature-icon"><i class="fas fa-camera"></i></div>
+          <div class="feature-title" data-ar="صور حقيقية" data-en="Real Photos">صور حقيقية</div>
+          <p class="feature-desc" data-ar="كل المنتجات مصورة على الطبيعة بعناية" data-en="All products carefully photographed in real life">كل المنتجات مصورة على الطبيعة بعناية</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon"><i class="fas fa-truck"></i></div>
+          <div class="feature-title" data-ar="توصيل سريع" data-en="Fast Delivery">توصيل سريع</div>
+          <p class="feature-desc" data-ar="توصيل لبيتك في أسرع وقت ممكن" data-en="Delivered to your door as fast as possible">توصيل لبيتك في أسرع وقت ممكن</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon"><i class="fas fa-tags"></i></div>
+          <div class="feature-title" data-ar="أقل الأسعار" data-en="Best Prices">أقل الأسعار</div>
+          <p class="feature-desc" data-ar="أسعار حرفياً مش هتلاقيها في أي مكان تاني" data-en="Prices you won't find anywhere else">أسعار حرفياً مش هتلاقيها في أي مكان تاني</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon"><i class="fas fa-heart"></i></div>
+          <div class="feature-title" data-ar="اهتمام حقيقي" data-en="Real Care">اهتمام حقيقي</div>
+          <p class="feature-desc" data-ar="بنوفرلك الطلب من منزلنا بكل حب" data-en="We source your order with love">بنوفرلك الطلب من منزلنا بكل حب</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:2rem">
+        <div>
+          <div class="footer-brand">Antika Gallery</div>
+          <p style="font-size:0.9rem;color:var(--text-muted);line-height:1.8" data-ar="كل التريندات هتلاقيها هنا وبأقل الأسعار حرفياً 🔥" data-en="Find all trends here at the lowest prices 🔥">كل التريندات هتلاقيها هنا وبأقل الأسعار حرفياً 🔥</p>
+        </div>
+        <div>
+          <h4 style="font-size:0.9rem;font-weight:700;margin-bottom:1rem;color:var(--text-secondary)" data-ar="روابط سريعة" data-en="Quick Links">روابط سريعة</h4>
+          <div style="display:flex;flex-direction:column;gap:0.6rem">
+            <a href="/shop.html" style="font-size:0.9rem;color:var(--text-muted);transition:color var(--transition)" onmouseover="this.style.color='var(--gold)'" onmouseout="this.style.color='var(--text-muted)'" data-ar="المتجر" data-en="Shop">المتجر</a>
+            <a href="/track.html" style="font-size:0.9rem;color:var(--text-muted);transition:color var(--transition)" onmouseover="this.style.color='var(--gold)'" onmouseout="this.style.color='var(--text-muted)'" data-ar="تتبع طلبك" data-en="Track Order">تتبع طلبك</a>
+            <a href="/profile.html" style="font-size:0.9rem;color:var(--text-muted);transition:color var(--transition)" onmouseover="this.style.color='var(--gold)'" onmouseout="this.style.color='var(--text-muted)'" data-ar="حسابي" data-en="My Account">حسابي</a>
+          </div>
+        </div>
+        <div>
+          <h4 style="font-size:0.9rem;font-weight:700;margin-bottom:1rem;color:var(--text-secondary)" data-ar="تواصل معنا" data-en="Contact Us">تواصل معنا</h4>
+          <div style="display:flex;flex-direction:column;gap:0.6rem">
+            <a id="footer-whatsapp" href="#" style="font-size:0.9rem;color:var(--text-muted);display:flex;align-items:center;gap:0.5rem;transition:color var(--transition)" onmouseover="this.style.color='var(--gold)'" onmouseout="this.style.color='var(--text-muted)'">
+              <i class="fab fa-whatsapp"></i> WhatsApp
+            </a>
+          </div>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p style="font-size:0.85rem;color:var(--text-muted)" data-ar="© 2024 أنتيكا جاليري. جميع الحقوق محفوظة" data-en="© 2024 Antika Gallery. All rights reserved">© 2024 أنتيكا جاليري. جميع الحقوق محفوظة</p>
+        <p class="footer-dev">Developed by <a href="https://www.facebook.com/profile.php?id=61552026802548&locale=ar_AR" target="_blank" rel="noopener">Moaz</a></p>
+      </div>
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+  <script src="/js/config.js"></script>
+  <script>
+    // Navbar scroll
+    window.addEventListener('scroll', () => {
+      document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 20);
+    });
+
+    // Mobile menu
+    function toggleMenu() {
+      document.getElementById('nav-menu').classList.toggle('open');
+    }
+
+    // Lang
+    function toggleLang() { setLang(getLang() === 'ar' ? 'en' : 'ar'); }
+
+    // Theme
+    function toggleTheme() {
+      const t = getTheme() === 'light' ? 'dark' : 'light';
+      setTheme(t);
+      document.getElementById('theme-toggle').innerHTML =
+        t === 'dark' ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
+    }
+
+    // Apply lang to static elements
+    function applyLang() {
+      const l = getLang();
+      document.querySelectorAll('[data-ar]').forEach(el => {
+        if (el.tagName === 'INPUT') return;
+        el.textContent = l === 'ar' ? el.dataset.ar : el.dataset.en;
+      });
+      document.getElementById('lang-toggle').textContent = l === 'ar' ? 'EN' : 'ع';
+    }
+
+    // Product card builder
+    function buildProductCard(p) {
+      const l = getLang();
+      const name = l === 'ar' && p.name_ar ? p.name_ar : p.name;
+      const img = p.images?.[0] || 'https://via.placeholder.com/400x500?text=Antika';
+      return `
+        <a href="/product.html?id=${p.id}" class="product-card">
+          <div class="product-card-image">
+            <img src="${img}" alt="${name}" loading="lazy">
+            ${p.created_at > new Date(Date.now() - 7*24*60*60*1000).toISOString()
+              ? `<span class="product-card-badge">${l === 'ar' ? 'جديد' : 'New'}</span>` : ''}
+          </div>
+          <div class="product-card-body">
+            <div class="product-card-title">${name}</div>
+            <div class="product-card-price">${formatPrice(p.price)}</div>
+            <div class="product-card-actions">
+              <button class="btn btn-primary btn-sm" style="flex:1" onclick="event.preventDefault();addToCart({id:'${p.id}',name:'${name}',price:${p.price},image:'${img}'})">
+                <i class="fas fa-shopping-bag"></i>
+              </button>
+            </div>
+          </div>
+        </a>`;
+    }
+
+    // Load categories
+    async function loadCategories() {
+      const { data } = await db.from('categories').select('*, products(count)');
+      const grid = document.getElementById('categories-grid');
+      const l = getLang();
+      if (!data?.length) { grid.innerHTML = ''; return; }
+      grid.innerHTML = data.map(c => `
+        <a href="/shop.html?cat=${c.slug}" class="category-card">
+          <div class="category-icon"><i class="fas fa-tag"></i></div>
+          <div class="category-name">${l === 'ar' && c.name_ar ? c.name_ar : c.name}</div>
+          <div class="category-count">${c.products?.[0]?.count || 0} ${l === 'ar' ? 'منتج' : 'products'}</div>
+        </a>`).join('');
+    }
+
+    // Load products
+    async function loadFeatured() {
+      const { data } = await db.from('products').select('*').eq('is_published', true).limit(4);
+      const grid = document.getElementById('featured-grid');
+      if (!data?.length) { grid.innerHTML = ''; return; }
+      grid.innerHTML = data.map(buildProductCard).join('');
+    }
+
+    async function loadNew() {
+      const { data } = await db.from('products').select('*').eq('is_published', true)
+        .order('created_at', { ascending: false }).limit(4);
+      const grid = document.getElementById('new-grid');
+      if (!data?.length) { grid.innerHTML = ''; return; }
+      grid.innerHTML = data.map(buildProductCard).join('');
+    }
+
+    // Load stats
+    async function loadStats() {
+      const [{ count: products }, { count: orders }, { count: customers }] = await Promise.all([
+        db.from('products').select('*', { count: 'exact', head: true }).eq('is_published', true),
+        db.from('orders').select('*', { count: 'exact', head: true }).eq('status', 'delivered'),
+        db.from('profiles').select('*', { count: 'exact', head: true })
+      ]);
+      document.getElementById('stat-products').textContent = products || 0;
+      document.getElementById('stat-orders').textContent = orders || 0;
+      document.getElementById('stat-customers').textContent = customers || 0;
+    }
+
+    // User area
+    async function initUserArea() {
+      const user = await getCurrentUser();
+      const area = document.getElementById('user-area');
+      if (user) {
+        const { data: profile } = await db.from('profiles').select('*').eq('id', user.id).single();
+        const avatar = profile?.avatar_url
+          ? `<img src="${profile.avatar_url}" style="width:36px;height:36px;border-radius:50%;object-fit:cover;border:2px solid var(--gold)">`
+          : `<div style="width:36px;height:36px;border-radius:50%;background:var(--gold);color:#fff;display:flex;align-items:center;justify-content:center;font-size:0.8rem;font-weight:700">${(profile?.full_name || 'U')[0]}</div>`;
+        area.innerHTML = `
+          <div style="position:relative">
+            <button class="navbar-icon-btn" onclick="toggleUserMenu()" style="padding:0">${avatar}</button>
+            <div id="user-menu" style="display:none;position:absolute;top:48px;left:0;background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:0.5rem;min-width:160px;box-shadow:var(--shadow-lg);z-index:100">
+              <a href="/profile.html" style="display:block;padding:0.6rem 1rem;font-size:0.9rem;color:var(--text);border-radius:var(--radius-sm);transition:background var(--transition)" onmouseover="this.style.background='var(--bg-secondary)'" onmouseout="this.style.background='none'">${getLang() === 'ar' ? 'حسابي' : 'My Account'}</a>
+              <button onclick="logout()" style="display:block;width:100%;text-align:right;padding:0.6rem 1rem;font-size:0.9rem;color:#dc2626;border-radius:var(--radius-sm);transition:background var(--transition)" onmouseover="this.style.background='var(--bg-secondary)'" onmouseout="this.style.background='none'">${getLang() === 'ar' ? 'تسجيل الخروج' : 'Sign Out'}</button>
+            </div>
+          </div>`;
+      } else {
+        area.innerHTML = `<a href="/auth.html" class="btn btn-primary btn-sm">${getLang() === 'ar' ? 'دخول' : 'Sign In'}</a>`;
+      }
+    }
+
+    function toggleUserMenu() {
+      const m = document.getElementById('user-menu');
+      m.style.display = m.style.display === 'none' ? 'block' : 'none';
+    }
+
+    async function logout() {
+      await db.auth.signOut();
+      window.location.reload();
+    }
+
+    // WhatsApp
+    async function initWhatsApp() {
+      const num = await getSetting('whatsapp_number');
+      if (num) {
+        document.getElementById('footer-whatsapp').href = `https://wa.me/2${num}`;
+      }
+    }
+
+    // Notification bar
+    async function initNotifBar() {
+      const msg = await getSetting('announcement');
+      if (msg) {
+        const bar = document.getElementById('notif-bar');
+        bar.textContent = msg;
+        bar.style.display = 'block';
+      }
+    }
+
+    // Theme init
+    document.getElementById('theme-toggle').innerHTML =
+      getTheme() === 'dark' ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
+
+    // Init
+    checkMaintenance();
+    applyLang();
+    updateCartCount();
+    initUserArea();
+    initWhatsApp();
+    initNotifBar();
+    loadCategories();
+    loadFeatured();
+    loadNew();
+    loadStats();
+  </script>
+</body>
+</html>

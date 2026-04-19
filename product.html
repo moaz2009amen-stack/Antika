@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Antika Gallery — المنتج</title>
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <style>
+    .product-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; padding: 2rem 0 4rem; }
+    .product-gallery { position: sticky; top: 90px; height: fit-content; }
+    .main-media { aspect-ratio: 3/4; border-radius: var(--radius-lg); overflow: hidden; background: var(--bg-secondary); border: 1px solid var(--border); position: relative; }
+    .main-media img, .main-media video { width: 100%; height: 100%; object-fit: cover; }
+    .media-badge { position: absolute; top: 12px; right: 12px; background: rgba(0,0,0,0.6); color: #fff; padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; display: flex; align-items: center; gap: 4px; }
+    [dir="ltr"] .media-badge { right: auto; left: 12px; }
+    .thumbnails { display: flex; gap: 0.6rem; margin-top: 0.75rem; flex-wrap: wrap; }
+    .thumb { width: 70px; height: 90px; border-radius: var(--radius-sm); overflow: hidden; cursor: pointer; border: 2px solid transparent; transition: border-color var(--transition); background: var(--bg-secondary); flex-shrink: 0; }
+    .thumb:hover, .thumb.active { border-color: var(--gold); }
+    .thumb img, .thumb video { width: 100%; height: 100%; object-fit: cover; }
+    .thumb-video { display: flex; align-items: center; justify-content: center; background: var(--charcoal); }
+    .thumb-video i { color: #fff; font-size: 1.2rem; }
+    .product-info { padding-top: 0.5rem; }
+    .product-category { font-size: 0.8rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--gold); margin-bottom: 0.75rem; }
+    .product-title { font-family: var(--font-display); font-size: 2rem; margin-bottom: 1rem; line-height: 1.3; }
+    .product-price { font-size: 2rem; font-weight: 700; color: var(--gold); margin-bottom: 1.5rem; }
+    .product-desc { color: var(--text-secondary); line-height: 1.9; margin-bottom: 2rem; font-size: 0.95rem; }
+    .quantity-selector { display: flex; align-items: center; gap: 0; border: 1.5px solid var(--border); border-radius: var(--radius-sm); width: fit-content; overflow: hidden; margin-bottom: 1.5rem; }
+    .qty-btn { width: 40px; height: 44px; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; color: var(--text); transition: all var(--transition); }
+    .qty-btn:hover { background: var(--bg-secondary); color: var(--gold); }
+    .qty-display { width: 50px; height: 44px; text-align: center; border: none; border-right: 1.5px solid var(--border); border-left: 1.5px solid var(--border); background: var(--bg-card); color: var(--text); font-size: 1rem; font-weight: 700; font-family: inherit; outline: none; }
+    .product-actions { display: flex; gap: 0.75rem; margin-bottom: 2rem; }
+    .product-meta { display: flex; flex-direction: column; gap: 0.75rem; padding-top: 1.5rem; border-top: 1px solid var(--border); }
+    .meta-row { display: flex; align-items: center; gap: 0.75rem; font-size: 0.9rem; }
+    .meta-icon { width: 36px; height: 36px; border-radius: 50%; background: rgba(201,168,76,0.1); display: flex; align-items: center; justify-content: center; color: var(--gold); font-size: 0.9rem; flex-shrink: 0; }
+    .stock-badge { display: inline-flex; align-items: center; gap: 0.4rem; font-size: 0.85rem; font-weight: 600; }
+    .related-section { padding: 3rem 0; border-top: 1px solid var(--border); }
+    @media (max-width: 900px) {
+      .product-layout { grid-template-columns: 1fr; gap: 2rem; }
+      .product-gallery { position: static; }
+      .product-title { font-size: 1.5rem; }
+    }
+  </style>
+</head>
+<body>
+  <nav class="navbar" id="navbar">
+    <a href="/" class="navbar-brand">Antika Gallery</a>
+    <ul class="navbar-nav" id="nav-menu">
+      <li><a href="/" data-ar="الرئيسية" data-en="Home">الرئيسية</a></li>
+      <li><a href="/shop.html" data-ar="المتجر" data-en="Shop">المتجر</a></li>
+      <li><a href="/track.html" data-ar="تتبع طلبك" data-en="Track Order">تتبع طلبك</a></li>
+    </ul>
+    <div class="navbar-actions">
+      <button class="navbar-icon-btn" onclick="toggleTheme()" id="theme-toggle"><i class="fas fa-moon"></i></button>
+      <button class="navbar-icon-btn" onclick="toggleLang()" style="font-size:0.75rem;font-weight:700" id="lang-toggle">EN</button>
+      <a href="/cart.html" class="navbar-icon-btn"><i class="fas fa-shopping-bag"></i><span class="cart-count" style="display:none">0</span></a>
+      <div id="user-area"></div>
+      <button class="hamburger" onclick="document.getElementById('nav-menu').classList.toggle('open')"><span></span><span></span><span></span></button>
+    </div>
+  </nav>
+
+  <div class="container page-enter" style="padding-top:80px">
+    <!-- Breadcrumb -->
+    <nav style="padding:1rem 0;font-size:0.85rem;color:var(--text-muted)">
+      <a href="/" style="color:var(--text-muted);transition:color var(--transition)" onmouseover="this.style.color='var(--gold)'" onmouseout="this.style.color='var(--text-muted)'" data-ar="الرئيسية" data-en="Home">الرئيسية</a>
+      <span style="margin:0 0.5rem">/</span>
+      <a href="/shop.html" style="color:var(--text-muted);transition:color var(--transition)" onmouseover="this.style.color='var(--gold)'" onmouseout="this.style.color='var(--text-muted)'" data-ar="المتجر" data-en="Shop">المتجر</a>
+      <span style="margin:0 0.5rem">/</span>
+      <span id="breadcrumb-name" style="color:var(--text)">...</span>
+    </nav>
+
+    <div id="product-container">
+      <!-- Skeleton -->
+      <div class="product-layout">
+        <div class="skeleton" style="aspect-ratio:3/4;border-radius:var(--radius-lg)"></div>
+        <div>
+          <div class="skeleton" style="height:20px;width:100px;margin-bottom:1rem;border-radius:4px"></div>
+          <div class="skeleton" style="height:40px;width:80%;margin-bottom:1rem;border-radius:4px"></div>
+          <div class="skeleton" style="height:32px;width:120px;margin-bottom:2rem;border-radius:4px"></div>
+          <div class="skeleton" style="height:80px;margin-bottom:2rem;border-radius:8px"></div>
+          <div class="skeleton" style="height:50px;border-radius:8px"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Related -->
+    <div class="related-section" id="related-section" style="display:none">
+      <h2 class="section-title" style="margin-bottom:2rem" data-ar="منتجات مشابهة" data-en="Related Products">منتجات مشابهة</h2>
+      <div class="products-grid" id="related-grid"></div>
+    </div>
+  </div>
+
+  <footer style="background:var(--bg-secondary);border-top:1px solid var(--border);padding:1.5rem 0;margin-top:2rem">
+    <div class="container" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem">
+      <p style="font-size:0.85rem;color:var(--text-muted)" data-ar="© 2024 أنتيكا جاليري" data-en="© 2024 Antika Gallery">© 2024 أنتيكا جاليري</p>
+      <p class="footer-dev">Developed by <a href="https://www.facebook.com/profile.php?id=61552026802548&locale=ar_AR" target="_blank" rel="noopener" style="color:var(--gold);font-weight:600">Moaz</a></p>
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+  <script src="/js/config.js"></script>
+  <script>
+    let product = null;
+    let currentMedia = null;
+    let quantity = 1;
+
+    function applyLang() {
+      const l = getLang();
+      document.querySelectorAll('[data-ar]').forEach(el => {
+        if (el.tagName === 'INPUT') return;
+        el.textContent = l === 'ar' ? el.dataset.ar : el.dataset.en;
+      });
+      document.getElementById('lang-toggle').textContent = l === 'ar' ? 'EN' : 'ع';
+    }
+
+    function toggleLang() { setLang(getLang() === 'ar' ? 'en' : 'ar'); }
+    function toggleTheme() {
+      const t = getTheme() === 'light' ? 'dark' : 'light';
+      setTheme(t);
+      document.getElementById('theme-toggle').innerHTML = t === 'dark' ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
+    }
+
+    function showMedia(src, isVideo, thumbEl) {
+      currentMedia = src;
+      const main = document.getElementById('main-media-el');
+      if (isVideo) {
+        main.innerHTML = `<video src="${src}" controls style="width:100%;height:100%;object-fit:cover"></video>`;
+        document.getElementById('media-badge').innerHTML = '<i class="fas fa-play"></i> فيديو';
+        document.getElementById('media-badge').style.display = 'flex';
+      } else {
+        main.innerHTML = `<img src="${src}" alt="${product?.name}" id="zoom-img" style="width:100%;height:100%;object-fit:cover;cursor:zoom-in" onclick="openZoom('${src}')">`;
+        document.getElementById('media-badge').style.display = 'none';
+      }
+      document.querySelectorAll('.thumb').forEach(t => t.classList.remove('active'));
+      if (thumbEl) thumbEl.classList.add('active');
+    }
+
+    function openZoom(src) {
+      const overlay = document.createElement('div');
+      overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.95);z-index:9999;display:flex;align-items:center;justify-content:center;cursor:zoom-out';
+      overlay.innerHTML = `<img src="${src}" style="max-width:90vw;max-height:90vh;object-fit:contain;border-radius:8px">`;
+      overlay.onclick = () => overlay.remove();
+      document.body.appendChild(overlay);
+    }
+
+    function updateQty(delta) {
+      quantity = Math.max(1, Math.min(quantity + delta, product?.stock || 99));
+      document.getElementById('qty-display').value = quantity;
+    }
+
+    function renderProduct(p, catName) {
+      const l = getLang();
+      const name = l === 'ar' && p.name_ar ? p.name_ar : p.name;
+      const desc = l === 'ar' && p.description_ar ? p.description_ar : p.description;
+      const imgs = p.images || [];
+      const hasVideo = !!p.video_url;
+      const allMedia = [...imgs.map(i => ({ src: i, isVideo: false })), ...(hasVideo ? [{ src: p.video_url, isVideo: true }] : [])];
+
+      document.title = `Antika Gallery — ${name}`;
+      document.getElementById('breadcrumb-name').textContent = name;
+
+      const firstMedia = allMedia[0];
+
+      document.getElementById('product-container').innerHTML = `
+        <div class="product-layout">
+          <!-- Gallery -->
+          <div class="product-gallery">
+            <div class="main-media">
+              <div id="main-media-el">
+                ${firstMedia
+                  ? firstMedia.isVideo
+                    ? `<video src="${firstMedia.src}" controls style="width:100%;height:100%;object-fit:cover"></video>`
+                    : `<img src="${firstMedia.src}" alt="${name}" style="width:100%;height:100%;object-fit:cover;cursor:zoom-in" onclick="openZoom('${firstMedia.src}')">`
+                  : `<div style="display:flex;align-items:center;justify-content:center;height:100%;color:var(--text-muted)"><i class="fas fa-image" style="font-size:3rem"></i></div>`
+                }
+              </div>
+              <div class="media-badge" id="media-badge" style="display:${firstMedia?.isVideo ? 'flex' : 'none'}">
+                <i class="fas fa-play"></i> ${l === 'ar' ? 'فيديو' : 'Video'}
+              </div>
+            </div>
+            ${allMedia.length > 1 ? `
+              <div class="thumbnails">
+                ${allMedia.map((m, i) => `
+                  <div class="thumb ${i === 0 ? 'active' : ''} ${m.isVideo ? 'thumb-video' : ''}"
+                    onclick="showMedia('${m.src}', ${m.isVideo}, this)">
+                    ${m.isVideo
+                      ? '<i class="fas fa-play" style="color:#fff;font-size:1rem"></i>'
+                      : `<img src="${m.src}" alt="" loading="lazy">`
+                    }
+                  </div>`).join('')}
+              </div>` : ''}
+          </div>
+
+          <!-- Info -->
+          <div class="product-info">
+            <div class="product-category">${catName}</div>
+            <h1 class="product-title">${name}</h1>
+
+            <div style="display:flex;align-items:center;gap:1rem;margin-bottom:1.5rem;flex-wrap:wrap">
+              <div class="product-price">${formatPrice(p.price)}</div>
+              ${p.stock > 0
+                ? `<span class="stock-badge" style="color:#16a34a"><i class="fas fa-circle" style="font-size:0.5rem"></i> ${l === 'ar' ? 'متاح' : 'In Stock'} (${p.stock})</span>`
+                : `<span class="stock-badge" style="color:#dc2626"><i class="fas fa-circle" style="font-size:0.5rem"></i> ${l === 'ar' ? 'غير متاح' : 'Out of Stock'}</span>`}
+            </div>
+
+            ${desc ? `<div class="product-desc">${desc}</div>` : ''}
+
+            ${p.stock > 0 ? `
+              <div style="margin-bottom:1.5rem">
+                <label style="font-size:0.85rem;font-weight:700;color:var(--text-muted);display:block;margin-bottom:0.75rem;letter-spacing:0.05em">
+                  ${l === 'ar' ? 'الكمية' : 'QUANTITY'}
+                </label>
+                <div class="quantity-selector">
+                  <button class="qty-btn" onclick="updateQty(-1)"><i class="fas fa-minus"></i></button>
+                  <input type="number" class="qty-display" id="qty-display" value="1" min="1" max="${p.stock}" readonly>
+                  <button class="qty-btn" onclick="updateQty(1)"><i class="fas fa-plus"></i></button>
+                </div>
+              </div>
+              <div class="product-actions">
+                <button class="btn btn-primary btn-lg" style="flex:1" onclick="handleAddToCart()">
+                  <i class="fas fa-shopping-bag"></i>
+                  ${l === 'ar' ? 'أضيفي للسلة' : 'Add to Cart'}
+                </button>
+                <a href="/checkout.html" class="btn btn-outline btn-lg" onclick="handleBuyNow(event)">
+                  ${l === 'ar' ? 'اشتري الآن' : 'Buy Now'}
+                </a>
+              </div>` : `
+              <div class="btn btn-ghost btn-lg btn-block" style="cursor:default;opacity:0.6;margin-bottom:1.5rem">
+                ${l === 'ar' ? 'غير متاح حالياً' : 'Currently Unavailable'}
+              </div>`}
+
+            <div class="product-meta">
+              <div class="meta-row">
+                <div class="meta-icon"><i class="fas fa-truck"></i></div>
+                <span>${l === 'ar' ? 'توصيل لكل المحافظات — كاش عند الاستلام' : 'Delivery to all governorates — Cash on delivery'}</span>
+              </div>
+              <div class="meta-row">
+                <div class="meta-icon"><i class="fab fa-whatsapp"></i></div>
+                <span>${l === 'ar' ? 'تواصل معنا على واتساب للاستفسار' : 'Contact us on WhatsApp for inquiries'}</span>
+              </div>
+              <div class="meta-row">
+                <div class="meta-icon"><i class="fas fa-shield-alt"></i></div>
+                <span>${l === 'ar' ? 'منتجات أصلية 100% مصورة على الطبيعة' : '100% authentic products, real photos'}</span>
+              </div>
+            </div>
+          </div>
+        </div>`;
+    }
+
+    function handleAddToCart() {
+      if (!product) return;
+      const l = getLang();
+      const name = l === 'ar' && product.name_ar ? product.name_ar : product.name;
+      addToCart({ id: product.id, name, price: product.price, image: product.images?.[0] }, quantity);
+    }
+
+    function handleBuyNow(e) {
+      handleAddToCart();
+    }
+
+    async function loadProduct() {
+      const id = new URLSearchParams(window.location.search).get('id');
+      if (!id) { window.location.href = '/shop.html'; return; }
+
+      const { data: p, error } = await db.from('products').select('*, categories(name, name_ar, slug)').eq('id', id).eq('is_published', true).single();
+
+      if (error || !p) { window.location.href = '/shop.html'; return; }
+
+      product = p;
+      const l = getLang();
+      const catName = l === 'ar' && p.categories?.name_ar ? p.categories.name_ar : (p.categories?.name || '');
+      renderProduct(p, catName);
+
+      // Load related
+      if (p.category_id) {
+        const { data: related } = await db.from('products').select('*')
+          .eq('category_id', p.category_id).eq('is_published', true).neq('id', id).limit(4);
+        if (related?.length) {
+          document.getElementById('related-section').style.display = 'block';
+          document.getElementById('related-grid').innerHTML = related.map(r => {
+            const rname = l === 'ar' && r.name_ar ? r.name_ar : r.name;
+            const rimg = r.images?.[0] || 'https://via.placeholder.com/400x500?text=Antika';
+            return `
+              <a href="/product.html?id=${r.id}" class="product-card">
+                <div class="product-card-image"><img src="${rimg}" alt="${rname}" loading="lazy"></div>
+                <div class="product-card-body">
+                  <div class="product-card-title">${rname}</div>
+                  <div class="product-card-price">${formatPrice(r.price)}</div>
+                </div>
+              </a>`;
+          }).join('');
+        }
+      }
+    }
+
+    async function initUserArea() {
+      const user = await getCurrentUser();
+      const area = document.getElementById('user-area');
+      if (user) {
+        const { data: profile } = await db.from('profiles').select('*').eq('id', user.id).single();
+        const avatar = profile?.avatar_url
+          ? `<img src="${profile.avatar_url}" style="width:36px;height:36px;border-radius:50%;object-fit:cover;border:2px solid var(--gold)">`
+          : `<div style="width:36px;height:36px;border-radius:50%;background:var(--gold);color:#fff;display:flex;align-items:center;justify-content:center;font-size:0.8rem;font-weight:700">${(profile?.full_name||'U')[0]}</div>`;
+        area.innerHTML = `<a href="/profile.html" class="navbar-icon-btn" style="padding:0">${avatar}</a>`;
+      } else {
+        area.innerHTML = `<a href="/auth.html" class="btn btn-primary btn-sm">${getLang()==='ar'?'دخول':'Sign In'}</a>`;
+      }
+    }
+
+    checkMaintenance();
+    applyLang();
+    updateCartCount();
+    initUserArea();
+    loadProduct();
+
+    document.getElementById('theme-toggle').innerHTML =
+      getTheme() === 'dark' ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
+
+    window.addEventListener('scroll', () => {
+      document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 20);
+    });
+  </script>
+</body>
+</html>

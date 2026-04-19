@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Antika Gallery — حسابي</title>
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <style>
+    .profile-layout { display: grid; grid-template-columns: 280px 1fr; gap: 2rem; padding: 2rem 0 4rem; }
+    .profile-sidebar { height: fit-content; }
+    .profile-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 2rem; text-align: center; margin-bottom: 1rem; }
+    .avatar-container { position: relative; width: 90px; height: 90px; margin: 0 auto 1rem; }
+    .avatar-img { width: 90px; height: 90px; border-radius: 50%; object-fit: cover; border: 3px solid var(--gold); background: var(--bg-secondary); }
+    .avatar-edit { position: absolute; bottom: 0; right: 0; width: 28px; height: 28px; border-radius: 50%; background: var(--gold); display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 0.75rem; color: #fff; }
+    [dir="ltr"] .avatar-edit { right: auto; left: 0; }
+    .profile-name { font-family: var(--font-display); font-size: 1.2rem; margin-bottom: 0.25rem; }
+    .profile-email { font-size: 0.85rem; color: var(--text-muted); }
+    .profile-nav { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); overflow: hidden; }
+    .profile-nav-item { display: flex; align-items: center; gap: 0.75rem; padding: 0.9rem 1.25rem; cursor: pointer; transition: all var(--transition); font-size: 0.9rem; font-weight: 600; color: var(--text-secondary); border-bottom: 1px solid var(--border); }
+    .profile-nav-item:last-child { border-bottom: none; }
+    .profile-nav-item:hover { background: var(--bg-secondary); color: var(--gold); }
+    .profile-nav-item.active { background: rgba(201,168,76,0.08); color: var(--gold); border-right: 3px solid var(--gold); }
+    [dir="ltr"] .profile-nav-item.active { border-right: none; border-left: 3px solid var(--gold); }
+    .profile-nav-item i { width: 20px; text-align: center; }
+    .profile-panel { display: none; }
+    .profile-panel.active { display: block; animation: fadeUp 0.3s ease; }
+    .order-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.25rem; margin-bottom: 0.75rem; transition: all var(--transition); }
+    .order-card:hover { border-color: var(--gold-light); }
+    .order-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.75rem; flex-wrap: wrap; gap: 0.5rem; }
+    .order-id { font-weight: 700; font-family: monospace; font-size: 0.9rem; color: var(--gold); }
+    .order-items-preview { display: flex; gap: 0.5rem; margin-bottom: 0.75rem; }
+    .order-item-thumb { width: 48px; height: 60px; border-radius: var(--radius-sm); object-fit: cover; background: var(--bg-secondary); border: 1px solid var(--border); }
+    .notif-item { display: flex; gap: 1rem; padding: 1rem; background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); margin-bottom: 0.5rem; cursor: pointer; transition: all var(--transition); }
+    .notif-item:hover { border-color: var(--gold-light); }
+    .notif-item.unread { border-right: 3px solid var(--gold); background: rgba(201,168,76,0.03); }
+    [dir="ltr"] .notif-item.unread { border-right: none; border-left: 3px solid var(--gold); }
+    .notif-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--gold); flex-shrink: 0; margin-top: 6px; }
+    @media (max-width: 900px) { .profile-layout { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+  <nav class="navbar" id="navbar">
+    <a href="/" class="navbar-brand">Antika Gallery</a>
+    <ul class="navbar-nav" id="nav-menu">
+      <li><a href="/" data-ar="الرئيسية" data-en="Home">الرئيسية</a></li>
+      <li><a href="/shop.html" data-ar="المتجر" data-en="Shop">المتجر</a></li>
+    </ul>
+    <div class="navbar-actions">
+      <button class="navbar-icon-btn" onclick="toggleTheme()" id="theme-toggle"><i class="fas fa-moon"></i></button>
+      <button class="navbar-icon-btn" onclick="toggleLang()" style="font-size:0.75rem;font-weight:700" id="lang-toggle">EN</button>
+      <a href="/cart.html" class="navbar-icon-btn"><i class="fas fa-shopping-bag"></i><span class="cart-count" style="display:none">0</span></a>
+      <button class="hamburger" onclick="document.getElementById('nav-menu').classList.toggle('open')"><span></span><span></span><span></span></button>
+    </div>
+  </nav>
+
+  <div class="container page-enter" style="padding-top:90px;padding-bottom:4rem">
+    <div class="profile-layout">
+      <!-- Sidebar -->
+      <div class="profile-sidebar">
+        <div class="profile-card">
+          <div class="avatar-container">
+            <img class="avatar-img" id="profile-avatar" src="" alt="">
+            <div class="avatar-edit" onclick="document.getElementById('avatar-input').click()">
+              <i class="fas fa-camera"></i>
+            </div>
+            <input type="file" id="avatar-input" accept="image/*" style="display:none" onchange="updateAvatar(this)">
+          </div>
+          <div class="profile-name" id="profile-name">...</div>
+          <div class="profile-email" id="profile-email">...</div>
+        </div>
+        <div class="profile-nav">
+          <div class="profile-nav-item active" onclick="showPanel('orders')" id="nav-orders">
+            <i class="fas fa-box"></i> <span data-ar="طلباتي" data-en="My Orders">طلباتي</span>
+          </div>
+          <div class="profile-nav-item" onclick="showPanel('info')" id="nav-info">
+            <i class="fas fa-user"></i> <span data-ar="بياناتي" data-en="My Info">بياناتي</span>
+          </div>
+          <div class="profile-nav-item" onclick="showPanel('notifications')" id="nav-notifications">
+            <i class="fas fa-bell"></i> <span data-ar="الإشعارات" data-en="Notifications">الإشعارات</span>
+            <span id="notif-badge" style="margin-right:auto;background:var(--gold);color:#fff;border-radius:20px;padding:2px 8px;font-size:0.75px;display:none"></span>
+          </div>
+          <div class="profile-nav-item" onclick="showPanel('password')" id="nav-password">
+            <i class="fas fa-lock"></i> <span data-ar="تغيير الباسوورد" data-en="Change Password">تغيير الباسوورد</span>
+          </div>
+          <div class="profile-nav-item" onclick="logout()" style="color:#dc2626">
+            <i class="fas fa-sign-out-alt"></i> <span data-ar="تسجيل الخروج" data-en="Sign Out">تسجيل الخروج</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Main Content -->
+      <div>
+        <!-- Orders -->
+        <div class="profile-panel active" id="panel-orders">
+          <h2 style="font-family:var(--font-display);font-size:1.4rem;margin-bottom:1.5rem" data-ar="طلباتي" data-en="My Orders">طلباتي</h2>
+          <div id="orders-list"><div class="skeleton" style="height:100px;border-radius:var(--radius)"></div></div>
+        </div>
+
+        <!-- Info -->
+        <div class="profile-panel" id="panel-info">
+          <h2 style="font-family:var(--font-display);font-size:1.4rem;margin-bottom:1.5rem" data-ar="بياناتي الشخصية" data-en="Personal Information">بياناتي الشخصية</h2>
+          <div class="card">
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">
+              <div class="form-group">
+                <label class="form-label" data-ar="الاسم الكامل" data-en="Full Name">الاسم الكامل</label>
+                <input type="text" class="form-control" id="info-name">
+              </div>
+              <div class="form-group">
+                <label class="form-label" data-ar="رقم التليفون" data-en="Phone">رقم التليفون</label>
+                <input type="tel" class="form-control" id="info-phone" dir="ltr">
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label" data-ar="العنوان" data-en="Address">العنوان</label>
+              <input type="text" class="form-control" id="info-address">
+            </div>
+            <div class="form-group" style="margin-bottom:0">
+              <label class="form-label" data-ar="البريد الإلكتروني" data-en="Email">البريد الإلكتروني</label>
+              <input type="email" class="form-control" id="info-email" disabled style="opacity:0.6">
+            </div>
+            <div style="margin-top:1.5rem;display:flex;gap:1rem;align-items:center;flex-wrap:wrap">
+              <button class="btn btn-primary" onclick="saveInfo()" data-ar="حفظ التغييرات" data-en="Save Changes">حفظ التغييرات</button>
+              <span id="info-msg" style="font-size:0.85rem;color:#16a34a"></span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Notifications -->
+        <div class="profile-panel" id="panel-notifications">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;flex-wrap:wrap;gap:1rem">
+            <h2 style="font-family:var(--font-display);font-size:1.4rem" data-ar="الإشعارات" data-en="Notifications">الإشعارات</h2>
+            <button class="btn btn-ghost btn-sm" onclick="markAllRead()" data-ar="تحديد الكل كمقروء" data-en="Mark all as read">تحديد الكل كمقروء</button>
+          </div>
+          <div id="notifications-list"><div class="skeleton" style="height:80px;border-radius:var(--radius)"></div></div>
+        </div>
+
+        <!-- Password -->
+        <div class="profile-panel" id="panel-password">
+          <h2 style="font-family:var(--font-display);font-size:1.4rem;margin-bottom:1.5rem" data-ar="تغيير كلمة المرور" data-en="Change Password">تغيير كلمة المرور</h2>
+          <div class="card" style="max-width:480px">
+            <div class="form-group">
+              <label class="form-label" data-ar="كلمة المرور الجديدة" data-en="New Password">كلمة المرور الجديدة</label>
+              <input type="password" class="form-control" id="new-password" dir="ltr">
+            </div>
+            <div class="form-group">
+              <label class="form-label" data-ar="تأكيد كلمة المرور" data-en="Confirm Password">تأكيد كلمة المرور</label>
+              <input type="password" class="form-control" id="confirm-password" dir="ltr">
+            </div>
+            <button class="btn btn-primary" onclick="changePassword()" data-ar="تغيير الباسوورد" data-en="Change Password">تغيير الباسوورد</button>
+            <span id="pass-msg" style="font-size:0.85rem;margin-right:1rem"></span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer style="background:var(--bg-secondary);border-top:1px solid var(--border);padding:1.5rem 0">
+    <div class="container footer-bottom">
+      <p style="font-size:0.85rem;color:var(--text-muted)">© 2024 Antika Gallery</p>
+      <p class="footer-dev">Developed by <a href="https://www.facebook.com/profile.php?id=61552026802548&locale=ar_AR" target="_blank" rel="noopener" style="color:var(--gold);font-weight:600">Moaz</a></p>
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+  <script src="/js/config.js"></script>
+  <script>
+    const l = getLang();
+    let currentUser = null;
+
+    function applyLang() {
+      document.querySelectorAll('[data-ar]').forEach(el => { if (el.tagName !== 'INPUT') el.textContent = l === 'ar' ? el.dataset.ar : el.dataset.en; });
+      document.getElementById('lang-toggle').textContent = l === 'ar' ? 'EN' : 'ع';
+    }
+    function toggleLang() { setLang(l === 'ar' ? 'en' : 'ar'); }
+    function toggleTheme() { const t = getTheme() === 'light' ? 'dark' : 'light'; setTheme(t); document.getElementById('theme-toggle').innerHTML = t === 'dark' ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>'; }
+
+    function showPanel(name) {
+      document.querySelectorAll('.profile-panel').forEach(p => p.classList.remove('active'));
+      document.querySelectorAll('.profile-nav-item').forEach(n => n.classList.remove('active'));
+      document.getElementById(`panel-${name}`).classList.add('active');
+      document.getElementById(`nav-${name}`).classList.add('active');
+    }
+
+    const statusMap = {
+      pending: { ar: 'في الانتظار', en: 'Pending', class: 'badge-warning' },
+      confirmed: { ar: 'مؤكد', en: 'Confirmed', class: 'badge-info' },
+      processing: { ar: 'قيد التجهيز', en: 'Processing', class: 'badge-info' },
+      shipped: { ar: 'في الطريق', en: 'Shipped', class: 'badge-gold' },
+      delivered: { ar: 'تم التوصيل', en: 'Delivered', class: 'badge-success' },
+      cancelled: { ar: 'ملغي', en: 'Cancelled', class: 'badge-danger' }
+    };
+
+    async function loadOrders() {
+      const { data: orders } = await db.from('orders').select('*, order_items(*, products(name, name_ar, images))')
+        .eq('user_id', currentUser.id).order('created_at', { ascending: false });
+
+      const el = document.getElementById('orders-list');
+      if (!orders?.length) {
+        el.innerHTML = `<div style="text-align:center;padding:3rem;color:var(--text-muted)"><i class="fas fa-box-open" style="font-size:2.5rem;display:block;margin-bottom:1rem;color:var(--border)"></i><p>${l === 'ar' ? 'مفيش طلبات لحد دلوقتي' : 'No orders yet'}</p><a href="/shop.html" class="btn btn-primary" style="margin-top:1rem">${l === 'ar' ? 'ابدئي التسوق' : 'Start Shopping'}</a></div>`;
+        return;
+      }
+
+      el.innerHTML = orders.map(order => {
+        const s = statusMap[order.status] || statusMap.pending;
+        const imgs = order.order_items?.slice(0, 3).map(oi => oi.products?.images?.[0]).filter(Boolean) || [];
+        return `
+          <div class="order-card">
+            <div class="order-header">
+              <div>
+                <div class="order-id">#${order.id.slice(0,8).toUpperCase()}</div>
+                <div style="font-size:0.8rem;color:var(--text-muted)">${formatDate(order.created_at)}</div>
+              </div>
+              <span class="badge ${s.class}">${l === 'ar' ? s.ar : s.en}</span>
+            </div>
+            ${imgs.length ? `<div class="order-items-preview">${imgs.map(img => `<img src="${img}" class="order-item-thumb" alt="">`).join('')}${order.order_items.length > 3 ? `<div class="order-item-thumb" style="display:flex;align-items:center;justify-content:center;font-size:0.8rem;font-weight:700;color:var(--text-muted)">+${order.order_items.length - 3}</div>` : ''}</div>` : ''}
+            <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:0.5rem">
+              <span style="font-weight:700;color:var(--gold)">${formatPrice(order.total)}</span>
+              <span style="font-size:0.85rem;color:var(--text-muted)">${order.payment_method === 'cash' ? (l === 'ar' ? 'كاش' : 'Cash') : (l === 'ar' ? 'محفظة' : 'Wallet')}</span>
+            </div>
+          </div>`;
+      }).join('');
+    }
+
+    async function loadNotifications() {
+      const { data: notifs } = await db.from('notifications').select('*')
+        .eq('user_id', currentUser.id).order('created_at', { ascending: false });
+
+      const el = document.getElementById('notifications-list');
+      const unreadCount = notifs?.filter(n => !n.is_read).length || 0;
+
+      if (unreadCount > 0) {
+        const badge = document.getElementById('notif-badge');
+        badge.textContent = unreadCount;
+        badge.style.display = 'inline-block';
+        badge.style.fontSize = '0.7rem';
+      }
+
+      if (!notifs?.length) {
+        el.innerHTML = `<div style="text-align:center;padding:3rem;color:var(--text-muted)"><i class="fas fa-bell-slash" style="font-size:2rem;display:block;margin-bottom:1rem;color:var(--border)"></i><p>${l === 'ar' ? 'مفيش إشعارات' : 'No notifications'}</p></div>`;
+        return;
+      }
+
+      el.innerHTML = notifs.map(n => `
+        <div class="notif-item ${!n.is_read ? 'unread' : ''}" onclick="markRead('${n.id}', this)">
+          ${!n.is_read ? '<div class="notif-dot"></div>' : '<div style="width:8px"></div>'}
+          <div style="flex:1">
+            <p style="font-size:0.9rem;margin-bottom:0.25rem">${n.message}</p>
+            <p style="font-size:0.8rem;color:var(--text-muted)">${formatDate(n.created_at)}</p>
+          </div>
+        </div>`).join('');
+    }
+
+    async function markRead(id, el) {
+      await db.from('notifications').update({ is_read: true }).eq('id', id);
+      el.classList.remove('unread');
+      el.querySelector('.notif-dot')?.remove();
+    }
+
+    async function markAllRead() {
+      await db.from('notifications').update({ is_read: true }).eq('user_id', currentUser.id);
+      document.querySelectorAll('.notif-item.unread').forEach(el => {
+        el.classList.remove('unread');
+        el.querySelector('.notif-dot')?.remove();
+      });
+      document.getElementById('notif-badge').style.display = 'none';
+    }
+
+    async function saveInfo() {
+      const name = document.getElementById('info-name').value.trim();
+      const phone = document.getElementById('info-phone').value.trim();
+      const address = document.getElementById('info-address').value.trim();
+      const msg = document.getElementById('info-msg');
+
+      await db.from('profiles').update({ full_name: name, phone, address }).eq('id', currentUser.id);
+      await db.auth.updateUser({ data: { full_name: name } });
+
+      document.getElementById('profile-name').textContent = name;
+      msg.textContent = l === 'ar' ? '✓ تم الحفظ' : '✓ Saved';
+      setTimeout(() => msg.textContent = '', 2000);
+    }
+
+    async function changePassword() {
+      const np = document.getElementById('new-password').value;
+      const cp = document.getElementById('confirm-password').value;
+      const msg = document.getElementById('pass-msg');
+
+      if (np !== cp) { msg.style.color = '#dc2626'; msg.textContent = l === 'ar' ? 'الباسوورد مش متطابق' : 'Passwords do not match'; return; }
+      if (np.length < 8) { msg.style.color = '#dc2626'; msg.textContent = l === 'ar' ? 'لازم 8 حروف على الأقل' : 'At least 8 characters'; return; }
+
+      const { error } = await db.auth.updateUser({ password: np });
+      msg.style.color = error ? '#dc2626' : '#16a34a';
+      msg.textContent = error ? (l === 'ar' ? 'حصل خطأ' : 'Error') : (l === 'ar' ? '✓ تم التغيير' : '✓ Changed');
+    }
+
+    async function updateAvatar(input) {
+      const file = input.files[0];
+      if (!file) return;
+      const ext = file.name.split('.').pop();
+      const path = `${currentUser.id}.${ext}`;
+      await db.storage.from('avatars').upload(path, file, { upsert: true });
+      const { data } = db.storage.from('avatars').getPublicUrl(path);
+      await db.from('profiles').update({ avatar_url: data.publicUrl }).eq('id', currentUser.id);
+      document.getElementById('profile-avatar').src = data.publicUrl + '?t=' + Date.now();
+      showToast(l === 'ar' ? 'تم تحديث الصورة' : 'Avatar updated');
+    }
+
+    async function logout() {
+      await db.auth.signOut();
+      window.location.href = '/';
+    }
+
+    async function init() {
+      currentUser = await requireAuth();
+      if (!currentUser) return;
+
+      const { data: profile } = await db.from('profiles').select('*').eq('id', currentUser.id).single();
+
+      document.getElementById('profile-name').textContent = profile?.full_name || '—';
+      document.getElementById('profile-email').textContent = currentUser.email;
+      document.getElementById('profile-avatar').src = profile?.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(profile?.full_name || 'U')}&background=C9A84C&color=fff`;
+      document.getElementById('info-name').value = profile?.full_name || '';
+      document.getElementById('info-phone').value = profile?.phone || '';
+      document.getElementById('info-address').value = profile?.address || '';
+      document.getElementById('info-email').value = currentUser.email;
+
+      loadOrders();
+      loadNotifications();
+    }
+
+    checkMaintenance(); applyLang(); updateCartCount(); init();
+    document.getElementById('theme-toggle').innerHTML = getTheme() === 'dark' ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
+    window.addEventListener('scroll', () => document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 20));
+  </script>
+</body>
+</html>

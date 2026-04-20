@@ -1,16 +1,7 @@
-<!DOCTYPE html>
-<html lang="ar" dir="rtl">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Antika Admin — الطلبات</title>
-  <link rel="stylesheet" href="/css/main.css">
-  <link rel="stylesheet" href="/css/admin.css">
-  
+<link rel="stylesheet" href="/css/admin.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <style>
     
-    /* moved to admin.css */
     .admin-sidebar { width: 260px; background: var(--bg-card); border-left: 1px solid var(--border); position: fixed; top: 0; right: 0; bottom: 0; display: flex; flex-direction: column; z-index: 100; overflow-y: auto; }
     [dir="ltr"] .admin-sidebar { right: auto; left: 0; border-left: none; border-right: 1px solid var(--border); }
     .admin-logo { padding: 1.5rem; border-bottom: 1px solid var(--border); }
@@ -41,7 +32,8 @@
   </style>
 </head>
 <body id="admin-body">
-  <aside class="admin-sidebar">
+  <div class="sidebar-overlay" id="sidebar-overlay" onclick="closeSidebar()"></div>
+  <aside class="admin-sidebar" id="admin-sidebar">
     <div class="admin-logo"><div class="admin-logo-text">Antika Gallery</div><div class="admin-logo-sub">Admin Panel</div></div>
     <nav class="admin-nav">
       <div class="nav-section-label">الرئيسية</div>
@@ -62,6 +54,7 @@
 
   <main class="admin-main">
     <div class="admin-topbar">
+      <button class="admin-hamburger" onclick="openSidebar()"><i class="fas fa-bars"></i></button>
       <button class="admin-mobile-toggle navbar-icon-btn" onclick="document.querySelector('.admin-sidebar').classList.toggle('open')" style="display:none"><i class="fas fa-bars"></i></button>
       <span style="font-family:var(--font-display);font-size:1.3rem">الطلبات</span>
       <button class="navbar-icon-btn" onclick="toggleTheme()" id="theme-toggle"><i class="fas fa-moon"></i></button>
@@ -244,6 +237,7 @@
       el.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
 
+    function openSidebar(){document.getElementById("admin-sidebar").classList.add("open");document.getElementById("sidebar-overlay").classList.add("active");}function closeSidebar(){document.getElementById("admin-sidebar").classList.remove("open");document.getElementById("sidebar-overlay").classList.remove("active");}
     async function init() {
       const ok = await adminAuthCheck();
       if (!ok) return;

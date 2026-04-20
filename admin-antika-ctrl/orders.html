@@ -2,21 +2,21 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <style>
     
-    .admin-sidebar { width: 260px; background: var(--bg-card); border-left: 1px solid var(--border); position: fixed; top: 0; right: 0; bottom: 0; display: flex; flex-direction: column; z-index: 100; overflow-y: auto; }
-    [dir="ltr"] .admin-sidebar { right: auto; left: 0; border-left: none; border-right: 1px solid var(--border); }
-    .admin-logo { padding: 1.5rem; border-bottom: 1px solid var(--border); }
-    .admin-logo-text { font-family: var(--font-display); font-size: 1.2rem; font-style: italic; color: var(--gold); }
-    .admin-logo-sub { font-size: 0.75rem; color: var(--text-muted); font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; }
-    .admin-nav { flex: 1; padding: 1rem 0; }
-    .nav-section-label { font-size: 0.7rem; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; color: var(--text-muted); padding: 0.5rem 1.5rem; margin-top: 0.5rem; }
-    .admin-nav-item { display: flex; align-items: center; gap: 0.75rem; padding: 0.8rem 1.5rem; font-size: 0.9rem; font-weight: 600; color: var(--text-secondary); cursor: pointer; transition: all var(--transition); text-decoration: none; }
-    .admin-nav-item:hover { color: var(--gold); background: rgba(201,168,76,0.06); }
-    .admin-nav-item.active { color: var(--gold); background: rgba(201,168,76,0.1); border-right: 3px solid var(--gold); }
-    [dir="ltr"] .admin-nav-item.active { border-right: none; border-left: 3px solid var(--gold); }
-    .admin-nav-item i { width: 18px; text-align: center; }
-    .admin-main { margin-right: 260px; flex: 1; }
-    [dir="ltr"] .admin-main { margin-right: 0; margin-left: 260px; }
-    .admin-topbar { background: var(--bg-card); border-bottom: 1px solid var(--border); padding: 0 2rem; height: 64px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 50; }
+    
+    [dir="ltr"] 
+    
+    
+    
+    
+    
+    
+    
+    
+    [dir="ltr"] 
+    
+    
+    [dir="ltr"] 
+    
     .admin-content { padding: 2rem; }
     .admin-table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
     .admin-table th { padding: 0.75rem 1.25rem; text-align: right; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-muted); border-bottom: 1px solid var(--border); background: var(--bg-secondary); }
@@ -28,27 +28,31 @@
     .order-detail.show { display: block; animation: fadeUp 0.3s ease; }
     .status-select { padding: 0.5rem 1rem; border: 1.5px solid var(--border); border-radius: var(--radius-sm); font-family: inherit; font-size: 0.9rem; background: var(--bg-card); color: var(--text); cursor: pointer; outline: none; }
     .status-select:focus { border-color: var(--gold); }
-    @media (max-width: 768px) { .admin-sidebar { display: none; } .admin-main { margin-right: 0; } }
+    @media (max-width: 768px) {   }
   </style>
 </head>
 <body id="admin-body">
-  <div class="sidebar-overlay" id="sidebar-overlay" onclick="closeSidebar()"></div>
+    <div class="sidebar-overlay" id="sidebar-overlay" onclick="closeSidebar()"></div>
   <aside class="admin-sidebar" id="admin-sidebar">
-    <div class="admin-logo"><div class="admin-logo-text">Antika Gallery</div><div class="admin-logo-sub">Admin Panel</div></div>
+    <div class="admin-logo">
+      <div class="admin-logo-text">Antika Gallery</div>
+      <div class="admin-logo-sub">Admin Panel</div>
+    </div>
     <nav class="admin-nav">
       <div class="nav-section-label">الرئيسية</div>
       <a href="/admin-antika-ctrl/" class="admin-nav-item"><i class="fas fa-chart-line"></i> لوحة التحكم</a>
       <div class="nav-section-label">المتجر</div>
       <a href="/admin-antika-ctrl/products.html" class="admin-nav-item"><i class="fas fa-box"></i> المنتجات</a>
-      <a href="/admin-antika-ctrl/settings.html" class="admin-nav-item"><i class="fas fa-tags"></i> التصنيفات والإعدادات</a>
-      <a href="/admin-antika-ctrl/orders.html" class="admin-nav-item active"><i class="fas fa-shopping-cart"></i> الطلبات</a>
-      <div class="nav-section-label">المستخدمين</div>
-      <a href="/admin-antika-ctrl/users.html" class="admin-nav-item"><i class="fas fa-users"></i> الحسابات</a>
-      <div class="nav-section-label">الإعدادات</div>
-      <a href="/admin-antika-ctrl/settings.html" class="admin-nav-item"><i class="fas fa-cog"></i> الإعدادات</a>
+      <a href="/admin-antika-ctrl/orders.html" class="admin-nav-item active"><i class="fas fa-shopping-cart"></i> الطلبات <span class="admin-nav-badge" id="pending-badge" style="display:none">0</span></a>
+      <div class="nav-section-label">الإدارة</div>
+      <a href="/admin-antika-ctrl/users.html" class="admin-nav-item"><i class="fas fa-users"></i> المستخدمين</a>
+      <a href="/admin-antika-ctrl/settings.html" class="admin-nav-item"><i class="fas fa-cog"></i> الإعدادات والتصنيفات</a>
+      <a href="/" class="admin-nav-item" target="_blank"><i class="fas fa-external-link-alt"></i> عرض الموقع</a>
     </nav>
-    <div style="padding:1rem 1.5rem;border-top:1px solid var(--border)">
-      <button onclick="logout()" style="display:flex;align-items:center;gap:0.75rem;font-size:0.9rem;color:#dc2626;font-weight:600;width:100%"><i class="fas fa-sign-out-alt"></i> تسجيل الخروج</button>
+    <div class="admin-sidebar-footer">
+      <button onclick="logout()" class="admin-nav-item" style="width:100%;color:#dc2626;background:none;border:none;font-family:inherit;cursor:pointer">
+        <i class="fas fa-sign-out-alt"></i> تسجيل الخروج
+      </button>
     </div>
   </aside>
 

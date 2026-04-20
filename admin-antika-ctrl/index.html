@@ -340,8 +340,19 @@
     }
 
     async function init() {
-      const ok = await requireAdmin();
-      if (!ok) return;
+      // استنى الـ session يتحمل من الـ storage
+      const { data: { session } } = await db.auth.getSession();
+      if (!session) {
+        window.location.href = '/auth.html';
+        return;
+      }
+      const role = session.user.user_metadata?.role;
+      if (role !== 'admin' && role !== 'moderator') {
+        window.location.href = '/';
+        return;
+      }
+      // مخفي الـ loading وبيظهر المحتوى
+      document.body.style.opacity = '1';
       loadStats();
       loadCharts();
       loadRecentOrders();
@@ -350,6 +361,8 @@
 
     initTheme();
     document.getElementById('theme-toggle').innerHTML = getTheme() === 'dark' ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
+    // إخفاء المحتوى لحد ما الـ auth يتأكد
+    document.body.style.opacity = '0';
     init();
   </script>
 </body>

@@ -202,10 +202,10 @@
     }
 
     async function init() {
-      const ok = await requireAdmin();
+      const ok = await adminAuthCheck();
       if (!ok) return;
-      const user = await getCurrentUser();
-      window._currentUserId = user?.id;
+      const { data: { session } } = await db.auth.getSession();
+      window._currentUserId = session?.user?.id;
       loadUsers();
     }
 

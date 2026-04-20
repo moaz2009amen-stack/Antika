@@ -198,3 +198,24 @@ function adminAuthCheck() {
     });
   });
 }
+
+// ── Admin Auth v3 (with retry) ─────────────────────────────────
+async function adminAuthCheck() {
+  document.body.style.opacity = '0';
+  document.body.style.transition = 'opacity 0.3s';
+
+  let { data: { session } } = await db.auth.getSession();
+
+  if (!session) {
+    await new Promise(r => setTimeout(r, 1000));
+    const res = await db.auth.getSession();
+    session = res.data.session;
+  }
+
+  if (!session) { window.location.href = '/auth.html'; return false; }
+  const role = session.user.user_metadata?.role;
+  if (role !== 'admin' && role !== 'moderator') { window.location.href = '/'; return false; }
+
+  document.body.style.opacity = '1';
+  return true;
+}

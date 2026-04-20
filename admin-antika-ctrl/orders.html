@@ -5,11 +5,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Antika Admin — الطلبات</title>
   <link rel="stylesheet" href="/css/main.css">
-  <style>#admin-body { padding-top: 0; display: flex; min-height: 100vh; }</style>
+  <link rel="stylesheet" href="/css/admin.css">
+  
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <style>
     
-    body { display: flex; min-height: 100vh; }
+    /* moved to admin.css */
     .admin-sidebar { width: 260px; background: var(--bg-card); border-left: 1px solid var(--border); position: fixed; top: 0; right: 0; bottom: 0; display: flex; flex-direction: column; z-index: 100; overflow-y: auto; }
     [dir="ltr"] .admin-sidebar { right: auto; left: 0; border-left: none; border-right: 1px solid var(--border); }
     .admin-logo { padding: 1.5rem; border-bottom: 1px solid var(--border); }
@@ -47,7 +48,7 @@
       <a href="/admin-antika-ctrl/" class="admin-nav-item"><i class="fas fa-chart-line"></i> لوحة التحكم</a>
       <div class="nav-section-label">المتجر</div>
       <a href="/admin-antika-ctrl/products.html" class="admin-nav-item"><i class="fas fa-box"></i> المنتجات</a>
-      <a href="/admin-antika-ctrl/categories.html" class="admin-nav-item"><i class="fas fa-tags"></i> التصنيفات</a>
+      <a href="/admin-antika-ctrl/settings.html" class="admin-nav-item"><i class="fas fa-tags"></i> التصنيفات والإعدادات</a>
       <a href="/admin-antika-ctrl/orders.html" class="admin-nav-item active"><i class="fas fa-shopping-cart"></i> الطلبات</a>
       <div class="nav-section-label">المستخدمين</div>
       <a href="/admin-antika-ctrl/users.html" class="admin-nav-item"><i class="fas fa-users"></i> الحسابات</a>
@@ -61,6 +62,7 @@
 
   <main class="admin-main">
     <div class="admin-topbar">
+      <button class="admin-mobile-toggle navbar-icon-btn" onclick="document.querySelector('.admin-sidebar').classList.toggle('open')" style="display:none"><i class="fas fa-bars"></i></button>
       <span style="font-family:var(--font-display);font-size:1.3rem">الطلبات</span>
       <button class="navbar-icon-btn" onclick="toggleTheme()" id="theme-toggle"><i class="fas fa-moon"></i></button>
     </div>

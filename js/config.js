@@ -171,14 +171,30 @@ function addToCart(product, quantity = 1) {
 initTheme();
 initLang();
 
-// ── Admin Auth (fast session check) ───────────────────────────
-async function adminAuthCheck() {
+// ── Admin Auth (reliable session check) ───────────────────────
+function adminAuthCheck() {
   document.body.style.opacity = '0';
   document.body.style.transition = 'opacity 0.2s';
-  const { data: { session } } = await db.auth.getSession();
-  if (!session) { window.location.href = '/auth.html'; return false; }
-  const role = session.user.user_metadata?.role;
-  if (role !== 'admin' && role !== 'moderator') { window.location.href = '/'; return false; }
-  document.body.style.opacity = '1';
-  return true;
+
+  return new Promise(resolve => {
+    const { data: { subscription } } = db.auth.onAuthStateChange((event, session) => {
+      subscription.unsubscribe();
+
+      if (!session) {
+        window.location.href = '/auth.html';
+        resolve(false);
+        return;
+      }
+
+      const role = session.user.user_metadata?.role;
+      if (role !== 'admin' && role !== 'moderator') {
+        window.location.href = '/';
+        resolve(false);
+        return;
+      }
+
+      document.body.style.opacity = '1';
+      resolve(true);
+    });
+  });
 }

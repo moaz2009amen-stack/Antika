@@ -241,10 +241,9 @@
     }
 
     async function init() {
-      const ok = await requireAdmin();
+      const ok = await adminAuthCheck();
       if (!ok) return;
       loadOrders();
-      // Check URL param
       const id = new URLSearchParams(window.location.search).get('id');
       if (id) setTimeout(() => showOrderDetail(id), 1000);
     }

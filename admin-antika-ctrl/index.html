@@ -340,23 +340,32 @@
     }
 
     async function init() {
-      // استنى الـ session يتحمل من الـ storage
-      const { data: { session } } = await db.auth.getSession();
-      if (!session) {
-        window.location.href = '/auth.html';
-        return;
-      }
-      const role = session.user.user_metadata?.role;
-      if (role !== 'admin' && role !== 'moderator') {
-        window.location.href = '/';
-        return;
-      }
-      // مخفي الـ loading وبيظهر المحتوى
-      document.body.style.opacity = '1';
-      loadStats();
-      loadCharts();
-      loadRecentOrders();
-      loadMaintenanceStatus();
+      document.body.style.opacity = '0';
+
+      // استنى الـ auth state الحقيقي مش بس الـ session
+      await new Promise(resolve => {
+        const { data: { subscription } } = db.auth.onAuthStateChange(async (event, session) => {
+          subscription.unsubscribe();
+
+          if (!session) {
+            window.location.href = '/auth.html';
+            return;
+          }
+
+          const role = session.user.user_metadata?.role;
+          if (role !== 'admin' && role !== 'moderator') {
+            window.location.href = '/';
+            return;
+          }
+
+          document.body.style.opacity = '1';
+          loadStats();
+          loadCharts();
+          loadRecentOrders();
+          loadMaintenanceStatus();
+          resolve();
+        });
+      });
     }
 
     initTheme();

@@ -5,9 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Antika Admin — الإعدادات</title>
   <link rel="stylesheet" href="/css/main.css">
+  <style>#admin-body { padding-top: 0; display: flex; min-height: 100vh; }</style>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <style>
-    body { padding-top: 0 !important; display: flex; }
+    
     body { display: flex; min-height: 100vh; }
     .admin-sidebar { width: 260px; background: var(--bg-card); border-left: 1px solid var(--border); position: fixed; top: 0; right: 0; bottom: 0; display: flex; flex-direction: column; z-index: 100; overflow-y: auto; }
     [dir="ltr"] .admin-sidebar { right: auto; left: 0; border-left: none; border-right: 1px solid var(--border); }
@@ -54,7 +55,7 @@
     @media (max-width: 768px) { .admin-sidebar { display: none; } .admin-main { margin-right: 0; } [dir="ltr"] .admin-main { margin-left: 0; } }
   </style>
 </head>
-<body>
+<body id="admin-body">
 
   <!-- Sidebar -->
   <aside class="admin-sidebar">

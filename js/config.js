@@ -170,3 +170,15 @@ function addToCart(product, quantity = 1) {
 // init
 initTheme();
 initLang();
+
+// ── Admin Auth (fast session check) ───────────────────────────
+async function adminAuthCheck() {
+  document.body.style.opacity = '0';
+  document.body.style.transition = 'opacity 0.2s';
+  const { data: { session } } = await db.auth.getSession();
+  if (!session) { window.location.href = '/auth.html'; return false; }
+  const role = session.user.user_metadata?.role;
+  if (role !== 'admin' && role !== 'moderator') { window.location.href = '/'; return false; }
+  document.body.style.opacity = '1';
+  return true;
+}

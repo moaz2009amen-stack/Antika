@@ -427,7 +427,7 @@
     }
 
     async function init() {
-      const ok = await requireAdmin();
+      const ok = await adminAuthCheck();
       if (!ok) return;
       await loadCategories();
       await loadProducts();

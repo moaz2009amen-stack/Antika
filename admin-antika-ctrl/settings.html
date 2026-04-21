@@ -1,449 +1,210 @@
-<link rel="stylesheet" href="/css/admin.css">
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Antika Admin — الإعدادات</title>
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="stylesheet" href="/css/admin.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-  <style>
-    
-    
-    [dir="ltr"] 
-    
-    
-    
-    
-    
-    
-    
-    
-    [dir="ltr"] 
-    
-    
-    [dir="ltr"] 
-    
-    .admin-content { padding: 2rem; max-width: 900px; }
-    .settings-section { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); margin-bottom: 1.5rem; overflow: hidden; }
-    .settings-section-header { padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 0.75rem; }
-    .settings-section-header i { color: var(--gold); font-size: 1.1rem; }
-    .settings-section-title { font-weight: 700; font-size: 1rem; }
-    .settings-section-body { padding: 1.5rem; }
-    .toggle-row { display: flex; align-items: center; justify-content: space-between; padding: 0.75rem 0; border-bottom: 1px solid var(--border); }
-    .toggle-row:last-child { border-bottom: none; }
-    .toggle-info { flex: 1; }
-    .toggle-label { font-weight: 600; font-size: 0.95rem; }
-    .toggle-desc { font-size: 0.82rem; color: var(--text-muted); margin-top: 0.2rem; }
-    .toggle-switch { width: 48px; height: 26px; border-radius: 13px; background: var(--border); cursor: pointer; position: relative; transition: background var(--transition); flex-shrink: 0; }
-    .toggle-switch.on { background: var(--gold); }
-    .toggle-switch::after { content: ''; position: absolute; width: 20px; height: 20px; border-radius: 50%; background: #fff; top: 3px; right: 3px; transition: transform var(--transition); box-shadow: 0 1px 4px rgba(0,0,0,0.2); }
-    [dir="ltr"] .toggle-switch::after { right: auto; left: 3px; }
-    .toggle-switch.on::after { transform: translateX(-22px); }
-    [dir="ltr"] .toggle-switch.on::after { transform: translateX(22px); }
-    .category-list { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1rem; }
-    .category-tag { display: flex; align-items: center; gap: 0.5rem; padding: 6px 14px; background: var(--bg-secondary); border: 1px solid var(--border); border-radius: 20px; font-size: 0.85rem; font-weight: 600; }
-    .category-tag button { color: var(--text-muted); transition: color var(--transition); font-size: 0.75rem; }
-    .category-tag button:hover { color: #dc2626; }
-    .moderator-item { display: flex; align-items: center; gap: 1rem; padding: 1rem 0; border-bottom: 1px solid var(--border); }
-    .moderator-item:last-child { border-bottom: none; }
-    .moderator-avatar { width: 40px; height: 40px; border-radius: 50%; background: rgba(201,168,76,0.15); display: flex; align-items: center; justify-content: center; font-weight: 700; color: var(--gold); font-size: 0.9rem; flex-shrink: 0; }
-    .moderator-info { flex: 1; }
-    .moderator-name { font-weight: 600; font-size: 0.95rem; }
-    .moderator-email { font-size: 0.8rem; color: var(--text-muted); }
-    @media (max-width: 768px) {   [dir="ltr"]  }
-  </style>
 </head>
-<body id="admin-body">
-
-  <!-- Sidebar -->
-    <div class="sidebar-overlay" id="sidebar-overlay" onclick="closeSidebar()"></div>
+<body>
+  <div class="sidebar-overlay" id="sidebar-overlay" onclick="closeSidebar()"></div>
   <aside class="admin-sidebar" id="admin-sidebar">
-    <div class="admin-logo">
-      <div class="admin-logo-text">Antika Gallery</div>
-      <div class="admin-logo-sub">Admin Panel</div>
+    <div class="admin-sidebar-header">
+      <span class="admin-sidebar-logo">Antika Gallery</span>
+      <button class="admin-sidebar-close" onclick="closeSidebar()"><i class="fas fa-times"></i></button>
     </div>
     <nav class="admin-nav">
       <div class="nav-section-label">الرئيسية</div>
       <a href="/admin-antika-ctrl/" class="admin-nav-item"><i class="fas fa-chart-line"></i> لوحة التحكم</a>
       <div class="nav-section-label">المتجر</div>
       <a href="/admin-antika-ctrl/products.html" class="admin-nav-item"><i class="fas fa-box"></i> المنتجات</a>
-      <a href="/admin-antika-ctrl/orders.html" class="admin-nav-item"><i class="fas fa-shopping-cart"></i> الطلبات <span class="admin-nav-badge" id="pending-badge" style="display:none">0</span></a>
+      <a href="/admin-antika-ctrl/orders.html" class="admin-nav-item"><i class="fas fa-shopping-cart"></i> الطلبات<span class="admin-nav-badge" id="pending-badge" style="display:none">0</span></a>
       <div class="nav-section-label">الإدارة</div>
       <a href="/admin-antika-ctrl/users.html" class="admin-nav-item"><i class="fas fa-users"></i> المستخدمين</a>
-      <a href="/admin-antika-ctrl/settings.html" class="admin-nav-item active"><i class="fas fa-cog"></i> الإعدادات والتصنيفات</a>
+      <a href="/admin-antika-ctrl/settings.html" class="admin-nav-item active"><i class="fas fa-cog"></i> الإعدادات</a>
       <a href="/" class="admin-nav-item" target="_blank"><i class="fas fa-external-link-alt"></i> عرض الموقع</a>
     </nav>
     <div class="admin-sidebar-footer">
-      <button onclick="logout()" class="admin-nav-item" style="width:100%;color:#dc2626;background:none;border:none;font-family:inherit;cursor:pointer">
+      <button onclick="logout()" class="admin-nav-item" style="color:#dc2626;cursor:pointer;background:none;border:none;font-family:inherit;width:100%;text-align:right">
         <i class="fas fa-sign-out-alt"></i> تسجيل الخروج
       </button>
     </div>
   </aside>
-
-  <!-- Main -->
   <main class="admin-main">
     <div class="admin-topbar">
-      <div style="display:flex;align-items:center;gap:0.75rem">
+      <div class="admin-topbar-right">
         <button class="admin-hamburger" onclick="openSidebar()"><i class="fas fa-bars"></i></button>
-        <span class="admin-page-title">الإعدادات والتصنيفات</span>
+        <span class="admin-brand">Antika</span>
+        <span class="admin-page-title">/ الإعدادات</span>
       </div>
-      <div style="display:flex;align-items:center;gap:1rem">
-        <button onclick="toggleTheme()" class="navbar-icon-btn" id="theme-toggle"><i class="fas fa-moon"></i></button>
+      <div class="admin-topbar-left">
+        <button class="navbar-icon-btn" onclick="toggleTheme()" id="theme-toggle"><i class="fas fa-moon"></i></button>
       </div>
     </div>
+    <div class="admin-content">
 
-    <div class="admin-content page-enter">
-
-      <!-- General Settings -->
+      <div style="max-width:860px">
+      <!-- General -->
       <div class="settings-section">
-        <div class="settings-section-header">
-          <i class="fas fa-store"></i>
-          <div class="settings-section-title">إعدادات المتجر</div>
-        </div>
+        <div class="settings-section-header"><i class="fas fa-store"></i><div class="settings-section-title">إعدادات المتجر</div></div>
         <div class="settings-section-body">
-          <div class="form-group">
-            <label class="form-label">اسم المتجر (عربي)</label>
-            <input type="text" class="form-control" id="site-name-ar" placeholder="أنتيكا جاليري">
-          </div>
-          <div class="form-group">
-            <label class="form-label">اسم المتجر (إنجليزي)</label>
-            <input type="text" class="form-control" id="site-name-en" dir="ltr" placeholder="Antika Gallery">
-          </div>
-          <div class="form-group">
-            <label class="form-label">إعلان / بنر علوي (اتركه فاضي لو مش محتاجه)</label>
-            <input type="text" class="form-control" id="announcement" placeholder="مثال: شحن مجاني على الطلبات فوق ٥٠٠ جنيه 🎉">
-          </div>
-          <button class="btn btn-primary" onclick="saveGeneralSettings()">
-            <i class="fas fa-save"></i> حفظ الإعدادات
-          </button>
+          <div class="form-group"><label class="form-label">اسم المتجر (عربي)</label><input type="text" class="form-control" id="site-name-ar"></div>
+          <div class="form-group"><label class="form-label">اسم المتجر (إنجليزي)</label><input type="text" class="form-control" id="site-name-en" dir="ltr"></div>
+          <div class="form-group"><label class="form-label">إعلان / بنر علوي</label><input type="text" class="form-control" id="announcement" placeholder="مثال: شحن مجاني فوق ٥٠٠ جنيه 🎉"></div>
+          <button class="btn btn-primary" onclick="saveGeneral()"><i class="fas fa-save"></i> حفظ</button>
         </div>
       </div>
-
-      <!-- Maintenance & Features -->
+      <!-- Toggles -->
       <div class="settings-section">
-        <div class="settings-section-header">
-          <i class="fas fa-tools"></i>
-          <div class="settings-section-title">التشغيل والصيانة</div>
-        </div>
+        <div class="settings-section-header"><i class="fas fa-tools"></i><div class="settings-section-title">التشغيل</div></div>
         <div class="settings-section-body">
-          <div class="toggle-row">
-            <div class="toggle-info">
-              <div class="toggle-label">وضع الصيانة</div>
-              <div class="toggle-desc">لما يكون شغال، الزوار هيشوفوا صفحة الصيانة بدل الموقع</div>
-            </div>
-            <div class="toggle-switch" id="maintenance-toggle" onclick="toggleMaintenance()"></div>
-          </div>
-          <div class="toggle-row">
-            <div class="toggle-info">
-              <div class="toggle-label">قبول الطلبات الجديدة</div>
-              <div class="toggle-desc">لو اتحاط على إيقاف، الزوار مش هيقدروا يطلبوا</div>
-            </div>
-            <div class="toggle-switch on" id="orders-toggle" onclick="toggleSetting('orders_enabled', this)"></div>
-          </div>
+          <div class="toggle-row"><div class="toggle-info"><div class="toggle-label">وضع الصيانة</div><div class="toggle-desc">الزوار هيشوفوا صفحة الصيانة</div></div><div class="toggle-switch" id="maintenance-toggle" onclick="toggleSetting('maintenance_mode',this)"></div></div>
+          <div class="toggle-row"><div class="toggle-info"><div class="toggle-label">قبول الطلبات</div><div class="toggle-desc">لو متوقف مش هيقدروا يطلبوا</div></div><div class="toggle-switch on" id="orders-toggle" onclick="toggleSetting('orders_enabled',this)"></div></div>
         </div>
       </div>
-
       <!-- WhatsApp -->
       <div class="settings-section">
-        <div class="settings-section-header">
-          <i class="fab fa-whatsapp" style="color:#25d366"></i>
-          <div class="settings-section-title">إعدادات الواتساب</div>
-        </div>
+        <div class="settings-section-header"><i class="fab fa-whatsapp" style="color:#25d366"></i><div class="settings-section-title">الواتساب</div></div>
         <div class="settings-section-body">
-          <div class="form-group">
-            <label class="form-label">رقم الواتساب (للإشعارات وتواصل العملاء)</label>
-            <input type="tel" class="form-control" id="whatsapp-number" dir="ltr" placeholder="01000000000">
-            <div class="form-hint">الرقم بدون كود الدولة — هيتضاف +20 تلقائياً</div>
-          </div>
-          <div class="form-group">
-            <label class="form-label">رسالة الترحيب للعملاء (اختياري)</label>
-            <textarea class="form-control" id="whatsapp-message" rows="3" placeholder="أهلاً بك في أنتيكا جاليري! كيف نقدر نساعدك؟"></textarea>
-          </div>
-          <button class="btn btn-primary" onclick="saveWhatsApp()">
-            <i class="fas fa-save"></i> حفظ
-          </button>
-          <button class="btn btn-ghost btn-sm" style="margin-right:0.75rem" onclick="testWhatsApp()">
-            <i class="fab fa-whatsapp"></i> تجربة الرابط
-          </button>
+          <div class="form-group"><label class="form-label">رقم الواتساب</label><input type="tel" class="form-control" id="whatsapp-number" dir="ltr" placeholder="01000000000"><div class="form-hint">بدون كود الدولة</div></div>
+          <button class="btn btn-primary" onclick="saveWhatsApp()"><i class="fas fa-save"></i> حفظ</button>
+          <button class="btn btn-ghost btn-sm" style="margin-right:.75rem" onclick="testWA()"><i class="fab fa-whatsapp"></i> تجربة</button>
         </div>
       </div>
-
       <!-- Categories -->
       <div class="settings-section">
-        <div class="settings-section-header">
-          <i class="fas fa-tags"></i>
-          <div class="settings-section-title">التصنيفات</div>
-        </div>
+        <div class="settings-section-header"><i class="fas fa-tags"></i><div class="settings-section-title">التصنيفات</div></div>
         <div class="settings-section-body">
-          <div class="category-list" id="category-list">
-            <div class="skeleton" style="width:80px;height:32px;border-radius:20px"></div>
-            <div class="skeleton" style="width:100px;height:32px;border-radius:20px"></div>
-          </div>
-          <div style="display:grid;grid-template-columns:1fr 1fr auto;gap:0.75rem;align-items:end">
-            <div class="form-group" style="margin-bottom:0">
-              <label class="form-label">اسم التصنيف (عربي)</label>
-              <input type="text" class="form-control" id="new-cat-ar" placeholder="مثال: ملابس حريمي">
-            </div>
-            <div class="form-group" style="margin-bottom:0">
-              <label class="form-label">الاسم (إنجليزي)</label>
-              <input type="text" class="form-control" id="new-cat-en" dir="ltr" placeholder="Women's Fashion">
-            </div>
-            <button class="btn btn-primary" onclick="addCategory()">
-              <i class="fas fa-plus"></i> إضافة
-            </button>
+          <div class="category-list" id="cat-list"><div class="skeleton" style="width:80px;height:32px;border-radius:20px"></div></div>
+          <div style="display:grid;grid-template-columns:1fr 1fr auto;gap:.75rem;align-items:end">
+            <div class="form-group" style="margin:0"><label class="form-label">اسم (عربي)</label><input type="text" class="form-control" id="new-cat-ar"></div>
+            <div class="form-group" style="margin:0"><label class="form-label">Name (EN)</label><input type="text" class="form-control" id="new-cat-en" dir="ltr"></div>
+            <button class="btn btn-primary" onclick="addCategory()"><i class="fas fa-plus"></i></button>
           </div>
         </div>
       </div>
-
       <!-- Moderators -->
-      <div class="settings-section" id="moderators-section">
-        <div class="settings-section-header">
-          <i class="fas fa-user-shield"></i>
-          <div class="settings-section-title">المشرفون</div>
-        </div>
+      <div class="settings-section" id="mod-section">
+        <div class="settings-section-header"><i class="fas fa-user-shield"></i><div class="settings-section-title">المشرفون</div></div>
         <div class="settings-section-body">
-          <div id="moderators-list" style="margin-bottom:1.5rem">
-            <div class="skeleton" style="height:60px;border-radius:var(--radius-sm)"></div>
-          </div>
-          <div style="border-top:1px solid var(--border);padding-top:1.5rem">
-            <label class="form-label">إضافة مشرف جديد (عن طريق الإيميل)</label>
-            <div style="display:flex;gap:0.75rem">
-              <input type="email" class="form-control" id="new-moderator-email" dir="ltr" placeholder="email@example.com" style="flex:1">
-              <button class="btn btn-primary" onclick="addModerator()">
-                <i class="fas fa-user-plus"></i> إضافة
-              </button>
-            </div>
-            <div class="form-hint">المشرف يقدر يشوف ويعدل الطلبات بس — مش يحذف منتجات أو يدخل الإعدادات</div>
+          <div id="mod-list" style="margin-bottom:1.5rem"><div class="skeleton" style="height:50px;border-radius:var(--radius-sm)"></div></div>
+          <label class="form-label">إضافة مشرف (بالإيميل)</label>
+          <div style="display:flex;gap:.75rem">
+            <input type="email" class="form-control" id="new-mod-email" dir="ltr" style="flex:1">
+            <button class="btn btn-primary" onclick="addModerator()"><i class="fas fa-user-plus"></i> إضافة</button>
           </div>
         </div>
       </div>
-
-      <!-- Danger Zone -->
-      <div class="settings-section" style="border-color:#dc2626">
-        <div class="settings-section-header" style="background:rgba(220,38,38,0.05)">
-          <i class="fas fa-exclamation-triangle" style="color:#dc2626"></i>
-          <div class="settings-section-title" style="color:#dc2626">منطقة الخطر</div>
-        </div>
-        <div class="settings-section-body">
-          <div class="toggle-row">
-            <div class="toggle-info">
-              <div class="toggle-label">حذف كل الطلبات القديمة</div>
-              <div class="toggle-desc">حذف الطلبات المكتملة أو الملغية اللي عدى عليها أكتر من ٩٠ يوم</div>
-            </div>
-            <button class="btn btn-danger btn-sm" onclick="cleanOldOrders()">تنظيف</button>
-          </div>
-        </div>
       </div>
-
     </div>
   </main>
-
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
   <script src="/js/config.js"></script>
   <script>
-    let maintenanceOn = false;
 
-    function toggleTheme() {
-      const t = getTheme() === 'light' ? 'dark' : 'light';
-      setTheme(t);
-      document.getElementById('theme-toggle').innerHTML = t === 'dark' ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
+    function openSidebar(){document.getElementById('admin-sidebar').classList.add('open');document.getElementById('sidebar-overlay').classList.add('active');}
+    function closeSidebar(){document.getElementById('admin-sidebar').classList.remove('open');document.getElementById('sidebar-overlay').classList.remove('active');}
+    function toggleTheme(){const t=getTheme()==='light'?'dark':'light';setTheme(t);document.getElementById('theme-toggle').innerHTML=t==='dark'?'<i class="fas fa-sun"></i>':'<i class="fas fa-moon"></i>';}
+    async function logout(){await db.auth.signOut();window.location.href='/admin-antika-ctrl/login.html';}
+    async function adminAuth(){
+      document.body.style.opacity='0';document.body.style.transition='opacity 0.25s';
+      let {data:{session}}=await db.auth.getSession();
+      if(!session){await new Promise(r=>setTimeout(r,900));const r=await db.auth.getSession();session=r.data.session;}
+      if(!session){window.location.href='/admin-antika-ctrl/login.html';return false;}
+      const role=session.user.user_metadata?.role;
+      if(role!=='admin'&&role!=='moderator'){window.location.href='/admin-antika-ctrl/login.html';return false;}
+      document.body.style.opacity='1';
+      initTheme();
+      document.getElementById('theme-toggle').innerHTML=getTheme()==='dark'?'<i class="fas fa-sun"></i>':'<i class="fas fa-moon"></i>';
+      return true;
+    }
+    async function loadPendingBadge(){
+      const {count}=await db.from('orders').select('*',{count:'exact',head:true}).eq('status','pending');
+      const b=document.getElementById('pending-badge');
+      if(b&&count>0){b.textContent=count;b.style.display='inline';}
     }
 
-    async function logout() {
-      await db.auth.signOut();
-      window.location.href = '/auth.html';
-    }
-
-    // Load all settings
-    async function loadSettings() {
-      const { data } = await db.from('settings').select('*');
-      const s = {};
-      (data || []).forEach(r => s[r.key] = r.value);
-
-      document.getElementById('site-name-ar').value = s['site_name_ar'] || '';
-      document.getElementById('site-name-en').value = s['site_name_en'] || '';
-      document.getElementById('announcement').value = s['announcement'] || '';
-      document.getElementById('whatsapp-number').value = s['whatsapp_number'] || '';
-      document.getElementById('whatsapp-message').value = s['whatsapp_message'] || '';
-
-      maintenanceOn = s['maintenance_mode'] === 'true';
-      document.getElementById('maintenance-toggle').classList.toggle('on', maintenanceOn);
-
-      const ordersOn = s['orders_enabled'] !== 'false';
-      document.getElementById('orders-toggle').classList.toggle('on', ordersOn);
-    }
-
-    async function saveSetting(key, value) {
-      await db.from('settings').upsert({ key, value }, { onConflict: 'key' });
-    }
-
-    async function saveGeneralSettings() {
-      await Promise.all([
-        saveSetting('site_name_ar', document.getElementById('site-name-ar').value),
-        saveSetting('site_name_en', document.getElementById('site-name-en').value),
-        saveSetting('announcement', document.getElementById('announcement').value),
-      ]);
-      showToast('تم حفظ إعدادات المتجر');
-    }
-
-    async function toggleMaintenance() {
-      maintenanceOn = !maintenanceOn;
-      document.getElementById('maintenance-toggle').classList.toggle('on', maintenanceOn);
-      await saveSetting('maintenance_mode', maintenanceOn.toString());
-      showToast(maintenanceOn ? 'وضع الصيانة شغال الآن' : 'الموقع عاد للعمل الطبيعي',
-        maintenanceOn ? 'info' : 'success');
-    }
-
-    async function toggleSetting(key, el) {
-      const isOn = el.classList.toggle('on');
-      await saveSetting(key, isOn.toString());
-      showToast(isOn ? 'تم التفعيل' : 'تم الإيقاف');
-    }
-
-    async function saveWhatsApp() {
-      await Promise.all([
-        saveSetting('whatsapp_number', document.getElementById('whatsapp-number').value),
-        saveSetting('whatsapp_message', document.getElementById('whatsapp-message').value),
-      ]);
-      showToast('تم حفظ إعدادات الواتساب');
-    }
-
-    function testWhatsApp() {
-      const num = document.getElementById('whatsapp-number').value;
-      const msg = document.getElementById('whatsapp-message').value;
-      if (!num) { showToast('اكتب الرقم الأول', 'error'); return; }
-      window.open(`https://wa.me/2${num}${msg ? '?text=' + encodeURIComponent(msg) : ''}`, '_blank');
-    }
-
-    // Categories
     let categories = [];
-
-    async function loadCategories() {
-      const { data } = await db.from('categories').select('*').order('name');
-      categories = data || [];
-      renderCategories();
+    async function loadSettings(){
+      const {data}=await db.from('settings').select('*');
+      const s={};(data||[]).forEach(r=>s[r.key]=r.value);
+      document.getElementById('site-name-ar').value=s['site_name_ar']||'';
+      document.getElementById('site-name-en').value=s['site_name_en']||'';
+      document.getElementById('announcement').value=s['announcement']||'';
+      document.getElementById('whatsapp-number').value=s['whatsapp_number']||'';
+      if(s['maintenance_mode']==='true')document.getElementById('maintenance-toggle').classList.add('on');
+      if(s['orders_enabled']==='false')document.getElementById('orders-toggle').classList.remove('on');
     }
-
-    function renderCategories() {
-      const list = document.getElementById('category-list');
-      if (!categories.length) {
-        list.innerHTML = '<p style="font-size:0.85rem;color:var(--text-muted)">مفيش تصنيفات لحد دلوقتي</p>';
-        return;
-      }
-      list.innerHTML = categories.map(c => `
-        <div class="category-tag">
-          <span>${c.name_ar || c.name}</span>
-          ${c.name_ar && c.name !== c.name_ar ? `<span style="color:var(--text-muted);font-size:0.78rem">/ ${c.name}</span>` : ''}
-          <button onclick="deleteCategory('${c.id}')" title="حذف">✕</button>
-        </div>`).join('');
+    async function toggleSetting(key,el){
+      const on=el.classList.toggle('on');
+      await db.from('settings').upsert({key,value:on.toString()},{onConflict:'key'});
+      showToast(on?'تم التفعيل':'تم الإيقاف');
     }
-
-    async function addCategory() {
-      const nameAr = document.getElementById('new-cat-ar').value.trim();
-      const nameEn = document.getElementById('new-cat-en').value.trim();
-      if (!nameAr && !nameEn) { showToast('اكتب اسم التصنيف', 'error'); return; }
-
-      const name = nameEn || nameAr;
-      const slug = name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
-
-      const { error } = await db.from('categories').insert({
-        name, name_ar: nameAr || null, slug: slug || Date.now().toString()
-      });
-
-      if (error) {
-        showToast('التصنيف ده موجود بالفعل', 'error');
-      } else {
-        document.getElementById('new-cat-ar').value = '';
-        document.getElementById('new-cat-en').value = '';
-        showToast('تم إضافة التصنيف');
-        loadCategories();
-      }
+    async function saveGeneral(){
+      await Promise.all([
+        db.from('settings').upsert({key:'site_name_ar',value:document.getElementById('site-name-ar').value},{onConflict:'key'}),
+        db.from('settings').upsert({key:'site_name_en',value:document.getElementById('site-name-en').value},{onConflict:'key'}),
+        db.from('settings').upsert({key:'announcement',value:document.getElementById('announcement').value},{onConflict:'key'}),
+      ]);
+      showToast('تم الحفظ');
     }
-
-    async function deleteCategory(id) {
-      if (!confirm('هتحذف التصنيف ده؟ المنتجات المرتبطة بيه مش هتتحذف')) return;
-      await db.from('categories').delete().eq('id', id);
-      showToast('تم حذف التصنيف');
-      loadCategories();
+    async function saveWhatsApp(){
+      await db.from('settings').upsert({key:'whatsapp_number',value:document.getElementById('whatsapp-number').value},{onConflict:'key'});
+      showToast('تم حفظ رقم الواتساب');
     }
-
-    // Moderators
-    async function loadModerators() {
-      const { data } = await db.from('auth.users').select('id, email, raw_user_meta_data, created_at');
-      // We use a workaround via profiles
-      const { data: profiles } = await db.from('profiles').select('id, full_name, created_at');
-      const { data: allUsers } = await db.rpc('get_moderators');
-
-      const list = document.getElementById('moderators-list');
-      if (!allUsers?.length) {
-        list.innerHTML = '<p style="font-size:0.85rem;color:var(--text-muted)">مفيش مشرفين مضافين</p>';
-        return;
-      }
-      list.innerHTML = allUsers.map(u => `
-        <div class="moderator-item">
-          <div class="moderator-avatar">${(u.full_name || u.email || 'M')[0].toUpperCase()}</div>
-          <div class="moderator-info">
-            <div class="moderator-name">${u.full_name || 'مشرف'}</div>
-            <div class="moderator-email">${u.email}</div>
-          </div>
-          <button class="btn btn-danger btn-sm" onclick="removeModerator('${u.id}')">إزالة</button>
-        </div>`).join('');
+    function testWA(){const n=document.getElementById('whatsapp-number').value;if(!n){showToast('اكتب الرقم الأول','error');return;}window.open(`https://wa.me/2${n}`,'_blank');}
+    async function loadCategories(){
+      const {data}=await db.from('categories').select('*').order('name');
+      categories=data||[];
+      const list=document.getElementById('cat-list');
+      if(!categories.length){list.innerHTML='<p style="font-size:.85rem;color:var(--text-muted)">مفيش تصنيفات</p>';return;}
+      list.innerHTML=categories.map(c=>`<div class="category-tag"><span>${c.name_ar||c.name}</span><button onclick="deleteCategory('${c.id}')">✕</button></div>`).join('');
     }
-
-    async function addModerator() {
-      const email = document.getElementById('new-moderator-email').value.trim();
-      if (!email) return;
-
-      // Find user by email via RPC
-      const { data, error } = await db.rpc('set_user_role', { user_email: email, new_role: 'moderator' });
-
-      if (error) {
-        showToast('مش لاقي يوزر بالإيميل ده', 'error');
-      } else {
-        document.getElementById('new-moderator-email').value = '';
-        showToast('تم إضافة المشرف');
-        loadModerators();
-      }
+    async function addCategory(){
+      const ar=document.getElementById('new-cat-ar').value.trim();
+      const en=document.getElementById('new-cat-en').value.trim();
+      if(!ar&&!en){showToast('اكتب اسم التصنيف','error');return;}
+      const name=en||ar;
+      const slug=name.toLowerCase().replace(/\s+/g,'-').replace(/[^a-z0-9-]/g,'')||Date.now().toString();
+      const {error}=await db.from('categories').insert({name,name_ar:ar||null,slug});
+      if(error){showToast('التصنيف موجود بالفعل','error');}
+      else{document.getElementById('new-cat-ar').value='';document.getElementById('new-cat-en').value='';showToast('تم إضافة التصنيف');loadCategories();}
     }
-
-    async function removeModerator(userId) {
-      if (!confirm('هتشيل الصلاحيات من المشرف ده؟')) return;
-      const { error } = await db.rpc('set_user_role_by_id', { user_id: userId, new_role: 'customer' });
-      if (!error) {
-        showToast('تم إزالة المشرف');
-        loadModerators();
-      }
+    async function deleteCategory(id){
+      if(!confirm('هتحذف التصنيف؟'))return;
+      await db.from('categories').delete().eq('id',id);
+      showToast('تم الحذف');loadCategories();
     }
-
-    async function cleanOldOrders() {
-      if (!confirm('هتحذف كل الطلبات المكتملة والملغية اللي عدى عليها +90 يوم. متأكد؟')) return;
-      const cutoff = new Date();
-      cutoff.setDate(cutoff.getDate() - 90);
-      const { error } = await db.from('orders')
-        .delete()
-        .in('status', ['delivered', 'cancelled'])
-        .lt('created_at', cutoff.toISOString());
-      if (!error) showToast('تم التنظيف بنجاح');
+    async function loadModerators(){
+      const {data,error}=await db.rpc('get_moderators');
+      const list=document.getElementById('mod-list');
+      if(error||!data?.length){list.innerHTML='<p style="font-size:.85rem;color:var(--text-muted)">مفيش مشرفين مضافين</p>';return;}
+      list.innerHTML=data.map(u=>`<div style="display:flex;align-items:center;gap:1rem;padding:.75rem 0;border-bottom:1px solid var(--border)"><div style="width:38px;height:38px;border-radius:50%;background:rgba(201,168,76,0.15);display:flex;align-items:center;justify-content:center;font-weight:700;color:var(--gold)">${(u.full_name||u.email||'M')[0].toUpperCase()}</div><div style="flex:1"><div style="font-weight:600">${u.full_name||'مشرف'}</div><div style="font-size:.8rem;color:var(--text-muted)">${u.email}</div></div><button class="btn btn-danger btn-sm" onclick="removeModerator('${u.id}')">إزالة</button></div>`).join('');
     }
-
-    // SQL Function needed for moderators
-    async function createHelperFunctions() {
-      // These functions need to be created in Supabase SQL Editor manually
-      // set_user_role(user_email, new_role) and get_moderators()
+    async function addModerator(){
+      const email=document.getElementById('new-mod-email').value.trim();
+      if(!email)return;
+      const {error}=await db.rpc('set_user_role',{user_email:email,new_role:'moderator'});
+      if(error){showToast('مش لاقي الإيميل ده','error');}
+      else{document.getElementById('new-mod-email').value='';showToast('تم إضافة المشرف');loadModerators();}
     }
-
-    document.getElementById('theme-toggle').innerHTML = getTheme() === 'dark' ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
-
-    function openSidebar(){document.getElementById("admin-sidebar").classList.add("open");document.getElementById("sidebar-overlay").classList.add("active");}function closeSidebar(){document.getElementById("admin-sidebar").classList.remove("open");document.getElementById("sidebar-overlay").classList.remove("active");}
-    async function init() {
-      const ok = await adminAuthCheck();
-      if (!ok) return;
-      // الإعدادات للأدمن بس مش المشرف
-      const { data: { session } } = await db.auth.getSession();
-      const role = session?.user?.user_metadata?.role;
-      if (role !== 'admin') { window.location.href = '/admin-antika-ctrl/'; return; }
-      document.body.style.opacity = '1';
+    async function removeModerator(id){
+      if(!confirm('هتشيل الصلاحيات؟'))return;
+      await db.rpc('set_user_role_by_id',{user_id:id,new_role:'customer'});
+      showToast('تم الإزالة');loadModerators();
+    }
+    async function init(){
+      const ok=await adminAuth();if(!ok)return;
+      const {data:{session}}=await db.auth.getSession();
+      if(session?.user?.user_metadata?.role!=='admin'){window.location.href='/admin-antika-ctrl/';return;}
+      document.body.style.opacity='1';
       await loadSettings();
       await loadCategories();
-      await loadModerators().catch(() => {
-        document.getElementById('moderators-list').innerHTML = '<p style="font-size:0.85rem;color:var(--text-muted)">محتاج إضافة الـ SQL functions في Supabase</p>';
-      });
+      await loadModerators().catch(()=>{document.getElementById('mod-list').innerHTML='<p style="font-size:.85rem;color:var(--text-muted)">يحتاج إضافة SQL functions في Supabase</p>';});
+      loadPendingBadge();
     }
-
     init();
   </script>
 </body>

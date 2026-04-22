@@ -22,12 +22,20 @@ async function uploadToCloudinary(file, folder = 'products') {
   formData.append('upload_preset', CONFIG.cloudinary.uploadPreset);
   formData.append('folder', `antika/${folder}`);
 
+  const isVideo = file.type.startsWith('video');
+  const endpoint = isVideo ? 'video' : 'image';
+
   const res = await fetch(
-    `https://api.cloudinary.com/v1_1/${CONFIG.cloudinary.cloudName}/auto/upload`,
+    `https://api.cloudinary.com/v1_1/${CONFIG.cloudinary.cloudName}/${endpoint}/upload`,
     { method: 'POST', body: formData }
   );
   const data = await res.json();
   if (!res.ok) throw new Error(data.error?.message || 'Upload failed');
+
+  // للفيديو نرجع الـ URL مع extension صح
+  if (isVideo) {
+    return data.secure_url.replace('/upload/', '/upload/').replace(/\.[^/.]+$/, '.mp4');
+  }
   return data.secure_url;
 }
 
@@ -65,8 +73,11 @@ async function getSetting(key) {
 }
 
 async function checkMaintenance() {
+  // مش نعمل redirect لو احنا على maintenance.html أو admin
+  const path = window.location.pathname;
+  if (path.includes('admin') || path.includes('maintenance')) return;
   const mode = await getSetting('maintenance_mode');
-  if (mode === 'true' && !window.location.pathname.includes('admin')) {
+  if (mode === 'true') {
     window.location.href = '/maintenance.html';
   }
 }

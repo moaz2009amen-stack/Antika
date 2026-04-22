@@ -19,6 +19,15 @@
   </div>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
   <script src="/js/config.js"></script>
-  <script>initTheme();</script>
+  <script>
+    initTheme();
+    // كل 10 ثواني بيتحقق لو الصيانة اتلغت
+    async function recheck() {
+      const mode = await getSetting('maintenance_mode');
+      if (mode !== 'true') window.location.href = '/';
+    }
+    recheck();
+    setInterval(recheck, 10000);
+  </script>
 </body>
 </html>

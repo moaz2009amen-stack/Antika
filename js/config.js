@@ -23,19 +23,22 @@ async function uploadToCloudinary(file, folder = 'products') {
   formData.append('folder', `antika/${folder}`);
 
   const isVideo = file.type.startsWith('video');
-  const endpoint = isVideo ? 'video' : 'image';
 
+  // نستخدم auto دايماً — Cloudinary بيعرف نوع الملف تلقائي
   const res = await fetch(
-    `https://api.cloudinary.com/v1_1/${CONFIG.cloudinary.cloudName}/${endpoint}/upload`,
+    `https://api.cloudinary.com/v1_1/${CONFIG.cloudinary.cloudName}/auto/upload`,
     { method: 'POST', body: formData }
   );
-  const data = await res.json();
-  if (!res.ok) throw new Error(data.error?.message || 'Upload failed');
 
-  // للفيديو نرجع الـ URL مع extension صح
+  const data = await res.json();
+  if (!res.ok || data.error) throw new Error(data.error?.message || 'Upload failed');
+
+  // للفيديو نتأكد إن الـ URL بيشير لـ video resource
   if (isVideo) {
-    return data.secure_url.replace('/upload/', '/upload/').replace(/\.[^/.]+$/, '.mp4');
+    // استبدل /image/ بـ /video/ في الـ URL لو موجودة
+    return data.secure_url.replace('/image/upload/', '/video/upload/');
   }
+
   return data.secure_url;
 }
 

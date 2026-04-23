@@ -296,13 +296,28 @@
     async function updateAvatar(input) {
       const file = input.files[0];
       if (!file) return;
-      const ext = file.name.split('.').pop();
-      const path = `${currentUser.id}.${ext}`;
-      await db.storage.from('avatars').upload(path, file, { upsert: true });
-      const { data } = db.storage.from('avatars').getPublicUrl(path);
-      await db.from('profiles').update({ avatar_url: data.publicUrl }).eq('id', currentUser.id);
-      document.getElementById('profile-avatar').src = data.publicUrl + '?t=' + Date.now();
-      showToast(l === 'ar' ? 'تم تحديث الصورة' : 'Avatar updated');
+
+      // تحقق إن الملف صورة
+      if (!file.type.startsWith('image/')) {
+        showToast(l === 'ar' ? 'يرجى اختيار صورة فقط' : 'Please select an image', 'error');
+        return;
+      }
+
+      showToast(l === 'ar' ? 'جاري رفع الصورة...' : 'Uploading...', 'info');
+
+      try {
+        // رفع على Cloudinary مش Supabase Storage
+        const url = await uploadToCloudinary(file, 'avatars');
+
+        // تحديث الـ profile
+        await db.from('profiles').update({ avatar_url: url }).eq('id', currentUser.id);
+
+        // تحديث الصورة في الصفحة فوراً
+        document.getElementById('profile-avatar').src = url;
+        showToast(l === 'ar' ? '✓ تم تحديث الصورة' : '✓ Avatar updated');
+      } catch (err) {
+        showToast(l === 'ar' ? 'فشل رفع الصورة' : 'Upload failed', 'error');
+      }
     }
 
     async function logout() {

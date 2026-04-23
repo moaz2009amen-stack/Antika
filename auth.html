@@ -476,12 +476,11 @@
 
       // Upload avatar if exists
       if (avatarFile && data.user) {
-        const ext = avatarFile.name.split('.').pop();
-        const path = `${data.user.id}.${ext}`;
-        const { data: uploadData } = await db.storage.from('avatars').upload(path, avatarFile, { upsert: true });
-        if (uploadData) {
-          const { data: urlData } = db.storage.from('avatars').getPublicUrl(path);
-          await db.from('profiles').update({ avatar_url: urlData.publicUrl }).eq('id', data.user.id);
+        try {
+          const avatarUrl = await uploadToCloudinary(avatarFile, 'avatars');
+          await db.from('profiles').update({ avatar_url: avatarUrl }).eq('id', data.user.id);
+        } catch (e) {
+          console.log('Avatar upload failed, continuing without it');
         }
       }
 

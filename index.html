@@ -2,13 +2,11 @@
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="google-site-verification" content="rz5pNaKLcGue7H5nqnFgN0AXCPKMKLcjwRay3X4sPCw" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="Antika Gallery متجر متخصص في بيع الملابس الحريمي، اللانجري، الإكسسوارات والتحف المميزة بأحدث التصميمات وجودة عالية وأسعار مناسبة في مصر">
   <title>Antika Gallery — أنتيكا جاليري</title>
-  <link rel="icon" type="image/png" sizes="32x32" href="https://res.cloudinary.com/df3ffyrsg/image/upload/q_auto/f_auto/v1776645596/ChatGPT_Image_20_%D8%A3%D8%A8%D8%B1%D9%8A%D9%84_2026_02_28_38_%D8%B5_etwl3l.png">
-<link rel="icon" type="image/png" sizes="16x16" href="https://res.cloudinary.com/df3ffyrsg/image/upload/q_auto/f_auto/v1776645596/ChatGPT_Image_20_%D8%A3%D8%A8%D8%B1%D9%8A%D9%84_2026_02_28_38_%D8%B5_etwl3l.png">
-<link rel="shortcut icon" href="https://res.cloudinary.com/df3ffyrsg/image/upload/q_auto/f_auto/v1776645596/ChatGPT_Image_20_%D8%A3%D8%A8%D8%B1%D9%8A%D9%84_2026_02_28_38_%D8%B5_etwl3l.png">
   <link rel="stylesheet" href="/css/main.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <style>
@@ -429,7 +427,7 @@
         </div>
       </div>
       <div class="footer-bottom">
-        <p style="font-size:0.85rem;color:var(--text-muted)" data-ar="© 2026 أنتيكا جاليري. جميع الحقوق محفوظة" data-en="© 2024 Antika Gallery. All rights reserved">© 2026 أنتيكا جاليري. جميع الحقوق محفوظة</p>
+        <p style="font-size:0.85rem;color:var(--text-muted)" data-ar="© 2024 أنتيكا جاليري. جميع الحقوق محفوظة" data-en="© 2024 Antika Gallery. All rights reserved">© 2024 أنتيكا جاليري. جميع الحقوق محفوظة</p>
         <p class="footer-dev">Developed by <a href="https://www.facebook.com/profile.php?id=61552026802548&locale=ar_AR" target="_blank" rel="noopener">Moaz</a></p>
       </div>
     </div>
@@ -473,7 +471,7 @@
     function buildProductCard(p) {
       const l = getLang();
       const name = l === 'ar' && p.name_ar ? p.name_ar : p.name;
-      const img = p.images?.[0] || 'https://via.placeholder.com/400x500?text=Antika';
+      const img = p.images?.[0] || 'https://res.cloudinary.com/df3ffyrsg/image/upload/v1/antika/placeholder';
       return `
         <a href="/product.html?id=${p.id}" class="product-card">
           <div class="product-card-image">

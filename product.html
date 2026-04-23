@@ -278,7 +278,7 @@
           document.getElementById('related-section').style.display = 'block';
           document.getElementById('related-grid').innerHTML = related.map(r => {
             const rname = l === 'ar' && r.name_ar ? r.name_ar : r.name;
-            const rimg = r.images?.[0] || 'https://via.placeholder.com/400x500?text=Antika';
+            const rimg = r.images?.[0] || 'https://res.cloudinary.com/df3ffyrsg/image/upload/v1/antika/placeholder';
             return `
               <a href="/product.html?id=${r.id}" class="product-card">
                 <div class="product-card-image"><img src="${rimg}" alt="${rname}" loading="lazy"></div>

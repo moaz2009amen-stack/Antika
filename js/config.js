@@ -18,7 +18,6 @@ const db = createClient(CONFIG.supabase.url, CONFIG.supabase.key);
 
 // ── Cloudinary Upload ──────────────────────────────────────────
 async function uploadToCloudinary(file, folder = 'products') {
-  // تحديد نوع الملف
   const isVideo = file.type.startsWith('video/');
   const resourceType = isVideo ? 'video' : 'image';
 
@@ -26,6 +25,7 @@ async function uploadToCloudinary(file, folder = 'products') {
   formData.append('file', file);
   formData.append('upload_preset', CONFIG.cloudinary.uploadPreset);
   formData.append('folder', `antika/${folder}`);
+  formData.append('resource_type', resourceType);
 
   const res = await fetch(
     `https://api.cloudinary.com/v1_1/${CONFIG.cloudinary.cloudName}/${resourceType}/upload`,

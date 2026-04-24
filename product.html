@@ -147,13 +147,25 @@
       document.getElementById('qty-display').value = quantity;
     }
 
+    function isVideo(url) {
+      if (!url) return false;
+      return url.includes('/video/upload/') ||
+             url.match(/\.(mp4|mov|webm|avi|mkv)(\?|$)/i) !== null;
+    }
+
     function renderProduct(p, catName) {
       const l = getLang();
       const name = l === 'ar' && p.name_ar ? p.name_ar : p.name;
       const desc = l === 'ar' && p.description_ar ? p.description_ar : p.description;
       const imgs = p.images || [];
-      const hasVideo = !!p.video_url;
-      const allMedia = [...imgs.map(i => ({ src: i, isVideo: false })), ...(hasVideo ? [{ src: p.video_url, isVideo: true }] : [])];
+
+      // كل ملف في الـ array — نحدد هو صورة ولا فيديو
+      const allMedia = imgs.map(src => ({ src, isVideo: isVideo(src) }));
+
+      // لو في video_url منفصل، نضيفه كمان
+      if (p.video_url && !allMedia.find(m => m.src === p.video_url)) {
+        allMedia.push({ src: p.video_url, isVideo: true });
+      }
 
       document.title = `Antika Gallery — ${name}`;
       document.getElementById('breadcrumb-name').textContent = name;

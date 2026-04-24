@@ -5,7 +5,8 @@ const CONFIG = {
   },
   cloudinary: {
     cloudName: 'df3ffyrsg',
-    uploadPreset: 'antika'
+    uploadPreset: 'antika',
+    videoPreset: 'antika_video'
   },
   admin: {
     path: '/admin-antika-ctrl'
@@ -17,28 +18,22 @@ const db = createClient(CONFIG.supabase.url, CONFIG.supabase.key);
 
 // ── Cloudinary Upload ──────────────────────────────────────────
 async function uploadToCloudinary(file, folder = 'products') {
+  // تحديد نوع الملف
+  const isVideo = file.type.startsWith('video/');
+  const resourceType = isVideo ? 'video' : 'image';
+
   const formData = new FormData();
   formData.append('file', file);
   formData.append('upload_preset', CONFIG.cloudinary.uploadPreset);
   formData.append('folder', `antika/${folder}`);
 
-  const isVideo = file.type.startsWith('video');
-
-  // نستخدم auto دايماً — Cloudinary بيعرف نوع الملف تلقائي
   const res = await fetch(
-    `https://api.cloudinary.com/v1_1/${CONFIG.cloudinary.cloudName}/auto/upload`,
+    `https://api.cloudinary.com/v1_1/${CONFIG.cloudinary.cloudName}/${resourceType}/upload`,
     { method: 'POST', body: formData }
   );
 
   const data = await res.json();
   if (!res.ok || data.error) throw new Error(data.error?.message || 'Upload failed');
-
-  // للفيديو نتأكد إن الـ URL بيشير لـ video resource
-  if (isVideo) {
-    // استبدل /image/ بـ /video/ في الـ URL لو موجودة
-    return data.secure_url.replace('/image/upload/', '/video/upload/');
-  }
-
   return data.secure_url;
 }
 

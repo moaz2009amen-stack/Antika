@@ -16,45 +16,6 @@ const CONFIG = {
 const { createClient } = supabase;
 const db = createClient(CONFIG.supabase.url, CONFIG.supabase.key);
 
-// ── Cloudinary Image Optimization ─────────────────────────────
-// بيضيف transformations تلقائي للصور عشان تكون أسرع وأخف
-function optimizeImage(url, options = {}) {
-  if (!url || !url.includes('cloudinary.com')) return url;
-  if (url.includes('/video/upload/')) return url; // فيديوهات مش بنحتاج نحولها
-
-  const {
-    width = 600,
-    height = null,
-    quality = 'auto',
-    format = 'auto',
-    crop = 'fill'
-  } = options;
-
-  // بنبني الـ transformation string
-  let transforms = `q_${quality},f_${format}`;
-  if (width) transforms += `,w_${width}`;
-  if (height) transforms += `,h_${height}`;
-  if (width || height) transforms += `,c_${crop}`;
-
-  // نضيف الـ transforms بعد /upload/
-  return url.replace('/upload/', `/upload/${transforms}/`);
-}
-
-// صور المنتجات في الكارد — مصغرة وسريعة
-function cardImage(url) {
-  return optimizeImage(url, { width: 400, height: 520, quality: 'auto', format: 'auto' });
-}
-
-// صور المنتجات في صفحة التفاصيل — جودة أعلى
-function detailImage(url) {
-  return optimizeImage(url, { width: 800, quality: 'auto', format: 'auto', crop: 'limit' });
-}
-
-// صور البروفايل — صغيرة جداً
-function avatarImage(url) {
-  return optimizeImage(url, { width: 100, height: 100, quality: 'auto', format: 'auto' });
-}
-
 // ── Cloudinary Upload ──────────────────────────────────────────
 async function uploadToCloudinary(file, folder = 'products') {
   const isVideo = file.type.startsWith('video/');

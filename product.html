@@ -167,10 +167,17 @@
         allMedia.push({ src: p.video_url, isVideo: true });
       }
 
+      // تطبيق image optimization على الـ thumbnails
+      const allMedia = imgs.map(src => ({ src, isVideo: isVideo(src) }));
+      if (p.video_url && !allMedia.find(m => m.src === p.video_url)) {
+        allMedia.push({ src: p.video_url, isVideo: true });
+      }
+
       document.title = `Antika Gallery — ${name}`;
       document.getElementById('breadcrumb-name').textContent = name;
 
       const firstMedia = allMedia[0];
+      const mainSrc = firstMedia?.isVideo ? firstMedia.src : detailImage(firstMedia?.src || '');
 
       document.getElementById('product-container').innerHTML = `
         <div class="product-layout">
@@ -181,8 +188,8 @@
                 ${firstMedia
                   ? firstMedia.isVideo
                     ? `<video src="${firstMedia.src}" controls style="width:100%;height:100%;object-fit:cover"></video>`
-                    : `<img src="${firstMedia.src}" alt="${name}" style="width:100%;height:100%;object-fit:cover;cursor:zoom-in" onclick="openZoom('${firstMedia.src}')">`
-                  : `<div style="display:flex;align-items:center;justify-content:center;height:100%;color:var(--text-muted)"><i class="fas fa-image" style="font-size:3rem"></i></div>`
+                    : `<img src="${mainSrc}" alt="${name}" style="width:100%;height:100%;object-fit:cover;cursor:zoom-in" onclick="openZoom('${mainSrc}')">`
+                  : `<div style="display:flex;align-items:center;justify-content:height:100%;color:var(--text-muted)"><i class="fas fa-image" style="font-size:3rem"></i></div>`
                 }
               </div>
               <div class="media-badge" id="media-badge" style="display:${firstMedia?.isVideo ? 'flex' : 'none'}">
@@ -193,10 +200,10 @@
               <div class="thumbnails">
                 ${allMedia.map((m, i) => `
                   <div class="thumb ${i === 0 ? 'active' : ''} ${m.isVideo ? 'thumb-video' : ''}"
-                    onclick="showMedia('${m.src}', ${m.isVideo}, this)">
+                    onclick="showMedia('${m.isVideo ? m.src : detailImage(m.src)}', ${m.isVideo}, this)">
                     ${m.isVideo
                       ? '<i class="fas fa-play" style="color:#fff;font-size:1rem"></i>'
-                      : `<img src="${m.src}" alt="" loading="lazy">`
+                      : `<img src="${cardImage(m.src)}" alt="" loading="lazy">`
                     }
                   </div>`).join('')}
               </div>` : ''}
@@ -284,16 +291,27 @@
 
       // Load related
       if (p.category_id) {
-        const { data: related } = await db.from('products').select('*')
-          .eq('category_id', p.category_id).eq('is_published', true).neq('id', id).limit(4);
+        const { data: related } = await db.from('products')
+          .select('id, name, name_ar, price, images')
+          .eq('category_id', p.category_id)
+          .eq('is_published', true)
+          .neq('id', id)
+          .limit(4);
         if (related?.length) {
           document.getElementById('related-section').style.display = 'block';
           document.getElementById('related-grid').innerHTML = related.map(r => {
             const rname = l === 'ar' && r.name_ar ? r.name_ar : r.name;
-            const rimg = r.images?.[0] || 'https://res.cloudinary.com/df3ffyrsg/image/upload/v1/antika/placeholder';
+            const rfirst = r.images?.[0];
+            const risVid = rfirst && (rfirst.includes('/video/upload/') || rfirst.match(/\.(mp4|mov|webm)(\?|$)/i));
+            const rimg = rfirst ? (risVid ? rfirst : cardImage(rfirst)) : 'https://res.cloudinary.com/df3ffyrsg/image/upload/v1/antika/placeholder';
             return `
               <a href="/product.html?id=${r.id}" class="product-card">
-                <div class="product-card-image"><img src="${rimg}" alt="${rname}" loading="lazy"></div>
+                <div class="product-card-image" style="position:relative">
+                  ${risVid
+                    ? `<video src="${rimg}" muted loop playsinline style="width:100%;height:100%;object-fit:cover"></video><span style="position:absolute;top:8px;left:8px;background:rgba(0,0,0,.6);color:#fff;border-radius:4px;padding:2px 8px;font-size:.7rem"><i class="fas fa-play"></i></span>`
+                    : `<img src="${rimg}" alt="${rname}" loading="lazy">`
+                  }
+                </div>
                 <div class="product-card-body">
                   <div class="product-card-title">${rname}</div>
                   <div class="product-card-price">${formatPrice(r.price)}</div>
@@ -301,6 +319,29 @@
               </a>`;
           }).join('');
         }
+      }
+
+      // زر واتساب عائم
+      const waNum = await getSetting('whatsapp_number');
+      if (waNum) {
+        const waName = encodeURIComponent(name);
+        const waMsg = encodeURIComponent(`أهلاً، أنا مهتمة بالمنتج: ${name} — ${window.location.href}`);
+        const waBtn = document.createElement('a');
+        waBtn.href = `https://wa.me/2${waNum}?text=${waMsg}`;
+        waBtn.target = '_blank';
+        waBtn.title = l === 'ar' ? 'تواصل عبر واتساب' : 'Contact via WhatsApp';
+        waBtn.style.cssText = `
+          position:fixed;bottom:2rem;left:2rem;width:56px;height:56px;
+          background:#25d366;color:#fff;border-radius:50%;
+          display:flex;align-items:center;justify-content:center;
+          font-size:1.5rem;box-shadow:0 4px 20px rgba(37,211,102,0.4);
+          z-index:999;transition:transform 0.2s,box-shadow 0.2s;
+          text-decoration:none;
+        `;
+        waBtn.innerHTML = '<i class="fab fa-whatsapp"></i>';
+        waBtn.onmouseover = () => { waBtn.style.transform = 'scale(1.1)'; waBtn.style.boxShadow = '0 6px 28px rgba(37,211,102,0.5)'; };
+        waBtn.onmouseout = () => { waBtn.style.transform = 'scale(1)'; waBtn.style.boxShadow = '0 4px 20px rgba(37,211,102,0.4)'; };
+        document.body.appendChild(waBtn);
       }
     }
 

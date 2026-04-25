@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Antika Gallery — المتجر</title>
+  <link rel="manifest" href="/manifest.json">
   <link rel="stylesheet" href="/css/main.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <style>
@@ -275,12 +276,18 @@
       }
       grid.innerHTML = products.map(p => {
         const name = l === 'ar' && p.name_ar ? p.name_ar : p.name;
-        const img = p.images?.[0] || 'https://res.cloudinary.com/df3ffyrsg/image/upload/v1/antika/placeholder';
+        const firstMedia = p.images?.[0];
+        const placeholder = 'https://res.cloudinary.com/df3ffyrsg/image/upload/v1/antika/placeholder';
+        const isVid = firstMedia && (firstMedia.includes('/video/upload/') || firstMedia.match(/\.(mp4|mov|webm|avi)(\?|$)/i));
+        const mediaSrc = firstMedia ? (isVid ? firstMedia : cardImage(firstMedia)) : placeholder;
         const isNew = new Date(p.created_at) > new Date(Date.now() - 7*24*60*60*1000);
+        const mediaEl = isVid
+          ? `<video src="${mediaSrc}" muted loop playsinline style="width:100%;height:100%;object-fit:cover"></video><span style="position:absolute;top:8px;left:8px;background:rgba(0,0,0,.6);color:#fff;border-radius:4px;padding:2px 8px;font-size:.7rem"><i class="fas fa-play"></i></span>`
+          : `<img src="${mediaSrc}" alt="${name}" loading="lazy">`;
         return `
           <a href="/product.html?id=${p.id}" class="product-card">
-            <div class="product-card-image">
-              <img src="${img}" alt="${name}" loading="lazy">
+            <div class="product-card-image" style="position:relative">
+              ${mediaEl}
               ${isNew ? `<span class="product-card-badge">${l === 'ar' ? 'جديد' : 'New'}</span>` : ''}
             </div>
             <div class="product-card-body">
@@ -288,7 +295,7 @@
               <div style="font-size:0.8rem;color:var(--text-muted);margin-bottom:0.5rem">${getCatName(p.category_id, l)}</div>
               <div class="product-card-price">${formatPrice(p.price)}</div>
               <div class="product-card-actions">
-                <button class="btn btn-primary btn-sm" style="flex:1" onclick="event.preventDefault();addToCart({id:'${p.id}',name:'${name}',price:${p.price},image:'${img}'})">
+                <button class="btn btn-primary btn-sm" style="flex:1" onclick="event.preventDefault();addToCart({id:'${p.id}',name:'${name.replace(/'/g,"\\'")}',price:${p.price},image:'${mediaSrc}'})">
                   <i class="fas fa-shopping-bag"></i> ${l === 'ar' ? 'أضيفي للسلة' : 'Add to Cart'}
                 </button>
               </div>

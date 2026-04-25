@@ -170,12 +170,6 @@
         allMedia.push({ src: p.video_url, isVideo: true });
       }
 
-      // تطبيق image optimization على الـ thumbnails
-      const allMedia = imgs.map(src => ({ src, isVideo: isVideo(src) }));
-      if (p.video_url && !allMedia.find(m => m.src === p.video_url)) {
-        allMedia.push({ src: p.video_url, isVideo: true });
-      }
-
       document.title = `Antika Gallery — ${name}`;
       document.getElementById('breadcrumb-name').textContent = name;
 

@@ -145,6 +145,22 @@
           <span data-ar="الإجمالي الفرعي" data-en="Subtotal">الإجمالي الفرعي</span>
           <span id="order-subtotal"></span>
         </div>
+
+        <!-- كوبون الخصم -->
+        <div style="margin:0.75rem 0;padding:0.75rem;background:var(--bg-secondary);border-radius:var(--radius-sm);border:1px dashed var(--border)">
+          <div style="display:flex;gap:0.5rem">
+            <input type="text" class="form-control" id="coupon-input" placeholder="كود الخصم" dir="ltr" style="flex:1;font-size:0.85rem;height:40px;padding:0.5rem 0.75rem">
+            <button class="btn btn-ghost btn-sm" onclick="applyCoupon()" id="coupon-btn" style="height:40px;white-space:nowrap">
+              <i class="fas fa-tag"></i> تطبيق
+            </button>
+          </div>
+          <div id="coupon-msg" style="font-size:0.82rem;margin-top:0.5rem;font-weight:600"></div>
+        </div>
+
+        <div class="summary-row" id="discount-row" style="display:none;color:#16a34a">
+          <span data-ar="الخصم" data-en="Discount">الخصم</span>
+          <span id="discount-amount"></span>
+        </div>
         <div class="summary-row">
           <span data-ar="التوصيل" data-en="Delivery">التوصيل</span>
           <span style="color:#16a34a;font-weight:600" data-ar="عند الاستلام" data-en="On delivery">عند الاستلام</span>
@@ -176,6 +192,7 @@
   <script>
     let selectedPayment = 'cash';
     let proofFile = null;
+    let appliedCoupon = null;
     const l = getLang();
 
     function applyLang() {
@@ -207,9 +224,17 @@
       const cart = getCart();
       if (!cart.length) { window.location.href = '/cart.html'; return; }
 
-      const total = cart.reduce((s, i) => s + i.price * i.quantity, 0);
-      document.getElementById('order-subtotal').textContent = formatPrice(total);
+      const subtotal = cart.reduce((s, i) => s + i.price * i.quantity, 0);
+      const discount = appliedCoupon?.discount || 0;
+      const total = subtotal - discount;
+
+      document.getElementById('order-subtotal').textContent = formatPrice(subtotal);
       document.getElementById('order-total').textContent = formatPrice(total);
+
+      if (discount > 0) {
+        document.getElementById('discount-row').style.display = 'flex';
+        document.getElementById('discount-amount').textContent = `- ${formatPrice(discount)}`;
+      }
 
       document.getElementById('order-items').innerHTML = cart.map(item => `
         <div class="order-item-row">
@@ -263,7 +288,9 @@
 
       try {
         const user = await getCurrentUser();
-        const total = cart.reduce((s, i) => s + i.price * i.quantity, 0);
+        const subtotal = cart.reduce((s, i) => s + i.price * i.quantity, 0);
+        const discount = appliedCoupon?.discount || 0;
+        const total = subtotal - discount;
 
         let proofUrl = null;
         if (proofFile) {
@@ -272,11 +299,11 @@
 
         // Create order
         const { data: order, error: orderError } = await db.from('orders').insert({
-          user_id: user.id,
+          user_id: user?.id || null,
           total,
           payment_method: selectedPayment,
           payment_proof_url: proofUrl,
-          notes: `الاسم: ${name} | التليفون: ${phone} | العنوان: ${address}${notes ? ' | ملاحظات: ' + notes : ''}`,
+          notes: `الاسم: ${name} | التليفون: ${phone} | العنوان: ${address}${notes ? ' | ملاحظات: ' + notes : ''}${appliedCoupon ? ' | كوبون: ' + document.getElementById('coupon-input').value.toUpperCase() : ''}`,
           status: 'pending'
         }).select().single();
 
@@ -291,18 +318,27 @@
         }));
         await db.from('order_items').insert(items);
 
+        // Update coupon usage count
+        if (appliedCoupon?.couponId) {
+          await db.from('coupons').update({ used_count: db.rpc('used_count + 1') }).eq('id', appliedCoupon.couponId);
+        }
+
         // Update profile
-        await db.from('profiles').update({ phone, address }).eq('id', user.id);
+        if (user?.id) {
+          await db.from('profiles').update({ phone, address }).eq('id', user.id);
+        }
 
         // Send WhatsApp notification
         const waNum = await getSetting('whatsapp_number');
         if (waNum) {
-          const msg = encodeURIComponent(`🛍️ طلب جديد من أنتيكا!\n\n👤 ${name}\n📱 ${phone}\n📍 ${address}\n💰 ${formatPrice(total)}\n💳 ${selectedPayment === 'cash' ? 'كاش' : 'محفظة'}\n🔖 رقم الطلب: ${order.id.slice(0,8)}`);
+          const couponInfo = appliedCoupon ? `\n🏷️ خصم: ${formatPrice(appliedCoupon.discount)}` : '';
+          const msg = encodeURIComponent(`🛍️ طلب جديد من أنتيكا!\n\n👤 ${name}\n📱 ${phone}\n📍 ${address}\n💰 ${formatPrice(total)}${couponInfo}\n💳 ${selectedPayment === 'cash' ? 'كاش' : 'محفظة'}\n🔖 رقم الطلب: ${order.id.slice(0,8)}`);
           window.open(`https://wa.me/2${waNum}?text=${msg}`, '_blank');
         }
 
         // Clear cart
         saveCart([]);
+        appliedCoupon = null;
 
         // Show success
         document.getElementById('success-order-id').textContent = order.id.slice(0, 8).toUpperCase();
@@ -314,6 +350,48 @@
         btn.disabled = false;
         btn.innerHTML = `<i class="fas fa-check-circle"></i> <span>${l === 'ar' ? 'تأكيد الطلب' : 'Place Order'}</span>`;
       }
+    }
+
+    async function applyCoupon() {
+      const code = document.getElementById('coupon-input').value.trim();
+      const msgEl = document.getElementById('coupon-msg');
+      const btn = document.getElementById('coupon-btn');
+      if (!code) return;
+
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+
+      const cart = getCart();
+      const subtotal = cart.reduce((s, i) => s + i.price * i.quantity, 0);
+      const result = await validateCoupon(code, subtotal);
+
+      msgEl.style.color = result.valid ? '#16a34a' : '#dc2626';
+      msgEl.textContent = result.msg;
+
+      if (result.valid) {
+        appliedCoupon = result;
+        document.getElementById('coupon-input').disabled = true;
+        btn.innerHTML = '<i class="fas fa-times"></i>';
+        btn.onclick = removeCoupon;
+      } else {
+        appliedCoupon = null;
+        btn.innerHTML = '<i class="fas fa-tag"></i> تطبيق';
+      }
+
+      btn.disabled = false;
+      renderOrderItems();
+    }
+
+    function removeCoupon() {
+      appliedCoupon = null;
+      document.getElementById('coupon-input').disabled = false;
+      document.getElementById('coupon-input').value = '';
+      document.getElementById('coupon-msg').textContent = '';
+      document.getElementById('discount-row').style.display = 'none';
+      const btn = document.getElementById('coupon-btn');
+      btn.innerHTML = '<i class="fas fa-tag"></i> تطبيق';
+      btn.onclick = applyCoupon;
+      renderOrderItems();
     }
 
     checkMaintenance();

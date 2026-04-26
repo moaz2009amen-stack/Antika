@@ -235,15 +235,19 @@
     // ── Review Modal ──────────────────────────────────────────────
     let reviewImages = [];
 
-    function openReviewModal(productId) {
+    function openReviewModal() {
       const l = getLang();
-      // تحقق من تسجيل الدخول
       getCurrentUser().then(user => {
         if (!user) {
           showToast(l === 'ar' ? 'سجلي دخولك أولاً' : 'Please sign in first', 'error');
           setTimeout(() => window.location.href = '/auth.html', 1200);
           return;
         }
+        reviewImages = [];
+        selectedRating = 0;
+        document.getElementById('review-comment').value = '';
+        document.getElementById('review-images-preview').innerHTML = '';
+        document.querySelectorAll('.star-btn').forEach(btn => btn.style.color = 'var(--border)');
         document.getElementById('review-modal').classList.add('open');
       });
     }
@@ -441,7 +445,7 @@
         <div class="related-section" id="reviews-section">
           <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;flex-wrap:wrap;gap:1rem">
             <h3 style="font-family:var(--font-display);font-size:1.4rem">${l === 'ar' ? 'آراء العملاء' : 'Customer Reviews'}</h3>
-            <button class="btn btn-outline btn-sm" onclick="openReviewModal('${p.id}')" id="write-review-btn">
+            <button class="btn btn-outline btn-sm" onclick="openReviewModal()" id="write-review-btn">
               <i class="fas fa-pen"></i> ${l === 'ar' ? 'اكتبي رأيك' : 'Write a Review'}
             </button>
           </div>
@@ -606,7 +610,11 @@
         <div style="margin-bottom:1.25rem">
           <label class="form-label">التقييم *</label>
           <div style="display:flex;gap:0.5rem;font-size:1.75rem">
-            ${[1,2,3,4,5].map(n => `<button class="star-btn" onclick="setReviewRating(${n})" style="background:none;border:none;cursor:pointer;color:var(--border);transition:color 0.2s;font-size:1.75rem"><i class="fas fa-star"></i></button>`).join('')}
+            <button class="star-btn" onclick="setReviewRating(1)" style="background:none;border:none;cursor:pointer;color:var(--border);transition:color 0.2s;font-size:1.75rem"><i class="fas fa-star"></i></button>
+            <button class="star-btn" onclick="setReviewRating(2)" style="background:none;border:none;cursor:pointer;color:var(--border);transition:color 0.2s;font-size:1.75rem"><i class="fas fa-star"></i></button>
+            <button class="star-btn" onclick="setReviewRating(3)" style="background:none;border:none;cursor:pointer;color:var(--border);transition:color 0.2s;font-size:1.75rem"><i class="fas fa-star"></i></button>
+            <button class="star-btn" onclick="setReviewRating(4)" style="background:none;border:none;cursor:pointer;color:var(--border);transition:color 0.2s;font-size:1.75rem"><i class="fas fa-star"></i></button>
+            <button class="star-btn" onclick="setReviewRating(5)" style="background:none;border:none;cursor:pointer;color:var(--border);transition:color 0.2s;font-size:1.75rem"><i class="fas fa-star"></i></button>
           </div>
         </div>
         <!-- Comment -->

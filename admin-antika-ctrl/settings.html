@@ -205,6 +205,34 @@
         </div>
       </div>
 
+      <!-- ── تصدير البيانات ── -->
+      <div class="s-section">
+        <div class="s-head"><i class="fas fa-download"></i><div class="s-head-title">تصدير البيانات</div></div>
+        <div class="s-body" style="padding-top:.5rem;padding-bottom:.5rem">
+          <div class="delete-btn-row">
+            <div class="delete-info">
+              <div class="delete-title">تصدير الطلبات</div>
+              <div class="delete-desc">تصدير كل الطلبات بصيغة CSV للمحاسبة</div>
+            </div>
+            <button class="btn btn-ghost btn-sm" onclick="exportOrders()"><i class="fas fa-file-csv"></i> تصدير</button>
+          </div>
+          <div class="delete-btn-row">
+            <div class="delete-info">
+              <div class="delete-title">تصدير المنتجات</div>
+              <div class="delete-desc">تصدير كل المنتجات مع أسعارها والمخزون</div>
+            </div>
+            <button class="btn btn-ghost btn-sm" onclick="exportProducts()"><i class="fas fa-file-csv"></i> تصدير</button>
+          </div>
+          <div class="delete-btn-row">
+            <div class="delete-info">
+              <div class="delete-title">تصدير المستخدمين</div>
+              <div class="delete-desc">تصدير بيانات العملاء</div>
+            </div>
+            <button class="btn btn-ghost btn-sm" onclick="exportUsers()"><i class="fas fa-file-csv"></i> تصدير</button>
+          </div>
+        </div>
+      </div>
+
       <!-- ── منطقة الخطر ── -->
       <div class="s-section danger-section">
         <div class="s-head"><i class="fas fa-exclamation-triangle"></i><div class="s-head-title">منطقة الخطر — حذف البيانات</div></div>
@@ -436,6 +464,62 @@
 
       if(error){showToast('حصل خطأ: '+error.message,'error');}
       else{showToast('✓ تم الحذف بنجاح');closeConfirm();loadRevenue('all',null);}
+    }
+
+    // ── CSV Export ────────────────────────────────────────────────
+    function downloadCSV(data, filename) {
+      if (!data?.length) { showToast('مفيش بيانات للتصدير', 'error'); return; }
+      const headers = Object.keys(data[0]);
+      const rows = data.map(row => headers.map(h => `"${(row[h] ?? '').toString().replace(/"/g, '""')}"`).join(','));
+      const csv = [headers.join(','), ...rows].join('\n');
+      const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = filename; a.click();
+      URL.revokeObjectURL(url);
+      showToast('✓ تم التصدير بنجاح');
+    }
+
+    async function exportOrders() {
+      const { data } = await db.from('orders')
+        .select('id, created_at, total, status, payment_method, notes')
+        .order('created_at', { ascending: false });
+      downloadCSV(data?.map(o => ({
+        'رقم الطلب': o.id.slice(0,8).toUpperCase(),
+        'التاريخ': new Date(o.created_at).toLocaleDateString('ar-EG'),
+        'الإجمالي': o.total,
+        'الحالة': o.status,
+        'طريقة الدفع': o.payment_method,
+        'ملاحظات': o.notes || ''
+      })), `antika-orders-${new Date().toISOString().split('T')[0]}.csv`);
+    }
+
+    async function exportProducts() {
+      const { data } = await db.from('products')
+        .select('id, name, name_ar, price, stock, is_published, created_at, categories(name)')
+        .order('created_at', { ascending: false });
+      downloadCSV(data?.map(p => ({
+        'الاسم': p.name_ar || p.name,
+        'الاسم الإنجليزي': p.name,
+        'السعر': p.price,
+        'المخزون': p.stock,
+        'التصنيف': p.categories?.name || '',
+        'منشور': p.is_published ? 'نعم' : 'لا',
+        'التاريخ': new Date(p.created_at).toLocaleDateString('ar-EG')
+      })), `antika-products-${new Date().toISOString().split('T')[0]}.csv`);
+    }
+
+    async function exportUsers() {
+      const { data } = await db.from('profiles')
+        .select('full_name, phone, address, created_at, is_banned')
+        .order('created_at', { ascending: false });
+      downloadCSV(data?.map(u => ({
+        'الاسم': u.full_name || '',
+        'التليفون': u.phone || '',
+        'العنوان': u.address || '',
+        'محظور': u.is_banned ? 'نعم' : 'لا',
+        'تاريخ التسجيل': new Date(u.created_at).toLocaleDateString('ar-EG')
+      })), `antika-users-${new Date().toISOString().split('T')[0]}.csv`);
     }
 
     // ── Init ──────────────────────────────────────────────────────

@@ -150,6 +150,166 @@
       document.getElementById('qty-display').value = quantity;
     }
 
+    // ── Stock Alert ───────────────────────────────────────────────
+    async function handleStockAlert(productId) {
+      const user = await getCurrentUser();
+      const l = getLang();
+      const btn = document.getElementById('stock-alert-btn');
+
+      if (!user) {
+        showToast(l === 'ar' ? 'سجلي دخولك أولاً' : 'Please sign in first', 'error');
+        setTimeout(() => window.location.href = '/auth.html', 1200);
+        return;
+      }
+
+      btn.disabled = true;
+      const { error } = await db.from('stock_alerts').insert({
+        product_id: productId, user_id: user.id, email: user.email
+      });
+
+      if (error?.code === '23505') {
+        showToast(l === 'ar' ? 'أنتِ مسجلة بالفعل للإشعار' : 'Already registered for notification');
+      } else if (!error) {
+        btn.innerHTML = `<i class="fas fa-check"></i> ${l === 'ar' ? 'هيتم إشعارك ✓' : 'You\'ll be notified ✓'}`;
+        btn.style.borderColor = '#16a34a';
+        btn.style.color = '#16a34a';
+        showToast(l === 'ar' ? 'هنبلغك لما المنتج يتوفر 🔔' : 'We\'ll notify you when available 🔔');
+      }
+      btn.disabled = false;
+    }
+
+    // ── Reviews ───────────────────────────────────────────────────
+    async function loadReviews(productId) {
+      const { data: reviews } = await db.from('reviews')
+        .select('*, profiles(full_name, avatar_url)')
+        .eq('product_id', productId)
+        .order('created_at', { ascending: false });
+
+      if (!reviews?.length) return;
+      const l = getLang();
+
+      // حساب المتوسط
+      const avg = reviews.reduce((s, r) => s + r.rating, 0) / reviews.length;
+      document.getElementById('avg-rating').textContent = avg.toFixed(1);
+      document.getElementById('star-display').innerHTML = renderStars(avg);
+      document.getElementById('review-count').textContent = `${reviews.length} ${l === 'ar' ? 'تقييم' : 'reviews'}`;
+
+      // شرائط التقييم
+      const counts = [5,4,3,2,1].map(n => reviews.filter(r => r.rating === n).length);
+      document.getElementById('rating-bars').innerHTML = [5,4,3,2,1].map((n, i) => `
+        <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.25rem">
+          <span style="font-size:0.75rem;color:var(--text-muted);width:14px">${n}</span>
+          <i class="fas fa-star" style="color:var(--gold);font-size:0.65rem"></i>
+          <div style="flex:1;height:6px;background:var(--border);border-radius:3px;overflow:hidden">
+            <div style="width:${reviews.length ? (counts[i]/reviews.length*100) : 0}%;height:100%;background:var(--gold);border-radius:3px"></div>
+          </div>
+          <span style="font-size:0.72rem;color:var(--text-muted);width:16px">${counts[i]}</span>
+        </div>`).join('');
+
+      // عرض التقييمات
+      document.getElementById('reviews-list').innerHTML = reviews.map(r => `
+        <div style="padding:1.25rem 0;border-bottom:1px solid var(--border)">
+          <div style="display:flex;align-items:center;gap:0.75rem;margin-bottom:0.75rem">
+            <div style="width:38px;height:38px;border-radius:50%;overflow:hidden;background:rgba(201,168,76,.15);display:flex;align-items:center;justify-content:center;font-weight:700;color:var(--gold);flex-shrink:0">
+              ${r.profiles?.avatar_url
+                ? `<img src="${avatarImage(r.profiles.avatar_url)}" style="width:100%;height:100%;object-fit:cover">`
+                : (r.profiles?.full_name || '?')[0].toUpperCase()}
+            </div>
+            <div>
+              <div style="font-weight:600;font-size:0.9rem">${r.profiles?.full_name || (l==='ar'?'عميل':'Customer')}</div>
+              <div style="color:var(--gold);font-size:0.8rem">${renderStars(r.rating)}</div>
+            </div>
+            <div style="margin-right:auto;font-size:0.78rem;color:var(--text-muted)">${formatDate(r.created_at)}</div>
+          </div>
+          ${r.comment ? `<p style="font-size:0.9rem;color:var(--text-secondary);line-height:1.7">${r.comment}</p>` : ''}
+          ${r.images?.length ? `<div style="display:flex;gap:0.5rem;margin-top:0.75rem;flex-wrap:wrap">${r.images.map(img => `<img src="${cardImage(img)}" style="width:70px;height:70px;object-fit:cover;border-radius:6px;cursor:pointer" onclick="openZoom('${img}')">`).join('')}</div>` : ''}
+        </div>`).join('');
+    }
+
+    function renderStars(rating) {
+      return Array.from({length:5}, (_, i) =>
+        `<i class="${i < Math.floor(rating) ? 'fas' : i < rating ? 'fas fa-star-half-alt' : 'far'} fa-star"></i>`
+      ).join('');
+    }
+
+    // ── Review Modal ──────────────────────────────────────────────
+    let reviewImages = [];
+
+    function openReviewModal(productId) {
+      const l = getLang();
+      // تحقق من تسجيل الدخول
+      getCurrentUser().then(user => {
+        if (!user) {
+          showToast(l === 'ar' ? 'سجلي دخولك أولاً' : 'Please sign in first', 'error');
+          setTimeout(() => window.location.href = '/auth.html', 1200);
+          return;
+        }
+        document.getElementById('review-modal').classList.add('open');
+      });
+    }
+
+    function closeReviewModal() {
+      document.getElementById('review-modal').classList.remove('open');
+      document.getElementById('review-comment').value = '';
+      document.getElementById('review-images-preview').innerHTML = '';
+      reviewImages = [];
+      setReviewRating(0);
+    }
+
+    let selectedRating = 0;
+    function setReviewRating(n) {
+      selectedRating = n;
+      document.querySelectorAll('.star-btn').forEach((btn, i) => {
+        btn.style.color = i < n ? 'var(--gold)' : 'var(--border)';
+      });
+    }
+
+    async function submitReview() {
+      const l = getLang();
+      const user = await getCurrentUser();
+      if (!user || !product) return;
+      if (!selectedRating) { showToast(l === 'ar' ? 'اختاري التقييم أولاً' : 'Please select a rating', 'error'); return; }
+
+      const btn = document.getElementById('submit-review-btn');
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+
+      const { error } = await db.from('reviews').upsert({
+        product_id: product.id,
+        user_id: user.id,
+        rating: selectedRating,
+        comment: document.getElementById('review-comment').value.trim() || null,
+        images: reviewImages
+      }, { onConflict: 'user_id,product_id' });
+
+      btn.disabled = false;
+      btn.innerHTML = l === 'ar' ? 'إرسال التقييم' : 'Submit Review';
+
+      if (error) { showToast(l === 'ar' ? 'حصل خطأ' : 'Error occurred', 'error'); return; }
+      showToast(l === 'ar' ? '✓ تم إرسال تقييمك' : '✓ Review submitted');
+      closeReviewModal();
+      loadReviews(product.id);
+    }
+
+    async function uploadReviewImages(input) {
+      const files = input.files;
+      if (!files?.length) return;
+      showToast(getLang() === 'ar' ? 'جاري رفع الصور...' : 'Uploading...', 'info');
+      for (const file of files) {
+        try {
+          const url = await uploadToCloudinary(file, 'reviews');
+          reviewImages.push(url);
+        } catch(e) {}
+      }
+      document.getElementById('review-images-preview').innerHTML = reviewImages.map((url, i) =>
+        `<div style="position:relative;display:inline-block">
+          <img src="${cardImage(url)}" style="width:60px;height:60px;object-fit:cover;border-radius:6px;border:1px solid var(--border)">
+          <button onclick="reviewImages.splice(${i},1);uploadReviewImages({files:[]})" style="position:absolute;top:-6px;right:-6px;width:18px;height:18px;border-radius:50%;background:#dc2626;color:#fff;border:none;cursor:pointer;font-size:0.6rem;display:flex;align-items:center;justify-content:center">✕</button>
+        </div>`
+      ).join('');
+      showToast(getLang() === 'ar' ? '✓ تم الرفع' : '✓ Uploaded');
+    }
+
     function isVideo(url) {
       if (!url) return false;
       return url.includes('/video/upload/') ||
@@ -243,9 +403,22 @@
                   <i class="far fa-heart"></i>
                 </button>
               </div>` : `
-              <div class="btn btn-ghost btn-lg btn-block" style="cursor:default;opacity:0.6;margin-bottom:1.5rem">
+              <div class="btn btn-ghost btn-lg btn-block" style="cursor:default;opacity:0.6;margin-bottom:1rem">
                 ${l === 'ar' ? 'غير متاح حالياً' : 'Currently Unavailable'}
-              </div>`}
+              </div>
+              <button class="btn btn-outline btn-block" onclick="handleStockAlert('${p.id}')" id="stock-alert-btn">
+                <i class="fas fa-bell"></i> ${l === 'ar' ? 'أبلغيني لما يتوفر' : 'Notify me when available'}
+              </button>`}
+
+            <!-- Reviews Summary -->
+            <div id="rating-summary" style="display:flex;align-items:center;gap:0.75rem;margin:1.5rem 0;padding:1rem;background:var(--bg-secondary);border-radius:var(--radius-sm)">
+              <div style="text-align:center">
+                <div style="font-size:2rem;font-weight:700;color:var(--gold);font-family:var(--font-display)" id="avg-rating">—</div>
+                <div id="star-display" style="color:var(--gold);font-size:0.85rem"></div>
+                <div style="font-size:0.75rem;color:var(--text-muted)" id="review-count"></div>
+              </div>
+              <div style="flex:1" id="rating-bars"></div>
+            </div>
 
             <div class="product-meta">
               <div class="meta-row">
@@ -262,6 +435,17 @@
               </div>
             </div>
           </div>
+        </div>
+
+        <!-- Reviews Section -->
+        <div class="related-section" id="reviews-section">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;flex-wrap:wrap;gap:1rem">
+            <h3 style="font-family:var(--font-display);font-size:1.4rem">${l === 'ar' ? 'آراء العملاء' : 'Customer Reviews'}</h3>
+            <button class="btn btn-outline btn-sm" onclick="openReviewModal('${p.id}')" id="write-review-btn">
+              <i class="fas fa-pen"></i> ${l === 'ar' ? 'اكتبي رأيك' : 'Write a Review'}
+            </button>
+          </div>
+          <div id="reviews-list"><div style="text-align:center;padding:2rem;color:var(--text-muted)">${l === 'ar' ? 'لا توجد تقييمات بعد' : 'No reviews yet'}</div></div>
         </div>`;
     }
 
@@ -387,14 +571,18 @@
     initUserArea();
     loadProduct().then(() => {
       initSwipe();
-      // تحقق من المفضلة بعد تحميل المنتج
       const id = new URLSearchParams(window.location.search).get('id');
       if (id) {
+        // تحقق من المفضلة
         isWishlisted(id).then(wishlisted => {
           const btn = document.getElementById('wishlist-btn');
-          if (btn) btn.innerHTML = wishlisted ? '<i class="fas fa-heart"></i>' : '<i class="far fa-heart"></i>';
-          if (wishlisted && btn) btn.classList.add('wishlisted');
+          if (btn) {
+            btn.innerHTML = wishlisted ? '<i class="fas fa-heart"></i>' : '<i class="far fa-heart"></i>';
+            if (wishlisted) btn.classList.add('wishlisted');
+          }
         });
+        // تحميل التقييمات
+        loadReviews(id);
       }
     });
 
@@ -405,5 +593,41 @@
       document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 20);
     });
   </script>
+
+  <!-- Review Modal -->
+  <div class="modal-overlay" id="review-modal">
+    <div class="modal" style="max-width:500px">
+      <div class="modal-header">
+        <h3 class="modal-title">اكتبي تقييمك</h3>
+        <button class="modal-close" onclick="closeReviewModal()"><i class="fas fa-times"></i></button>
+      </div>
+      <div style="padding:1.5rem">
+        <!-- Stars -->
+        <div style="margin-bottom:1.25rem">
+          <label class="form-label">التقييم *</label>
+          <div style="display:flex;gap:0.5rem;font-size:1.75rem">
+            ${[1,2,3,4,5].map(n => `<button class="star-btn" onclick="setReviewRating(${n})" style="background:none;border:none;cursor:pointer;color:var(--border);transition:color 0.2s;font-size:1.75rem"><i class="fas fa-star"></i></button>`).join('')}
+          </div>
+        </div>
+        <!-- Comment -->
+        <div class="form-group">
+          <label class="form-label">رأيك (اختياري)</label>
+          <textarea class="form-control" id="review-comment" rows="3" placeholder="شاركي تجربتك مع المنتج..."></textarea>
+        </div>
+        <!-- Images -->
+        <div class="form-group">
+          <label class="form-label">صور (اختياري)</label>
+          <div style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-bottom:0.5rem" id="review-images-preview"></div>
+          <button class="btn btn-ghost btn-sm" onclick="document.getElementById('review-img-input').click()">
+            <i class="fas fa-camera"></i> إضافة صور
+          </button>
+          <input type="file" id="review-img-input" accept="image/*" multiple style="display:none" onchange="uploadReviewImages(this)">
+        </div>
+        <button class="btn btn-primary btn-block" id="submit-review-btn" onclick="submitReview()">
+          إرسال التقييم
+        </button>
+      </div>
+    </div>
+  </div>
 </body>
 </html>

@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Antika Admin — الكوبونات</title>
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="stylesheet" href="/css/admin.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <style>
+    .coupon-card { background:var(--bg-card); border:1px solid var(--border); border-radius:var(--radius-lg); padding:1.25rem; position:relative; overflow:hidden; transition:all .2s; }
+    .coupon-card:hover { box-shadow:var(--shadow-lg); border-color:var(--gold-light); }
+    .coupon-card::before { content:''; position:absolute; top:0; left:0; right:0; height:3px; background:var(--gold); }
+    .coupon-card.inactive::before { background:var(--border); }
+    .coupon-code { font-family:monospace; font-size:1.3rem; font-weight:700; color:var(--gold); letter-spacing:0.1em; margin-bottom:0.5rem; }
+    .coupon-value { font-size:1.6rem; font-weight:700; font-family:var(--font-display); }
+    .coupon-meta { font-size:0.78rem; color:var(--text-muted); margin-top:0.5rem; }
+    .coupons-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); gap:1rem; }
+    .m-overlay { position:fixed; inset:0; background:rgba(0,0,0,.6); z-index:2000; display:flex; align-items:center; justify-content:center; padding:1rem; opacity:0; visibility:hidden; transition:all .25s; backdrop-filter:blur(4px); }
+    .m-overlay.open { opacity:1; visibility:visible; }
+    .m-box { background:var(--bg-card); border-radius:var(--radius-lg); width:100%; max-width:480px; border:1px solid var(--border); overflow:hidden; transform:translateY(20px); transition:transform .25s; }
+    .m-overlay.open .m-box { transform:translateY(0); }
+    .m-head { display:flex; align-items:center; justify-content:space-between; padding:1.25rem 1.5rem; border-bottom:1px solid var(--border); }
+    .m-head h3 { font-family:var(--font-display); font-size:1.15rem; }
+    .m-body { padding:1.5rem; }
+    .m-foot { padding:1rem 1.5rem; border-top:1px solid var(--border); display:flex; gap:.75rem; justify-content:flex-end; }
+  </style>
+</head>
+<body>
+  <div class="sidebar-overlay" id="sidebar-overlay" onclick="closeSidebar()"></div>
+  <aside class="admin-sidebar" id="admin-sidebar">
+    <div class="admin-sidebar-header">
+      <span class="admin-sidebar-logo">Antika Gallery</span>
+      <button class="admin-sidebar-close" onclick="closeSidebar()"><i class="fas fa-times"></i></button>
+    </div>
+    <nav class="admin-nav">
+      <div class="nav-section-label">الرئيسية</div>
+      <a href="/admin-antika-ctrl/" class="admin-nav-item"><i class="fas fa-chart-line"></i> لوحة التحكم</a>
+      <div class="nav-section-label">المتجر</div>
+      <a href="/admin-antika-ctrl/products.html" class="admin-nav-item"><i class="fas fa-box"></i> المنتجات</a>
+      <a href="/admin-antika-ctrl/orders.html" class="admin-nav-item"><i class="fas fa-shopping-cart"></i> الطلبات <span class="admin-nav-badge" id="pending-badge" style="display:none">0</span></a>
+      <a href="/admin-antika-ctrl/coupons.html" class="admin-nav-item active"><i class="fas fa-tag"></i> الكوبونات</a>
+      <div class="nav-section-label">الإدارة</div>
+      <a href="/admin-antika-ctrl/users.html" class="admin-nav-item"><i class="fas fa-users"></i> المستخدمين</a>
+      <a href="/admin-antika-ctrl/settings.html" class="admin-nav-item"><i class="fas fa-cog"></i> الإعدادات</a>
+      <a href="/" class="admin-nav-item" target="_blank"><i class="fas fa-external-link-alt"></i> عرض الموقع</a>
+    </nav>
+    <div class="admin-sidebar-footer">
+      <button onclick="logout()" class="admin-nav-item" style="color:#dc2626;cursor:pointer;background:none;border:none;font-family:inherit;width:100%;text-align:right">
+        <i class="fas fa-sign-out-alt"></i> تسجيل الخروج
+      </button>
+    </div>
+  </aside>
+
+  <main class="admin-main">
+    <div class="admin-topbar">
+      <div class="admin-topbar-right">
+        <button class="admin-hamburger" onclick="openSidebar()"><i class="fas fa-bars"></i></button>
+        <span class="admin-brand">Antika</span>
+        <span class="admin-page-title">/ الكوبونات</span>
+      </div>
+      <div class="admin-topbar-left">
+        <button class="btn btn-primary btn-sm" onclick="openModal()">
+          <i class="fas fa-plus"></i> كوبون جديد
+        </button>
+        <button class="navbar-icon-btn" onclick="toggleTheme()" id="theme-toggle"><i class="fas fa-moon"></i></button>
+      </div>
+    </div>
+
+    <div class="admin-content">
+      <!-- Stats -->
+      <div class="stat-cards" style="margin-bottom:1.5rem">
+        <div class="stat-card"><div class="stat-icon"><i class="fas fa-tag"></i></div><div class="stat-value" id="s-total">—</div><div class="stat-label">إجمالي الكوبونات</div></div>
+        <div class="stat-card"><div class="stat-icon" style="background:rgba(22,163,74,0.1)"><i class="fas fa-check-circle" style="color:#16a34a"></i></div><div class="stat-value" id="s-active" style="color:#16a34a">—</div><div class="stat-label">كوبونات نشطة</div></div>
+        <div class="stat-card"><div class="stat-icon"><i class="fas fa-fire"></i></div><div class="stat-value" id="s-used">—</div><div class="stat-label">مرات الاستخدام</div></div>
+      </div>
+
+      <!-- Filter -->
+      <div style="display:flex;gap:.75rem;margin-bottom:1.25rem;flex-wrap:wrap">
+        <select class="form-control" id="f-status" onchange="filterCoupons()" style="width:auto;min-width:130px">
+          <option value="">الكل</option>
+          <option value="active">نشطة</option>
+          <option value="inactive">متوقفة</option>
+        </select>
+        <select class="form-control" id="f-type" onchange="filterCoupons()" style="width:auto;min-width:130px">
+          <option value="">كل الأنواع</option>
+          <option value="percentage">نسبة مئوية</option>
+          <option value="fixed">مبلغ ثابت</option>
+        </select>
+      </div>
+
+      <div id="coupons-container">
+        <div style="text-align:center;padding:3rem"><div class="spinner" style="margin:0 auto"></div></div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Add/Edit Modal -->
+  <div class="m-overlay" id="modal">
+    <div class="m-box">
+      <div class="m-head">
+        <h3 id="modal-title">كوبون جديد</h3>
+        <button onclick="closeModal()" style="width:32px;height:32px;border-radius:50%;border:1.5px solid var(--border);background:none;cursor:pointer;color:var(--text-muted);font-size:.85rem;display:flex;align-items:center;justify-content:center"><i class="fas fa-times"></i></button>
+      </div>
+      <div class="m-body">
+        <div class="form-group">
+          <label class="form-label">كود الكوبون *</label>
+          <input type="text" class="form-control" id="f-code" dir="ltr" placeholder="SAVE20" style="text-transform:uppercase;font-family:monospace;font-size:1.1rem;letter-spacing:0.1em">
+          <div class="form-hint">حروف وأرقام فقط — هيتحول لكبير تلقائي</div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">
+          <div class="form-group">
+            <label class="form-label">نوع الخصم *</label>
+            <select class="form-control" id="f-type-input" onchange="updateValueLabel()">
+              <option value="percentage">نسبة مئوية (%)</option>
+              <option value="fixed">مبلغ ثابت (جنيه)</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label" id="value-label">قيمة الخصم (%) *</label>
+            <input type="number" class="form-control" id="f-value" dir="ltr" min="1" placeholder="20">
+          </div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">
+          <div class="form-group">
+            <label class="form-label">الحد الأدنى للطلب (جنيه)</label>
+            <input type="number" class="form-control" id="f-min" dir="ltr" min="0" placeholder="0">
+            <div class="form-hint">0 = بدون حد أدنى</div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">أقصى عدد استخدام</label>
+            <input type="number" class="form-control" id="f-max-uses" dir="ltr" min="1" placeholder="∞">
+            <div class="form-hint">فاضي = بدون حد</div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">تاريخ الانتهاء</label>
+          <input type="datetime-local" class="form-control" id="f-expires" dir="ltr">
+          <div class="form-hint">فاضي = لا ينتهي</div>
+        </div>
+
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:0.875rem;background:var(--bg-secondary);border-radius:var(--radius-sm)">
+          <div>
+            <div style="font-weight:600;font-size:0.9rem">الكوبون نشط</div>
+            <div style="font-size:0.78rem;color:var(--text-muted)">لو متوقف مش هيشتغل مع العملاء</div>
+          </div>
+          <div class="toggle-switch on" id="f-active" onclick="this.classList.toggle('on')"></div>
+        </div>
+
+        <div class="form-error" id="modal-error" style="margin-top:1rem;display:none"></div>
+      </div>
+      <div class="m-foot">
+        <button class="btn btn-ghost" onclick="closeModal()">إلغاء</button>
+        <button class="btn btn-primary" onclick="saveCoupon()" id="save-btn">
+          <i class="fas fa-save"></i> حفظ
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+  <script src="/js/config.js"></script>
+  <script>
+    let allCoupons = [], editId = null;
+
+    function openSidebar(){document.getElementById('admin-sidebar').classList.add('open');document.getElementById('sidebar-overlay').classList.add('active');}
+    function closeSidebar(){document.getElementById('admin-sidebar').classList.remove('open');document.getElementById('sidebar-overlay').classList.remove('active');}
+    function toggleTheme(){const t=getTheme()==='light'?'dark':'light';setTheme(t);document.getElementById('theme-toggle').innerHTML=t==='dark'?'<i class="fas fa-sun"></i>':'<i class="fas fa-moon"></i>';}
+    async function logout(){await db.auth.signOut();window.location.href='/admin-antika-ctrl/login.html';}
+
+    async function adminAuth(){
+      document.body.style.opacity='0';document.body.style.transition='opacity .25s';
+      let{data:{session}}=await db.auth.getSession();
+      if(!session){await new Promise(r=>setTimeout(r,900));const r=await db.auth.getSession();session=r.data.session;}
+      if(!session){window.location.href='/admin-antika-ctrl/login.html';return false;}
+      const role=session.user.user_metadata?.role;
+      if(role!=='admin'){window.location.href='/admin-antika-ctrl/login.html';return false;}
+      document.body.style.opacity='1';initTheme();
+      document.getElementById('theme-toggle').innerHTML=getTheme()==='dark'?'<i class="fas fa-sun"></i>':'<i class="fas fa-moon"></i>';
+      return true;
+    }
+
+    async function loadBadge(){
+      const{count}=await db.from('orders').select('*',{count:'exact',head:true}).eq('status','pending');
+      const b=document.getElementById('pending-badge');if(b&&count>0){b.textContent=count;b.style.display='inline';}
+    }
+
+    async function loadCoupons(){
+      const{data}=await db.from('coupons').select('*').order('created_at',{ascending:false});
+      allCoupons=data||[];
+
+      // Stats
+      document.getElementById('s-total').textContent=allCoupons.length;
+      document.getElementById('s-active').textContent=allCoupons.filter(c=>c.is_active).length;
+      document.getElementById('s-used').textContent=allCoupons.reduce((s,c)=>s+(c.used_count||0),0);
+
+      filterCoupons();
+    }
+
+    function filterCoupons(){
+      const status=document.getElementById('f-status').value;
+      const type=document.getElementById('f-type').value;
+      let list=allCoupons.filter(c=>{
+        if(status==='active'&&!c.is_active)return false;
+        if(status==='inactive'&&c.is_active)return false;
+        if(type&&c.type!==type)return false;
+        return true;
+      });
+      render(list);
+    }
+
+    function render(list){
+      const container=document.getElementById('coupons-container');
+      if(!list.length){
+        container.innerHTML=`<div style="text-align:center;padding:3rem;color:var(--text-muted)"><i class="fas fa-tag" style="font-size:3rem;margin-bottom:1rem;display:block;opacity:.4"></i><p>مفيش كوبونات</p></div>`;
+        return;
+      }
+      container.innerHTML=`<div class="coupons-grid">${list.map(c=>{
+        const isExpired=c.expires_at&&new Date(c.expires_at)<new Date();
+        const isMaxed=c.max_uses!==null&&c.used_count>=c.max_uses;
+        const statusBadge=!c.is_active?'<span class="badge badge-gray">متوقف</span>':isExpired?'<span class="badge badge-danger">منتهي</span>':isMaxed?'<span class="badge badge-warning">مكتمل</span>':'<span class="badge badge-success">نشط</span>';
+        return `
+          <div class="coupon-card ${!c.is_active||isExpired?'inactive':''}">
+            <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:0.5rem;margin-bottom:0.75rem">
+              <div class="coupon-code">${c.code}</div>
+              ${statusBadge}
+            </div>
+            <div class="coupon-value" style="color:${c.is_active&&!isExpired?'var(--gold)':'var(--text-muted)'}">
+              ${c.type==='percentage'?c.value+'%':formatPrice(c.value)} ${c.type==='percentage'?'خصم':'خصم'}
+            </div>
+            <div class="coupon-meta">
+              ${c.min_order>0?`<div><i class="fas fa-receipt"></i> حد أدنى: ${formatPrice(c.min_order)}</div>`:''}
+              <div><i class="fas fa-fire"></i> استُخدم ${c.used_count||0} ${c.max_uses?'/ '+c.max_uses:''} مرة</div>
+              ${c.expires_at?`<div><i class="fas fa-clock"></i> ينتهي: ${formatDate(c.expires_at)}</div>`:'<div><i class="fas fa-infinity"></i> لا ينتهي</div>'}
+            </div>
+            <div style="display:flex;gap:0.5rem;margin-top:1rem">
+              <button class="btn btn-ghost btn-sm" style="flex:1" onclick="openEdit('${c.id}')"><i class="fas fa-edit"></i> تعديل</button>
+              <button class="btn btn-sm" style="background:${c.is_active?'rgba(220,38,38,.1)':'rgba(22,163,74,.1)'};color:${c.is_active?'#dc2626':'#16a34a'};border:none;flex:1" onclick="toggleActive('${c.id}',${c.is_active})">
+                <i class="fas ${c.is_active?'fa-pause':'fa-play'}"></i> ${c.is_active?'إيقاف':'تفعيل'}
+              </button>
+              <button class="btn btn-danger btn-sm" onclick="deleteCoupon('${c.id}')"><i class="fas fa-trash"></i></button>
+            </div>
+          </div>`}).join('')}</div>`;
+    }
+
+    function updateValueLabel(){
+      const type=document.getElementById('f-type-input').value;
+      document.getElementById('value-label').textContent=type==='percentage'?'قيمة الخصم (%) *':'قيمة الخصم (جنيه) *';
+    }
+
+    function openModal(){
+      editId=null;
+      document.getElementById('modal-title').textContent='كوبون جديد';
+      document.getElementById('f-code').value='';
+      document.getElementById('f-value').value='';
+      document.getElementById('f-min').value='';
+      document.getElementById('f-max-uses').value='';
+      document.getElementById('f-expires').value='';
+      document.getElementById('f-type-input').value='percentage';
+      document.getElementById('f-active').classList.add('on');
+      document.getElementById('modal-error').style.display='none';
+      updateValueLabel();
+      document.getElementById('modal').classList.add('open');
+    }
+
+    function openEdit(id){
+      const c=allCoupons.find(x=>x.id===id);if(!c)return;
+      editId=id;
+      document.getElementById('modal-title').textContent='تعديل الكوبون';
+      document.getElementById('f-code').value=c.code;
+      document.getElementById('f-type-input').value=c.type;
+      document.getElementById('f-value').value=c.value;
+      document.getElementById('f-min').value=c.min_order||'';
+      document.getElementById('f-max-uses').value=c.max_uses||'';
+      document.getElementById('f-expires').value=c.expires_at?new Date(c.expires_at).toISOString().slice(0,16):'';
+      document.getElementById('f-active').classList.toggle('on',c.is_active);
+      document.getElementById('modal-error').style.display='none';
+      updateValueLabel();
+      document.getElementById('modal').classList.add('open');
+    }
+
+    function closeModal(){document.getElementById('modal').classList.remove('open');}
+
+    async function saveCoupon(){
+      const code=document.getElementById('f-code').value.trim().toUpperCase().replace(/[^A-Z0-9]/g,'');
+      const value=parseFloat(document.getElementById('f-value').value);
+      const type=document.getElementById('f-type-input').value;
+      const errEl=document.getElementById('modal-error');
+
+      if(!code){errEl.textContent='اكتب كود الكوبون';errEl.style.display='block';return;}
+      if(!value||value<=0){errEl.textContent='اكتب قيمة صحيحة';errEl.style.display='block';return;}
+      if(type==='percentage'&&value>100){errEl.textContent='النسبة مش ممكن تزيد عن 100%';errEl.style.display='block';return;}
+      errEl.style.display='none';
+
+      const btn=document.getElementById('save-btn');
+      btn.disabled=true;btn.innerHTML='<i class="fas fa-spinner fa-spin"></i>';
+
+      const payload={
+        code,type,value,
+        min_order:parseFloat(document.getElementById('f-min').value)||0,
+        max_uses:document.getElementById('f-max-uses').value?parseInt(document.getElementById('f-max-uses').value):null,
+        expires_at:document.getElementById('f-expires').value?new Date(document.getElementById('f-expires').value).toISOString():null,
+        is_active:document.getElementById('f-active').classList.contains('on')
+      };
+
+      const{error}=editId
+        ?await db.from('coupons').update(payload).eq('id',editId)
+        :await db.from('coupons').insert(payload);
+
+      btn.disabled=false;btn.innerHTML='<i class="fas fa-save"></i> حفظ';
+
+      if(error){errEl.textContent=error.code==='23505'?'الكود ده موجود بالفعل':error.message;errEl.style.display='block';return;}
+      showToast(editId?'✓ تم التعديل':'✓ تم إضافة الكوبون');
+      closeModal();loadCoupons();
+    }
+
+    async function toggleActive(id,cur){
+      await db.from('coupons').update({is_active:!cur}).eq('id',id);
+      showToast(!cur?'تم التفعيل':'تم الإيقاف');
+      loadCoupons();
+    }
+
+    async function deleteCoupon(id){
+      if(!confirm('هتحذف الكوبون ده؟'))return;
+      await db.from('coupons').delete().eq('id',id);
+      showToast('تم الحذف');loadCoupons();
+    }
+
+    document.getElementById('f-code').addEventListener('input',e=>{
+      e.target.value=e.target.value.toUpperCase().replace(/[^A-Z0-9]/g,'');
+    });
+
+    async function init(){
+      const ok=await adminAuth();if(!ok)return;
+      loadCoupons();loadBadge();
+    }
+    init();
+  </script>
+</body>
+</html>

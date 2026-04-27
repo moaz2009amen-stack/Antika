@@ -111,7 +111,7 @@
       itemsEl.innerHTML = cart.map((item, i) => `
         <div class="cart-item">
           <div class="cart-item-img">
-            <img src="${item.image || 'https://res.cloudinary.com/df3ffyrsg/image/upload/v1/antika/placeholder'}" alt="${item.name}">
+            <img src="${cardImage(item.image) || 'https://res.cloudinary.com/df3ffyrsg/image/upload/q_auto,f_auto,w_80/v1/antika/placeholder'}" alt="${item.name}" onerror="this.src='https://res.cloudinary.com/df3ffyrsg/image/upload/q_auto,f_auto,w_80/v1/antika/placeholder'">
           </div>
           <div class="cart-item-info">
             <div class="cart-item-name">${item.name}</div>

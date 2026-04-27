@@ -509,7 +509,7 @@ textarea.form-control { resize: vertical; min-height: 100px; }
   backdrop-filter: blur(4px);
 }
 
-.modal-overlay.active { opacity: 1; visibility: visible; }
+.modal-overlay.active, .modal-overlay.open { opacity: 1; visibility: visible; }
 
 .modal {
   background: var(--bg-card);
@@ -524,7 +524,7 @@ textarea.form-control { resize: vertical; min-height: 100px; }
   overflow-y: auto;
 }
 
-.modal-overlay.active .modal { transform: translateY(0); }
+.modal-overlay.active .modal, .modal-overlay.open .modal { transform: translateY(0); }
 
 .modal-header {
   display: flex;

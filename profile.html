@@ -207,7 +207,10 @@
 
       el.innerHTML = orders.map(order => {
         const s = statusMap[order.status] || statusMap.pending;
-        const imgs = order.order_items?.slice(0, 3).map(oi => oi.products?.images?.[0]).filter(Boolean) || [];
+        const imgs = order.order_items?.slice(0, 3).map(oi => {
+          const img = oi.products?.images?.[0];
+          return img ? cardImage(img) : null;
+        }).filter(Boolean) || [];
         return `
           <div class="order-card">
             <div class="order-header">
@@ -217,7 +220,7 @@
               </div>
               <span class="badge ${s.class}">${l === 'ar' ? s.ar : s.en}</span>
             </div>
-            ${imgs.length ? `<div class="order-items-preview">${imgs.map(img => `<img src="${img}" class="order-item-thumb" alt="">`).join('')}${order.order_items.length > 3 ? `<div class="order-item-thumb" style="display:flex;align-items:center;justify-content:center;font-size:0.8rem;font-weight:700;color:var(--text-muted)">+${order.order_items.length - 3}</div>` : ''}</div>` : ''}
+            ${imgs.length ? `<div class="order-items-preview">${imgs.map(img => `<img src="${img}" class="order-item-thumb" alt="" onerror="this.style.display='none'">`).join('')}${order.order_items.length > 3 ? `<div class="order-item-thumb" style="display:flex;align-items:center;justify-content:center;font-size:0.8rem;font-weight:700;color:var(--text-muted)">+${order.order_items.length - 3}</div>` : ''}</div>` : ''}
             <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:0.5rem">
               <span style="font-weight:700;color:var(--gold)">${formatPrice(order.total)}</span>
               <span style="font-size:0.85rem;color:var(--text-muted)">${order.payment_method === 'cash' ? (l === 'ar' ? 'كاش' : 'Cash') : (l === 'ar' ? 'محفظة' : 'Wallet')}</span>

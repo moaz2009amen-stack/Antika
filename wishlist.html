@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Antika Gallery — المفضلة</title>
+  <link rel="manifest" href="/manifest.json">
+  <link rel="icon" href="https://res.cloudinary.com/df3ffyrsg/image/upload/q_auto/f_auto/v1776645596/ChatGPT_Image_20_%D8%A3%D8%A8%D8%B1%D9%8A%D9%84_2026_02_28_38_%D8%B5_etwl3l.png">
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <style>
+    .page-header { padding: 2rem 0 1.5rem; border-bottom: 1px solid var(--border); margin-bottom: 2rem; }
+    .page-header h1 { font-family: var(--font-display); font-size: 2rem; }
+    .empty-wishlist { text-align: center; padding: 5rem 2rem; }
+    .empty-wishlist i { font-size: 4rem; color: var(--border); margin-bottom: 1.5rem; display: block; }
+    .empty-wishlist h3 { font-family: var(--font-display); font-size: 1.5rem; margin-bottom: 0.75rem; }
+    .empty-wishlist p { color: var(--text-muted); margin-bottom: 2rem; }
+    .wishlist-card { position: relative; }
+    .remove-wishlist-btn {
+      position: absolute; top: 10px; right: 10px; z-index: 10;
+      width: 32px; height: 32px; border-radius: 50%;
+      background: rgba(255,255,255,0.9); border: none; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      color: #dc2626; font-size: 0.9rem; transition: all 0.2s;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    [data-theme="dark"] .remove-wishlist-btn { background: rgba(31,28,22,0.9); }
+    .remove-wishlist-btn:hover { transform: scale(1.1); background: #dc2626; color: #fff; }
+  </style>
+</head>
+<body>
+  <!-- Navbar -->
+  <nav class="navbar" id="navbar">
+    <a href="/" class="navbar-brand">Antika Gallery</a>
+    <ul class="navbar-nav" id="nav-menu">
+      <li><a href="/" data-ar="الرئيسية" data-en="Home">الرئيسية</a></li>
+      <li><a href="/shop.html" data-ar="المتجر" data-en="Shop">المتجر</a></li>
+      <li><a href="/wishlist.html" data-ar="المفضلة" data-en="Wishlist" style="color:var(--gold)">المفضلة</a></li>
+    </ul>
+    <div class="navbar-actions">
+      <button class="navbar-icon-btn" onclick="toggleTheme()" id="theme-toggle"><i class="fas fa-moon"></i></button>
+      <button class="navbar-icon-btn" onclick="toggleLang()" style="font-size:0.75rem;font-weight:700" id="lang-toggle">EN</button>
+      <a href="/cart.html" class="navbar-icon-btn"><i class="fas fa-shopping-bag"></i><span class="cart-count" style="display:none">0</span></a>
+      <div id="user-area"></div>
+      <button class="hamburger" onclick="document.getElementById('nav-menu').classList.toggle('open')"><span></span><span></span><span></span></button>
+    </div>
+  </nav>
+
+  <div class="container" style="padding-bottom:4rem">
+    <div class="page-header">
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem">
+        <div>
+          <h1><i class="fas fa-heart" style="color:#dc2626;margin-left:0.75rem"></i> <span data-ar="المفضلة" data-en="Wishlist">المفضلة</span></h1>
+          <p style="color:var(--text-muted);font-size:0.9rem;margin-top:0.25rem" id="wishlist-count"></p>
+        </div>
+        <div style="display:flex;gap:0.75rem">
+          <button class="btn btn-ghost btn-sm" onclick="addAllToCart()" id="add-all-btn" style="display:none">
+            <i class="fas fa-shopping-bag"></i> <span data-ar="أضيفي الكل للسلة" data-en="Add All to Cart">أضيفي الكل للسلة</span>
+          </button>
+          <button class="btn btn-danger btn-sm" onclick="clearWishlist()" id="clear-btn" style="display:none">
+            <i class="fas fa-trash"></i> <span data-ar="مسح الكل" data-en="Clear All">مسح الكل</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div id="wishlist-container">
+      <div style="text-align:center;padding:3rem"><div class="spinner" style="margin:0 auto"></div></div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-bottom">
+        <p style="font-size:0.85rem;color:var(--text-muted)">© 2026 أنتيكا جاليري</p>
+        <p class="footer-dev">Developed by <a href="https://www.facebook.com/profile.php?id=61552026802548&locale=ar_AR" target="_blank">Moaz</a></p>
+      </div>
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+  <script src="/js/config.js"></script>
+  <script>
+    const l = getLang();
+    let wishlistProducts = [];
+
+    function toggleTheme() {
+      const t = getTheme() === 'light' ? 'dark' : 'light';
+      setTheme(t);
+      document.getElementById('theme-toggle').innerHTML = t === 'dark' ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
+    }
+    function toggleLang() { setLang(l === 'ar' ? 'en' : 'ar'); }
+
+    function applyLang() {
+      document.querySelectorAll('[data-ar]').forEach(el => {
+        if (el.tagName === 'INPUT') return;
+        el.textContent = l === 'ar' ? el.dataset.ar : el.dataset.en;
+      });
+      document.getElementById('lang-toggle').textContent = l === 'ar' ? 'EN' : 'ع';
+    }
+
+    function isVideoUrl(url) {
+      return url && (url.includes('/video/upload/') || url.match(/\.(mp4|mov|webm|avi)(\?|$)/i));
+    }
+
+    async function loadWishlist() {
+      const container = document.getElementById('wishlist-container');
+      const user = await getCurrentUser();
+
+      let productIds = [];
+      if (user) {
+        const { data } = await db.from('wishlist').select('product_id').eq('user_id', user.id);
+        productIds = data?.map(w => w.product_id) || [];
+      } else {
+        productIds = JSON.parse(localStorage.getItem('antika_wishlist') || '[]');
+      }
+
+      if (!productIds.length) {
+        renderEmpty();
+        return;
+      }
+
+      const { data: products } = await db.from('products')
+        .select('*')
+        .in('id', productIds)
+        .eq('is_published', true);
+
+      wishlistProducts = products || [];
+
+      if (!wishlistProducts.length) { renderEmpty(); return; }
+
+      document.getElementById('wishlist-count').textContent =
+        `${wishlistProducts.length} ${l === 'ar' ? 'منتج محفوظ' : 'saved products'}`;
+      document.getElementById('add-all-btn').style.display = 'flex';
+      document.getElementById('clear-btn').style.display = 'flex';
+
+      container.innerHTML = `<div class="products-grid">${wishlistProducts.map(p => {
+        const name = l === 'ar' && p.name_ar ? p.name_ar : p.name;
+        const firstMedia = p.images?.[0];
+        const isVid = isVideoUrl(firstMedia);
+        const mediaSrc = firstMedia ? (isVid ? firstMedia : cardImage(firstMedia)) : 'https://res.cloudinary.com/df3ffyrsg/image/upload/v1/antika/placeholder';
+        return `
+          <div class="product-card wishlist-card">
+            <button class="remove-wishlist-btn" onclick="removeItem('${p.id}')" title="${l==='ar'?'إزالة من المفضلة':'Remove'}">
+              <i class="fas fa-heart"></i>
+            </button>
+            <a href="/product.html?id=${p.id}">
+              <div class="product-card-image" style="position:relative">
+                ${isVid
+                  ? `<video src="${mediaSrc}" muted loop playsinline style="width:100%;height:100%;object-fit:cover"></video>`
+                  : `<img src="${mediaSrc}" alt="${name}" loading="lazy">`}
+                ${p.stock === 0 ? `<div style="position:absolute;inset:0;background:rgba(0,0,0,0.4);display:flex;align-items:center;justify-content:center"><span style="background:#fff;color:#1a1510;padding:5px 14px;border-radius:20px;font-weight:700;font-size:0.8rem">${l==='ar'?'غير متاح':'Out of Stock'}</span></div>` : ''}
+              </div>
+              <div class="product-card-body">
+                <div class="product-card-title">${name}</div>
+                <div class="product-card-price">${formatPrice(p.price)}</div>
+              </div>
+            </a>
+            <div style="padding:0 1rem 1rem">
+              <button class="btn btn-primary btn-sm btn-block" ${p.stock===0?'disabled':''} onclick="addOne('${p.id}','${name.replace(/'/g,"\\'")}',${p.price},'${mediaSrc}')">
+                <i class="fas fa-shopping-bag"></i> ${l==='ar'?'أضيفي للسلة':'Add to Cart'}
+              </button>
+            </div>
+          </div>`;
+      }).join('')}</div>`;
+    }
+
+    function renderEmpty() {
+      document.getElementById('wishlist-count').textContent = l === 'ar' ? '0 منتجات' : '0 products';
+      document.getElementById('wishlist-container').innerHTML = `
+        <div class="empty-wishlist">
+          <i class="far fa-heart"></i>
+          <h3>${l === 'ar' ? 'المفضلة فاضية' : 'Your wishlist is empty'}</h3>
+          <p>${l === 'ar' ? 'ابدأي بإضافة منتجات عجبتك من المتجر' : 'Start adding products you like from the shop'}</p>
+          <a href="/shop.html" class="btn btn-primary btn-lg">
+            <i class="fas fa-shopping-bag"></i> ${l === 'ar' ? 'تسوقي الآن' : 'Shop Now'}
+          </a>
+        </div>`;
+    }
+
+    async function removeItem(productId) {
+      const user = await getCurrentUser();
+      if (user) {
+        await db.from('wishlist').delete().eq('user_id', user.id).eq('product_id', productId);
+      } else {
+        const list = JSON.parse(localStorage.getItem('antika_wishlist') || '[]');
+        localStorage.setItem('antika_wishlist', JSON.stringify(list.filter(id => id !== productId)));
+      }
+      showToast(l === 'ar' ? 'تم الإزالة من المفضلة' : 'Removed from wishlist');
+      loadWishlist();
+    }
+
+    function addOne(id, name, price, image) {
+      addToCart({ id, name, price, image });
+    }
+
+    function addAllToCart() {
+      wishlistProducts.filter(p => p.stock > 0).forEach(p => {
+        const name = l === 'ar' && p.name_ar ? p.name_ar : p.name;
+        addToCart({ id: p.id, name, price: p.price, image: p.images?.[0] || '' });
+      });
+      showToast(l === 'ar' ? '✓ تم إضافة الكل للسلة' : '✓ All added to cart');
+    }
+
+    async function clearWishlist() {
+      if (!confirm(l === 'ar' ? 'هتمسحي كل المفضلة؟' : 'Clear all wishlist?')) return;
+      const user = await getCurrentUser();
+      if (user) {
+        await db.from('wishlist').delete().eq('user_id', user.id);
+      } else {
+        localStorage.removeItem('antika_wishlist');
+      }
+      wishlistProducts = [];
+      showToast(l === 'ar' ? 'تم مسح المفضلة' : 'Wishlist cleared');
+      renderEmpty();
+      document.getElementById('add-all-btn').style.display = 'none';
+      document.getElementById('clear-btn').style.display = 'none';
+    }
+
+    async function initUserArea() {
+      const user = await getCurrentUser();
+      const area = document.getElementById('user-area');
+      if (user) {
+        const { data: profile } = await db.from('profiles').select('full_name,avatar_url').eq('id', user.id).single();
+        const initial = (profile?.full_name || 'U')[0];
+        area.innerHTML = profile?.avatar_url
+          ? `<a href="/profile.html" class="navbar-icon-btn" style="padding:0"><img src="${avatarImage(profile.avatar_url)}" style="width:36px;height:36px;border-radius:50%;object-fit:cover;border:2px solid var(--gold)"></a>`
+          : `<a href="/profile.html" class="navbar-icon-btn" style="padding:0"><div style="width:36px;height:36px;border-radius:50%;background:var(--gold);color:#fff;display:flex;align-items:center;justify-content:center;font-size:0.8rem;font-weight:700">${initial}</div></a>`;
+      } else {
+        area.innerHTML = `<a href="/auth.html" class="btn btn-primary btn-sm">${l === 'ar' ? 'دخول' : 'Sign In'}</a>`;
+      }
+    }
+
+    document.getElementById('theme-toggle').innerHTML = getTheme() === 'dark' ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
+    window.addEventListener('scroll', () => document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 20));
+    checkMaintenance();
+    applyLang();
+    updateCartCount();
+    initUserArea();
+    loadWishlist();
+  </script>
+</body>
+</html>

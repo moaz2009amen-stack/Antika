@@ -1,0 +1,40 @@
+{
+  "name": "Antika Gallery — أنتيكا جاليري",
+  "short_name": "Antika",
+  "description": "كل التريندات هتلاقيها هنا — ملابس، أنتيكات، وهوم وير بأقل الأسعار",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#FAFAF7",
+  "theme_color": "#C9A84C",
+  "orientation": "portrait",
+  "lang": "ar",
+  "dir": "rtl",
+  "icons": [
+    {
+      "src": "https://res.cloudinary.com/df3ffyrsg/image/upload/q_auto/f_auto/w_192/v1776645596/ChatGPT_Image_20_%D8%A3%D8%A8%D8%B1%D9%8A%D9%84_2026_02_28_38_%D8%B5_etwl3l.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "https://res.cloudinary.com/df3ffyrsg/image/upload/q_auto/f_auto/w_512/v1776645596/ChatGPT_Image_20_%D8%A3%D8%A8%D8%B1%D9%8A%D9%84_2026_02_28_38_%D8%B5_etwl3l.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ],
+  "screenshots": [],
+  "categories": ["shopping", "lifestyle"],
+  "shortcuts": [
+    {
+      "name": "المتجر",
+      "short_name": "Shop",
+      "url": "/shop.html",
+      "icons": [{"src": "https://res.cloudinary.com/df3ffyrsg/image/upload/q_auto/f_auto/w_96/v1776645596/ChatGPT_Image_20_%D8%A3%D8%A8%D8%B1%D9%8A%D9%84_2026_02_28_38_%D8%B5_etwl3l.png", "sizes": "96x96"}]
+    },
+    {
+      "name": "سلة التسوق",
+      "short_name": "Cart",
+      "url": "/cart.html",
+      "icons": [{"src": "https://res.cloudinary.com/df3ffyrsg/image/upload/q_auto/f_auto/w_96/v1776645596/ChatGPT_Image_20_%D8%A3%D8%A8%D8%B1%D9%8A%D9%84_2026_02_28_38_%D8%B5_etwl3l.png", "sizes": "96x96"}]
+    }
+  ]
+}

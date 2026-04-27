@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Antika Gallery — تسجيل الدخول</title>
+  <link rel="manifest" href="/manifest.json">
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <style>
+    body { display: flex; min-height: 100vh; }
+
+    .auth-left {
+      flex: 1;
+      background: var(--bg-secondary);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 3rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .auth-left::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse at 30% 50%, rgba(201,168,76,0.12) 0%, transparent 70%);
+    }
+
+    .auth-left-content { position: relative; z-index: 1; text-align: center; }
+
+    .auth-logo {
+      font-family: var(--font-display);
+      font-size: 3rem;
+      font-style: italic;
+      color: var(--gold);
+      margin-bottom: 1rem;
+    }
+
+    .auth-tagline {
+      color: var(--text-secondary);
+      font-size: 1rem;
+      max-width: 280px;
+      line-height: 1.8;
+    }
+
+    .auth-deco {
+      margin: 2rem auto;
+      width: 60px;
+      height: 1px;
+      background: var(--gold);
+    }
+
+    .auth-right {
+      width: 460px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 3rem;
+      background: var(--bg-card);
+      border-right: 1px solid var(--border);
+    }
+
+    [dir="ltr"] .auth-right { border-right: none; border-left: 1px solid var(--border); }
+
+    .auth-tabs {
+      display: flex;
+      gap: 0;
+      margin-bottom: 2rem;
+      border-bottom: 2px solid var(--border);
+    }
+
+    .auth-tab {
+      flex: 1;
+      padding: 0.75rem;
+      text-align: center;
+      font-weight: 600;
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      border-bottom: 2px solid transparent;
+      margin-bottom: -2px;
+      transition: all var(--transition);
+      cursor: pointer;
+    }
+
+    .auth-tab.active { color: var(--gold); border-bottom-color: var(--gold); }
+
+    .auth-panel { display: none; }
+    .auth-panel.active { display: block; animation: fadeUp 0.3s ease; }
+
+    .auth-title {
+      font-family: var(--font-display);
+      font-size: 1.6rem;
+      margin-bottom: 0.4rem;
+    }
+
+    .auth-subtitle {
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      margin-bottom: 2rem;
+    }
+
+    .password-toggle {
+      position: relative;
+    }
+
+    .password-toggle .toggle-eye {
+      position: absolute;
+      top: 50%;
+      left: 1rem;
+      transform: translateY(-50%);
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: color var(--transition);
+    }
+
+    [dir="ltr"] .password-toggle .toggle-eye { left: auto; right: 1rem; }
+
+    .password-toggle .toggle-eye:hover { color: var(--gold); }
+    .password-toggle .form-control { padding-left: 2.8rem; }
+    [dir="ltr"] .password-toggle .form-control { padding-left: 1rem; padding-right: 2.8rem; }
+
+    .avatar-upload {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .avatar-preview {
+      width: 72px;
+      height: 72px;
+      border-radius: 50%;
+      border: 2px solid var(--border);
+      object-fit: cover;
+      background: var(--bg-secondary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      color: var(--text-muted);
+      overflow: hidden;
+      cursor: pointer;
+      transition: border-color var(--transition);
+      flex-shrink: 0;
+    }
+
+    .avatar-preview:hover { border-color: var(--gold); }
+
+    .avatar-upload-info small { color: var(--text-muted); font-size: 0.8rem; }
+
+    .strength-bar {
+      height: 4px;
+      border-radius: 2px;
+      background: var(--border);
+      margin-top: 0.5rem;
+      overflow: hidden;
+    }
+
+    .strength-fill {
+      height: 100%;
+      border-radius: 2px;
+      transition: all 0.3s ease;
+    }
+
+    @media (max-width: 768px) {
+      body { flex-direction: column; }
+      .auth-left { display: none; }
+      .auth-right { width: 100%; padding: 2rem 1.5rem; border: none; }
+    }
+  </style>
+</head>
+<body>
+  <!-- Left Side -->
+  <div class="auth-left">
+    <div class="auth-left-content">
+      <div class="auth-logo">Antika Gallery</div>
+      <div class="auth-deco"></div>
+      <p class="auth-tagline" id="tagline-ar">كل التريندات هتلاقيها هنا — ملابس، أنتيكات، وهوم وير بأقل الأسعار</p>
+      <p class="auth-tagline" id="tagline-en" style="display:none">Discover all trends here — fashion, antiques, and homewear at the best prices</p>
+    </div>
+  </div>
+
+  <!-- Right Side -->
+  <div class="auth-right page-enter">
+    <!-- Lang + Theme -->
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:2rem">
+      <button onclick="toggleLang()" style="font-size:0.85rem;color:var(--text-muted);font-weight:600;padding:6px 14px;border:1.5px solid var(--border);border-radius:20px;transition:all var(--transition)" onmouseover="this.style.borderColor='var(--gold)';this.style.color='var(--gold)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text-muted)'" id="lang-btn">EN</button>
+      <button onclick="toggleTheme()" style="font-size:1.1rem;color:var(--text-muted);width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;transition:all var(--transition)" onmouseover="this.style.background='var(--bg-secondary)'" onmouseout="this.style.background='none'" id="theme-btn">
+        <i class="fas fa-moon"></i>
+      </button>
+    </div>
+
+    <!-- Tabs -->
+    <div class="auth-tabs">
+      <button class="auth-tab active" onclick="showTab('login')" id="tab-login" data-ar="تسجيل الدخول" data-en="Sign In">تسجيل الدخول</button>
+      <button class="auth-tab" onclick="showTab('register')" id="tab-register" data-ar="حساب جديد" data-en="Register">حساب جديد</button>
+    </div>
+
+    <!-- Login Panel -->
+    <div class="auth-panel active" id="panel-login">
+      <h2 class="auth-title" data-ar="أهلاً بعودتك" data-en="Welcome Back">أهلاً بعودتك</h2>
+      <p class="auth-subtitle" data-ar="سجل دخولك للمتابعة" data-en="Sign in to continue">سجل دخولك للمتابعة</p>
+
+      <div class="form-group">
+        <label class="form-label" data-ar="البريد الإلكتروني" data-en="Email">البريد الإلكتروني</label>
+        <input type="email" class="form-control" id="login-email" placeholder="example@gmail.com" dir="ltr">
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" data-ar="كلمة المرور" data-en="Password">كلمة المرور</label>
+        <div class="password-toggle">
+          <input type="password" class="form-control" id="login-password" dir="ltr">
+          <i class="fas fa-eye toggle-eye" onclick="togglePassword('login-password', this)"></i>
+        </div>
+      </div>
+
+      <div style="text-align:left;margin-bottom:1.5rem">
+        <button onclick="showTab('forgot')" style="font-size:0.85rem;color:var(--gold);font-weight:600" data-ar="نسيت كلمة المرور؟" data-en="Forgot password?">نسيت كلمة المرور؟</button>
+      </div>
+
+      <button class="btn btn-primary btn-block btn-lg" onclick="handleLogin()" id="login-btn">
+        <span data-ar="دخول" data-en="Sign In">دخول</span>
+      </button>
+
+      <div id="login-error" class="form-error" style="margin-top:1rem;text-align:center"></div>
+    </div>
+
+    <!-- Register Panel -->
+    <div class="auth-panel" id="panel-register">
+      <h2 class="auth-title" data-ar="إنشاء حساب" data-en="Create Account">إنشاء حساب</h2>
+      <p class="auth-subtitle" data-ar="انضم لعائلة أنتيكا" data-en="Join Antika family">انضم لعائلة أنتيكا</p>
+
+      <!-- Avatar -->
+      <div class="avatar-upload">
+        <div class="avatar-preview" onclick="document.getElementById('avatar-input').click()" id="avatar-preview-el">
+          <i class="fas fa-user"></i>
+        </div>
+        <input type="file" id="avatar-input" accept="image/*" style="display:none" onchange="previewAvatar(this)">
+        <div class="avatar-upload-info">
+          <p style="font-weight:600;font-size:0.9rem" data-ar="صورة شخصية" data-en="Profile Photo">صورة شخصية</p>
+          <small data-ar="اضغط لرفع صورة (اختياري)" data-en="Tap to upload (optional)">اضغط لرفع صورة (اختياري)</small>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">
+        <div class="form-group">
+          <label class="form-label" data-ar="الاسم الكامل" data-en="Full Name">الاسم الكامل</label>
+          <input type="text" class="form-control" id="reg-name">
+        </div>
+        <div class="form-group">
+          <label class="form-label" data-ar="رقم التليفون" data-en="Phone">رقم التليفون</label>
+          <input type="tel" class="form-control" id="reg-phone" dir="ltr">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" data-ar="البريد الإلكتروني" data-en="Email">البريد الإلكتروني</label>
+        <input type="email" class="form-control" id="reg-email" dir="ltr">
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" data-ar="العنوان" data-en="Address">العنوان</label>
+        <input type="text" class="form-control" id="reg-address">
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" data-ar="كلمة المرور" data-en="Password">كلمة المرور</label>
+        <div class="password-toggle">
+          <input type="password" class="form-control" id="reg-password" dir="ltr" oninput="checkStrength(this.value)">
+          <i class="fas fa-eye toggle-eye" onclick="togglePassword('reg-password', this)"></i>
+        </div>
+        <div class="strength-bar">
+          <div class="strength-fill" id="strength-fill"></div>
+        </div>
+        <small class="form-hint" id="strength-text"></small>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" data-ar="تأكيد كلمة المرور" data-en="Confirm Password">تأكيد كلمة المرور</label>
+        <div class="password-toggle">
+          <input type="password" class="form-control" id="reg-confirm" dir="ltr">
+          <i class="fas fa-eye toggle-eye" onclick="togglePassword('reg-confirm', this)"></i>
+        </div>
+      </div>
+
+      <button class="btn btn-primary btn-block btn-lg" onclick="handleRegister()" id="register-btn">
+        <span data-ar="إنشاء الحساب" data-en="Create Account">إنشاء الحساب</span>
+      </button>
+
+      <div id="register-error" class="form-error" style="margin-top:1rem;text-align:center"></div>
+    </div>
+
+    <!-- Forgot Password Panel -->
+    <div class="auth-panel" id="panel-forgot">
+      <button onclick="showTab('login')" style="color:var(--text-muted);font-size:0.85rem;margin-bottom:1.5rem;display:flex;align-items:center;gap:0.5rem">
+        <i class="fas fa-arrow-right"></i>
+        <span data-ar="رجوع" data-en="Back">رجوع</span>
+      </button>
+
+      <h2 class="auth-title" data-ar="نسيت كلمة المرور؟" data-en="Forgot Password?">نسيت كلمة المرور؟</h2>
+      <p class="auth-subtitle" data-ar="هنبعتلك رابط لإعادة التعيين على إيميلك" data-en="We'll send a reset link to your email">هنبعتلك رابط لإعادة التعيين على إيميلك</p>
+
+      <div class="form-group">
+        <label class="form-label" data-ar="البريد الإلكتروني" data-en="Email">البريد الإلكتروني</label>
+        <input type="email" class="form-control" id="forgot-email" dir="ltr">
+      </div>
+
+      <button class="btn btn-primary btn-block" onclick="handleForgot()" id="forgot-btn">
+        <span data-ar="إرسال رابط الاستعادة" data-en="Send Reset Link">إرسال رابط الاستعادة</span>
+      </button>
+
+      <div id="forgot-msg" style="margin-top:1rem;text-align:center;font-size:0.9rem"></div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+  <script src="/js/config.js"></script>
+  <script>
+    const lang = getLang();
+    let avatarFile = null;
+
+    // Init lang display
+    function applyLang() {
+      const l = getLang();
+      document.querySelectorAll('[data-ar]').forEach(el => {
+        el.textContent = l === 'ar' ? el.dataset.ar : el.dataset.en;
+      });
+      document.getElementById('tagline-ar').style.display = l === 'ar' ? 'block' : 'none';
+      document.getElementById('tagline-en').style.display = l === 'en' ? 'block' : 'none';
+      document.getElementById('lang-btn').textContent = l === 'ar' ? 'EN' : 'ع';
+    }
+
+    function toggleLang() {
+      setLang(getLang() === 'ar' ? 'en' : 'ar');
+    }
+
+    function toggleTheme() {
+      const t = getTheme() === 'light' ? 'dark' : 'light';
+      setTheme(t);
+      document.getElementById('theme-btn').innerHTML =
+        t === 'dark' ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
+    }
+
+    function showTab(tab) {
+      document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.auth-panel').forEach(p => p.classList.remove('active'));
+      document.getElementById(`panel-${tab}`).classList.add('active');
+      if (tab !== 'forgot') document.getElementById(`tab-${tab}`).classList.add('active');
+    }
+
+    function togglePassword(id, icon) {
+      const input = document.getElementById(id);
+      const isPass = input.type === 'password';
+      input.type = isPass ? 'text' : 'password';
+      icon.className = isPass ? 'fas fa-eye-slash toggle-eye' : 'fas fa-eye toggle-eye';
+    }
+
+    function previewAvatar(input) {
+      const file = input.files[0];
+      if (!file) return;
+      avatarFile = file;
+      const reader = new FileReader();
+      reader.onload = e => {
+        const el = document.getElementById('avatar-preview-el');
+        el.innerHTML = `<img src="${e.target.result}" style="width:100%;height:100%;object-fit:cover">`;
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function checkStrength(val) {
+      const fill = document.getElementById('strength-fill');
+      const text = document.getElementById('strength-text');
+      const l = getLang();
+      let score = 0;
+      if (val.length >= 8) score++;
+      if (/[A-Z]/.test(val)) score++;
+      if (/[0-9]/.test(val)) score++;
+      if (/[^A-Za-z0-9]/.test(val)) score++;
+
+      const colors = ['#dc2626','#f59e0b','#3b82f6','#16a34a'];
+      const labels_ar = ['ضعيفة','متوسطة','جيدة','قوية'];
+      const labels_en = ['Weak','Fair','Good','Strong'];
+
+      fill.style.width = `${score * 25}%`;
+      fill.style.background = colors[score - 1] || '#dc2626';
+      text.textContent = score > 0 ? (l === 'ar' ? labels_ar[score-1] : labels_en[score-1]) : '';
+    }
+
+    async function handleLogin() {
+      const btn = document.getElementById('login-btn');
+      const errEl = document.getElementById('login-error');
+      const email = document.getElementById('login-email').value.trim();
+      const password = document.getElementById('login-password').value;
+
+      if (!email || !password) {
+        errEl.textContent = lang === 'ar' ? 'من فضلك اكمل البيانات' : 'Please fill all fields';
+        return;
+      }
+
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+      errEl.textContent = '';
+
+      const { data, error } = await db.auth.signInWithPassword({ email, password });
+
+      if (error) {
+        errEl.textContent = lang === 'ar' ? 'إيميل أو كلمة مرور غلط' : 'Invalid email or password';
+        btn.disabled = false;
+        btn.innerHTML = `<span data-ar="دخول" data-en="Sign In">${lang === 'ar' ? 'دخول' : 'Sign In'}</span>`;
+        return;
+      }
+
+      // Check banned
+      const { data: profile } = await db.from('profiles').select('is_banned').eq('id', data.user.id).single();
+      if (profile?.is_banned) {
+        await db.auth.signOut();
+        errEl.textContent = lang === 'ar' ? 'هذا الحساب محظور' : 'This account is banned';
+        btn.disabled = false;
+        btn.innerHTML = `<span>${lang === 'ar' ? 'دخول' : 'Sign In'}</span>`;
+        return;
+      }
+
+      const role = data.user.user_metadata?.role;
+      if (role === 'admin' || role === 'moderator') {
+        window.location.href = '/admin-antika-ctrl/';
+      } else {
+        window.location.href = '/';
+      }
+    }
+
+    async function handleRegister() {
+      const btn = document.getElementById('register-btn');
+      const errEl = document.getElementById('register-error');
+      const name = document.getElementById('reg-name').value.trim();
+      const phone = document.getElementById('reg-phone').value.trim();
+      const email = document.getElementById('reg-email').value.trim();
+      const address = document.getElementById('reg-address').value.trim();
+      const password = document.getElementById('reg-password').value;
+      const confirm = document.getElementById('reg-confirm').value;
+
+      if (!name || !phone || !email || !password) {
+        errEl.textContent = lang === 'ar' ? 'من فضلك اكمل البيانات' : 'Please fill all fields';
+        return;
+      }
+
+      if (password !== confirm) {
+        errEl.textContent = lang === 'ar' ? 'كلمة المرور مش متطابقة' : 'Passwords do not match';
+        return;
+      }
+
+      if (password.length < 8) {
+        errEl.textContent = lang === 'ar' ? 'كلمة المرور لازم تكون 8 حروف على الأقل' : 'Password must be at least 8 characters';
+        return;
+      }
+
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+      errEl.textContent = '';
+
+      const { data, error } = await db.auth.signUp({
+        email, password,
+        options: { data: { full_name: name, role: 'customer' } }
+      });
+
+      if (error) {
+        errEl.textContent = error.message;
+        btn.disabled = false;
+        btn.innerHTML = `<span>${lang === 'ar' ? 'إنشاء الحساب' : 'Create Account'}</span>`;
+        return;
+      }
+
+      // Update profile
+      await db.from('profiles').update({ full_name: name, phone, address }).eq('id', data.user.id);
+
+      // Upload avatar if exists
+      if (avatarFile && data.user) {
+        try {
+          const avatarUrl = await uploadToCloudinary(avatarFile, 'avatars');
+          await db.from('profiles').update({ avatar_url: avatarUrl }).eq('id', data.user.id);
+        } catch (e) {
+          console.log('Avatar upload failed, continuing without it');
+        }
+      }
+
+      showToast(lang === 'ar' ? 'تم إنشاء الحساب! تحقق من إيميلك' : 'Account created! Check your email');
+      showTab('login');
+      btn.disabled = false;
+      btn.innerHTML = `<span>${lang === 'ar' ? 'إنشاء الحساب' : 'Create Account'}</span>`;
+    }
+
+    async function handleForgot() {
+      const btn = document.getElementById('forgot-btn');
+      const msgEl = document.getElementById('forgot-msg');
+      const email = document.getElementById('forgot-email').value.trim();
+
+      if (!email) return;
+
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+
+      const { error } = await db.auth.resetPasswordForEmail(email, {
+        redirectTo: `${window.location.origin}/reset-password.html`
+      });
+
+      msgEl.style.color = error ? '#dc2626' : '#16a34a';
+      msgEl.textContent = error
+        ? (lang === 'ar' ? 'حصل خطأ، حاول تاني' : 'Something went wrong')
+        : (lang === 'ar' ? 'تم إرسال رابط الاستعادة على إيميلك ✓' : 'Reset link sent to your email ✓');
+
+      btn.disabled = false;
+      btn.innerHTML = `<span>${lang === 'ar' ? 'إرسال رابط الاستعادة' : 'Send Reset Link'}</span>`;
+    }
+
+    // Redirect if already logged in
+    (async () => {
+      const user = await getCurrentUser();
+      if (user) {
+        const role = user.user_metadata?.role;
+        window.location.href = (role === 'admin' || role === 'moderator') ? '/admin-antika-ctrl/' : '/';
+      }
+    })();
+
+    applyLang();
+
+    // Theme icon init
+    document.getElementById('theme-btn').innerHTML =
+      getTheme() === 'dark' ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
+  </script>
+</body>
+</html>

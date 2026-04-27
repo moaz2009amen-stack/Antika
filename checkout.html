@@ -238,7 +238,7 @@
 
       document.getElementById('order-items').innerHTML = cart.map(item => `
         <div class="order-item-row">
-          <img src="${item.image || 'https://res.cloudinary.com/df3ffyrsg/image/upload/v1/antika/placeholder'}" class="order-item-img" alt="${item.name}">
+          <img src="${cardImage(item.image) || 'https://res.cloudinary.com/df3ffyrsg/image/upload/q_auto,f_auto,w_50/v1/antika/placeholder'}" class="order-item-img" alt="${item.name}" onerror="this.src='https://res.cloudinary.com/df3ffyrsg/image/upload/q_auto,f_auto,w_50/v1/antika/placeholder'">
           <div style="flex:1">
             <div style="font-weight:600;font-size:0.9rem">${item.name}</div>
             <div style="font-size:0.8rem;color:var(--text-muted)">${l === 'ar' ? 'الكمية:' : 'Qty:'} ${item.quantity}</div>

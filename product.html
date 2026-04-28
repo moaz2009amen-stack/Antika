@@ -93,6 +93,19 @@
       <h2 class="section-title" style="margin-bottom:2rem" data-ar="منتجات مشابهة" data-en="Related Products">منتجات مشابهة</h2>
       <div class="products-grid" id="related-grid"></div>
     </div>
+
+    <!-- Reviews -->
+    <div class="related-section" id="reviews-section" style="display:none">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;flex-wrap:wrap;gap:1rem">
+        <h3 style="font-family:var(--font-display);font-size:1.4rem" id="reviews-title">آراء العملاء</h3>
+        <button class="btn btn-outline btn-sm" onclick="openReviewModal()" id="write-review-btn">
+          <i class="fas fa-pen"></i> <span id="write-review-label">اكتبي رأيك</span>
+        </button>
+      </div>
+      <div id="reviews-list">
+        <div style="text-align:center;padding:2rem;color:var(--text-muted)" id="no-reviews-msg">لا توجد تقييمات بعد</div>
+      </div>
+    </div>
   </div>
 
   <footer style="background:var(--bg-secondary);border-top:1px solid var(--border);padding:1.5rem 0;margin-top:2rem">
@@ -443,17 +456,18 @@
             </div>
           </div>
         </div>
+      `;
 
-        <!-- Reviews Section -->
-        <div class="related-section" id="reviews-section">
-          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;flex-wrap:wrap;gap:1rem">
-            <h3 style="font-family:var(--font-display);font-size:1.4rem">${l === 'ar' ? 'آراء العملاء' : 'Customer Reviews'}</h3>
-            <button class="btn btn-outline btn-sm" onclick="openReviewModal()" id="write-review-btn">
-              <i class="fas fa-pen"></i> ${l === 'ar' ? 'اكتبي رأيك' : 'Write a Review'}
-            </button>
-          </div>
-          <div id="reviews-list"><div style="text-align:center;padding:2rem;color:var(--text-muted)">${l === 'ar' ? 'لا توجد تقييمات بعد' : 'No reviews yet'}</div></div>
-        </div>`;
+      // إظهار قسم التقييمات
+      const reviewsSection = document.getElementById('reviews-section');
+      if (reviewsSection) {
+        reviewsSection.style.display = 'block';
+        const l2 = getLang();
+        const title = document.getElementById('reviews-title');
+        const label = document.getElementById('write-review-label');
+        if (title) title.textContent = l2 === 'ar' ? 'آراء العملاء' : 'Customer Reviews';
+        if (label) label.textContent = l2 === 'ar' ? 'اكتبي رأيك' : 'Write a Review';
+      }
     }
 
     function handleAddToCart() {

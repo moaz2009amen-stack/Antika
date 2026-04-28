@@ -115,6 +115,43 @@
     </div>
   </footer>
 
+  <!-- Review Modal -->
+  <div class="modal-overlay" id="review-modal">
+    <div class="modal" style="max-width:500px">
+      <div class="modal-header">
+        <h3 class="modal-title">اكتبي تقييمك</h3>
+        <button class="modal-close" onclick="closeReviewModal()"><i class="fas fa-times"></i></button>
+      </div>
+      <div style="padding:1.5rem">
+        <div style="margin-bottom:1.25rem">
+          <label class="form-label">التقييم *</label>
+          <div style="display:flex;gap:0.5rem">
+            <button class="star-btn" onclick="setReviewRating(1)" style="background:none;border:none;cursor:pointer;color:var(--border);transition:color 0.2s;font-size:1.75rem"><i class="fas fa-star"></i></button>
+            <button class="star-btn" onclick="setReviewRating(2)" style="background:none;border:none;cursor:pointer;color:var(--border);transition:color 0.2s;font-size:1.75rem"><i class="fas fa-star"></i></button>
+            <button class="star-btn" onclick="setReviewRating(3)" style="background:none;border:none;cursor:pointer;color:var(--border);transition:color 0.2s;font-size:1.75rem"><i class="fas fa-star"></i></button>
+            <button class="star-btn" onclick="setReviewRating(4)" style="background:none;border:none;cursor:pointer;color:var(--border);transition:color 0.2s;font-size:1.75rem"><i class="fas fa-star"></i></button>
+            <button class="star-btn" onclick="setReviewRating(5)" style="background:none;border:none;cursor:pointer;color:var(--border);transition:color 0.2s;font-size:1.75rem"><i class="fas fa-star"></i></button>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">رأيك (اختياري)</label>
+          <textarea class="form-control" id="review-comment" rows="3" placeholder="شاركي تجربتك مع المنتج..."></textarea>
+        </div>
+        <div class="form-group">
+          <label class="form-label">صور (اختياري)</label>
+          <div style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-bottom:0.5rem" id="review-images-preview"></div>
+          <button class="btn btn-ghost btn-sm" onclick="document.getElementById('review-img-input').click()">
+            <i class="fas fa-camera"></i> إضافة صور
+          </button>
+          <input type="file" id="review-img-input" accept="image/*" multiple style="display:none" onchange="uploadReviewImages(this)">
+        </div>
+        <button class="btn btn-primary btn-block" id="submit-review-btn" onclick="submitReview()">
+          إرسال التقييم
+        </button>
+      </div>
+    </div>
+  </div>
+
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
   <script src="/js/config.js"></script>
   <script>
@@ -614,45 +651,5 @@
       document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 20);
     });
   </script>
-
-  <!-- Review Modal -->
-  <div class="modal-overlay" id="review-modal">
-    <div class="modal" style="max-width:500px">
-      <div class="modal-header">
-        <h3 class="modal-title">اكتبي تقييمك</h3>
-        <button class="modal-close" onclick="closeReviewModal()"><i class="fas fa-times"></i></button>
-      </div>
-      <div style="padding:1.5rem">
-        <!-- Stars -->
-        <div style="margin-bottom:1.25rem">
-          <label class="form-label">التقييم *</label>
-          <div style="display:flex;gap:0.5rem;font-size:1.75rem">
-            <button class="star-btn" onclick="setReviewRating(1)" style="background:none;border:none;cursor:pointer;color:var(--border);transition:color 0.2s;font-size:1.75rem"><i class="fas fa-star"></i></button>
-            <button class="star-btn" onclick="setReviewRating(2)" style="background:none;border:none;cursor:pointer;color:var(--border);transition:color 0.2s;font-size:1.75rem"><i class="fas fa-star"></i></button>
-            <button class="star-btn" onclick="setReviewRating(3)" style="background:none;border:none;cursor:pointer;color:var(--border);transition:color 0.2s;font-size:1.75rem"><i class="fas fa-star"></i></button>
-            <button class="star-btn" onclick="setReviewRating(4)" style="background:none;border:none;cursor:pointer;color:var(--border);transition:color 0.2s;font-size:1.75rem"><i class="fas fa-star"></i></button>
-            <button class="star-btn" onclick="setReviewRating(5)" style="background:none;border:none;cursor:pointer;color:var(--border);transition:color 0.2s;font-size:1.75rem"><i class="fas fa-star"></i></button>
-          </div>
-        </div>
-        <!-- Comment -->
-        <div class="form-group">
-          <label class="form-label">رأيك (اختياري)</label>
-          <textarea class="form-control" id="review-comment" rows="3" placeholder="شاركي تجربتك مع المنتج..."></textarea>
-        </div>
-        <!-- Images -->
-        <div class="form-group">
-          <label class="form-label">صور (اختياري)</label>
-          <div style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-bottom:0.5rem" id="review-images-preview"></div>
-          <button class="btn btn-ghost btn-sm" onclick="document.getElementById('review-img-input').click()">
-            <i class="fas fa-camera"></i> إضافة صور
-          </button>
-          <input type="file" id="review-img-input" accept="image/*" multiple style="display:none" onchange="uploadReviewImages(this)">
-        </div>
-        <button class="btn btn-primary btn-block" id="submit-review-btn" onclick="submitReview()">
-          إرسال التقييم
-        </button>
-      </div>
-    </div>
-  </div>
 </body>
 </html>

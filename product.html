@@ -5,117 +5,54 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Antika Gallery — المنتج</title>
   <link rel="manifest" href="/manifest.json">
+  <link rel="icon" href="https://res.cloudinary.com/df3ffyrsg/image/upload/q_auto/f_auto/v1776645596/ChatGPT_Image_20_%D8%A3%D8%A8%D8%B1%D9%8A%D9%84_2026_02_28_38_%D8%B5_etwl3l.png">
   <link rel="stylesheet" href="/css/main.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <style>
-    .product-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; padding: 2rem 0 4rem; }
-    .product-gallery { position: sticky; top: 90px; height: fit-content; }
-    .main-media { aspect-ratio: 3/4; border-radius: var(--radius-lg); overflow: hidden; background: var(--bg-secondary); border: 1px solid var(--border); position: relative; touch-action: pan-y; user-select: none; }
-    .main-media img, .main-media video { width: 100%; height: 100%; object-fit: cover; }
-    .media-badge { position: absolute; top: 12px; right: 12px; background: rgba(0,0,0,0.6); color: #fff; padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; display: flex; align-items: center; gap: 4px; }
-    [dir="ltr"] .media-badge { right: auto; left: 12px; }
-    .thumbnails { display: flex; gap: 0.6rem; margin-top: 0.75rem; flex-wrap: wrap; }
-    .thumb { width: 70px; height: 90px; border-radius: var(--radius-sm); overflow: hidden; cursor: pointer; border: 2px solid transparent; transition: border-color var(--transition); background: var(--bg-secondary); flex-shrink: 0; }
-    .thumb:hover, .thumb.active { border-color: var(--gold); }
-    .thumb img, .thumb video { width: 100%; height: 100%; object-fit: cover; }
-    .thumb-video { display: flex; align-items: center; justify-content: center; background: var(--charcoal); }
-    .thumb-video i { color: #fff; font-size: 1.2rem; }
-    .product-info { padding-top: 0.5rem; }
-    .product-category { font-size: 0.8rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--gold); margin-bottom: 0.75rem; }
-    .product-title { font-family: var(--font-display); font-size: 2rem; margin-bottom: 1rem; line-height: 1.3; }
-    .product-price { font-size: 2rem; font-weight: 700; color: var(--gold); margin-bottom: 1.5rem; }
-    .product-desc { color: var(--text-secondary); line-height: 1.9; margin-bottom: 2rem; font-size: 0.95rem; }
-    .quantity-selector { display: flex; align-items: center; gap: 0; border: 1.5px solid var(--border); border-radius: var(--radius-sm); width: fit-content; overflow: hidden; margin-bottom: 1.5rem; }
-    .qty-btn { width: 40px; height: 44px; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; color: var(--text); transition: all var(--transition); }
-    .qty-btn:hover { background: var(--bg-secondary); color: var(--gold); }
-    .qty-display { width: 50px; height: 44px; text-align: center; border: none; border-right: 1.5px solid var(--border); border-left: 1.5px solid var(--border); background: var(--bg-card); color: var(--text); font-size: 1rem; font-weight: 700; font-family: inherit; outline: none; }
-    .product-actions { display: flex; gap: 0.75rem; margin-bottom: 2rem; }
-    .product-meta { display: flex; flex-direction: column; gap: 0.75rem; padding-top: 1.5rem; border-top: 1px solid var(--border); }
-    .meta-row { display: flex; align-items: center; gap: 0.75rem; font-size: 0.9rem; }
-    .meta-icon { width: 36px; height: 36px; border-radius: 50%; background: rgba(201,168,76,0.1); display: flex; align-items: center; justify-content: center; color: var(--gold); font-size: 0.9rem; flex-shrink: 0; }
-    .stock-badge { display: inline-flex; align-items: center; gap: 0.4rem; font-size: 0.85rem; font-weight: 600; }
-    .related-section { padding: 3rem 0; border-top: 1px solid var(--border); }
-    .wishlist-btn { width: 44px; height: 44px; border-radius: 50%; border: 1.5px solid var(--border); background: var(--bg-card); color: var(--text-muted); display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 1.1rem; transition: all 0.2s; flex-shrink: 0; }
-    .wishlist-btn:hover, .wishlist-btn.wishlisted { border-color: #dc2626; color: #dc2626; background: rgba(220,38,38,0.05); }
-    @media (max-width: 900px) {
-      .product-layout { grid-template-columns: 1fr; gap: 2rem; }
-      .product-gallery { position: static; }
-      .product-title { font-size: 1.5rem; }
-    }
+    .product-layout{display:grid;grid-template-columns:1fr 1fr;gap:3rem;padding:2rem 0 4rem}
+    .product-gallery{position:sticky;top:90px;height:fit-content}
+    .main-media{aspect-ratio:3/4;border-radius:var(--radius-lg);overflow:hidden;background:var(--bg-secondary);border:1px solid var(--border);position:relative;touch-action:pan-y;user-select:none}
+    .main-media img,.main-media video{width:100%;height:100%;object-fit:cover}
+    .media-badge{position:absolute;top:12px;right:12px;background:rgba(0,0,0,.6);color:#fff;padding:4px 10px;border-radius:20px;font-size:.75rem;display:flex;align-items:center;gap:4px}
+    .thumbnails{display:flex;gap:.6rem;margin-top:.75rem;flex-wrap:wrap}
+    .thumb{width:70px;height:90px;border-radius:var(--radius-sm);overflow:hidden;cursor:pointer;border:2px solid transparent;transition:border-color .2s;background:var(--bg-secondary);flex-shrink:0;display:flex;align-items:center;justify-content:center}
+    .thumb:hover,.thumb.active{border-color:var(--gold)}
+    .thumb img,.thumb video{width:100%;height:100%;object-fit:cover}
+    .thumb-video{background:#1a1510}
+    .thumb-video i{color:#fff;font-size:1.2rem}
+    .product-info{padding-top:.5rem}
+    .product-category{font-size:.8rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--gold);margin-bottom:.75rem}
+    .product-title{font-family:var(--font-display);font-size:2rem;margin-bottom:1rem;line-height:1.3}
+    .product-price{font-size:2rem;font-weight:700;color:var(--gold);margin-bottom:1.5rem}
+    .product-desc{color:var(--text-secondary);line-height:1.9;margin-bottom:2rem;font-size:.95rem}
+    .quantity-selector{display:flex;align-items:center;border:1.5px solid var(--border);border-radius:var(--radius-sm);width:fit-content;overflow:hidden;margin-bottom:1.5rem}
+    .qty-btn{width:40px;height:44px;display:flex;align-items:center;justify-content:center;font-size:1.1rem;color:var(--text);transition:all .2s}
+    .qty-btn:hover{background:var(--bg-secondary);color:var(--gold)}
+    .qty-display{width:50px;height:44px;text-align:center;border:none;border-right:1.5px solid var(--border);border-left:1.5px solid var(--border);background:var(--bg-card);color:var(--text);font-size:1rem;font-weight:700;font-family:inherit;outline:none}
+    .product-actions{display:flex;gap:.75rem;margin-bottom:2rem}
+    .product-meta{display:flex;flex-direction:column;gap:.75rem;padding-top:1.5rem;border-top:1px solid var(--border)}
+    .meta-row{display:flex;align-items:center;gap:.75rem;font-size:.9rem}
+    .meta-icon{width:36px;height:36px;border-radius:50%;background:rgba(201,168,76,.1);display:flex;align-items:center;justify-content:center;color:var(--gold);font-size:.9rem;flex-shrink:0}
+    .related-section{padding:3rem 0;border-top:1px solid var(--border)}
+    .wishlist-btn{width:44px;height:44px;border-radius:50%;border:1.5px solid var(--border);background:var(--bg-card);color:var(--text-muted);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:1.1rem;transition:all .2s;flex-shrink:0}
+    .wishlist-btn:hover,.wishlist-btn.wishlisted{border-color:#dc2626;color:#dc2626;background:rgba(220,38,38,.05)}
+    /* Zoom overlay */
+    .zoom-overlay{position:fixed;inset:0;background:rgba(0,0,0,.9);z-index:5000;display:none;align-items:center;justify-content:center;cursor:zoom-out}
+    .zoom-overlay.open{display:flex}
+    .zoom-overlay img{max-width:95vw;max-height:95vh;object-fit:contain;border-radius:8px}
+    /* Rating Summary */
+    .rating-summary{display:flex;align-items:center;gap:.75rem;margin:1.5rem 0;padding:1rem;background:var(--bg-secondary);border-radius:var(--radius-sm)}
+    @media(max-width:900px){.product-layout{grid-template-columns:1fr;gap:2rem}.product-gallery{position:static}.product-title{font-size:1.5rem}}
   </style>
 </head>
 <body>
-  <nav class="navbar" id="navbar">
-    <a href="/" class="navbar-brand">Antika Gallery</a>
-    <ul class="navbar-nav" id="nav-menu">
-      <li><a href="/" data-ar="الرئيسية" data-en="Home">الرئيسية</a></li>
-      <li><a href="/shop.html" data-ar="المتجر" data-en="Shop">المتجر</a></li>
-      <li><a href="/track.html" data-ar="تتبع طلبك" data-en="Track Order">تتبع طلبك</a></li>
-    </ul>
-    <div class="navbar-actions">
-      <button class="navbar-icon-btn" onclick="toggleTheme()" id="theme-toggle"><i class="fas fa-moon"></i></button>
-      <button class="navbar-icon-btn" onclick="toggleLang()" style="font-size:0.75rem;font-weight:700" id="lang-toggle">EN</button>
-      <a href="/wishlist.html" class="navbar-icon-btn" title="المفضلة">
-        <i class="far fa-heart"></i>
-      </a>
-      <a href="/cart.html" class="navbar-icon-btn"><i class="fas fa-shopping-bag"></i><span class="cart-count" style="display:none">0</span></a>
-      <div id="user-area"></div>
-      <button class="hamburger" onclick="document.getElementById('nav-menu').classList.toggle('open')"><span></span><span></span><span></span></button>
-    </div>
-  </nav>
 
-  <div class="container page-enter" style="padding-top:80px">
-    <!-- Breadcrumb -->
-    <nav style="padding:1rem 0;font-size:0.85rem;color:var(--text-muted)">
-      <a href="/" style="color:var(--text-muted);transition:color var(--transition)" onmouseover="this.style.color='var(--gold)'" onmouseout="this.style.color='var(--text-muted)'" data-ar="الرئيسية" data-en="Home">الرئيسية</a>
-      <span style="margin:0 0.5rem">/</span>
-      <a href="/shop.html" style="color:var(--text-muted);transition:color var(--transition)" onmouseover="this.style.color='var(--gold)'" onmouseout="this.style.color='var(--text-muted)'" data-ar="المتجر" data-en="Shop">المتجر</a>
-      <span style="margin:0 0.5rem">/</span>
-      <span id="breadcrumb-name" style="color:var(--text)">...</span>
-    </nav>
-
-    <div id="product-container">
-      <!-- Skeleton -->
-      <div class="product-layout">
-        <div class="skeleton" style="aspect-ratio:3/4;border-radius:var(--radius-lg)"></div>
-        <div>
-          <div class="skeleton" style="height:20px;width:100px;margin-bottom:1rem;border-radius:4px"></div>
-          <div class="skeleton" style="height:40px;width:80%;margin-bottom:1rem;border-radius:4px"></div>
-          <div class="skeleton" style="height:32px;width:120px;margin-bottom:2rem;border-radius:4px"></div>
-          <div class="skeleton" style="height:80px;margin-bottom:2rem;border-radius:8px"></div>
-          <div class="skeleton" style="height:50px;border-radius:8px"></div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Related -->
-    <div class="related-section" id="related-section" style="display:none">
-      <h2 class="section-title" style="margin-bottom:2rem" data-ar="منتجات مشابهة" data-en="Related Products">منتجات مشابهة</h2>
-      <div class="products-grid" id="related-grid"></div>
-    </div>
-
-    <!-- Reviews -->
-    <div class="related-section" id="reviews-section" style="display:none">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;flex-wrap:wrap;gap:1rem">
-        <h3 style="font-family:var(--font-display);font-size:1.4rem" id="reviews-title">آراء العملاء</h3>
-        <button class="btn btn-outline btn-sm" onclick="openReviewModal()" id="write-review-btn">
-          <i class="fas fa-pen"></i> <span id="write-review-label">اكتبي رأيك</span>
-        </button>
-      </div>
-      <div id="reviews-list">
-        <div style="text-align:center;padding:2rem;color:var(--text-muted)" id="no-reviews-msg">لا توجد تقييمات بعد</div>
-      </div>
-    </div>
+  <!-- Zoom Overlay -->
+  <div class="zoom-overlay" id="zoom-overlay" onclick="closeZoom()">
+    <img id="zoom-img" src="" alt="">
   </div>
 
-  <footer style="background:var(--bg-secondary);border-top:1px solid var(--border);padding:1.5rem 0;margin-top:2rem">
-    <div class="container" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem">
-      <p style="font-size:0.85rem;color:var(--text-muted)" data-ar="© 2024 أنتيكا جاليري" data-en="© 2024 Antika Gallery">© 2024 أنتيكا جاليري</p>
-      <p class="footer-dev">Developed by <a href="https://www.facebook.com/profile.php?id=61552026802548&locale=ar_AR" target="_blank" rel="noopener" style="color:var(--gold);font-weight:600">Moaz</a></p>
-    </div>
-  </footer>
-
-  <!-- Review Modal -->
+  <!-- Review Modal — قبل الـ scripts عشان يكون موجود في الـ DOM -->
   <div class="modal-overlay" id="review-modal">
     <div class="modal" style="max-width:500px">
       <div class="modal-header">
@@ -125,13 +62,14 @@
       <div style="padding:1.5rem">
         <div style="margin-bottom:1.25rem">
           <label class="form-label">التقييم *</label>
-          <div style="display:flex;gap:0.5rem">
-            <button class="star-btn" onclick="setReviewRating(1)" style="background:none;border:none;cursor:pointer;color:var(--border);transition:color 0.2s;font-size:1.75rem"><i class="fas fa-star"></i></button>
-            <button class="star-btn" onclick="setReviewRating(2)" style="background:none;border:none;cursor:pointer;color:var(--border);transition:color 0.2s;font-size:1.75rem"><i class="fas fa-star"></i></button>
-            <button class="star-btn" onclick="setReviewRating(3)" style="background:none;border:none;cursor:pointer;color:var(--border);transition:color 0.2s;font-size:1.75rem"><i class="fas fa-star"></i></button>
-            <button class="star-btn" onclick="setReviewRating(4)" style="background:none;border:none;cursor:pointer;color:var(--border);transition:color 0.2s;font-size:1.75rem"><i class="fas fa-star"></i></button>
-            <button class="star-btn" onclick="setReviewRating(5)" style="background:none;border:none;cursor:pointer;color:var(--border);transition:color 0.2s;font-size:1.75rem"><i class="fas fa-star"></i></button>
+          <div style="display:flex;gap:.5rem" id="stars-container">
+            <button class="star-btn" data-rating="1" style="background:none;border:none;cursor:pointer;color:var(--border);font-size:2rem;transition:color .15s;padding:0"><i class="fas fa-star"></i></button>
+            <button class="star-btn" data-rating="2" style="background:none;border:none;cursor:pointer;color:var(--border);font-size:2rem;transition:color .15s;padding:0"><i class="fas fa-star"></i></button>
+            <button class="star-btn" data-rating="3" style="background:none;border:none;cursor:pointer;color:var(--border);font-size:2rem;transition:color .15s;padding:0"><i class="fas fa-star"></i></button>
+            <button class="star-btn" data-rating="4" style="background:none;border:none;cursor:pointer;color:var(--border);font-size:2rem;transition:color .15s;padding:0"><i class="fas fa-star"></i></button>
+            <button class="star-btn" data-rating="5" style="background:none;border:none;cursor:pointer;color:var(--border);font-size:2rem;transition:color .15s;padding:0"><i class="fas fa-star"></i></button>
           </div>
+          <div id="rating-hint" style="font-size:.8rem;color:var(--text-muted);margin-top:.35rem"></div>
         </div>
         <div class="form-group">
           <label class="form-label">رأيك (اختياري)</label>
@@ -139,517 +77,453 @@
         </div>
         <div class="form-group">
           <label class="form-label">صور (اختياري)</label>
-          <div style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-bottom:0.5rem" id="review-images-preview"></div>
+          <div style="display:flex;gap:.5rem;flex-wrap:wrap;margin-bottom:.5rem" id="review-images-preview"></div>
           <button class="btn btn-ghost btn-sm" onclick="document.getElementById('review-img-input').click()">
             <i class="fas fa-camera"></i> إضافة صور
           </button>
           <input type="file" id="review-img-input" accept="image/*" multiple style="display:none" onchange="uploadReviewImages(this)">
         </div>
+        <div class="form-error" id="review-error" style="margin-bottom:.75rem;display:none"></div>
         <button class="btn btn-primary btn-block" id="submit-review-btn" onclick="submitReview()">
-          إرسال التقييم
+          <i class="fas fa-paper-plane"></i> إرسال التقييم
         </button>
       </div>
     </div>
   </div>
 
+  <!-- Navbar -->
+  <nav class="navbar" id="navbar">
+    <a href="/" class="navbar-brand">Antika Gallery</a>
+    <ul class="navbar-nav" id="nav-menu">
+      <li><a href="/">الرئيسية</a></li>
+      <li><a href="/shop.html">المتجر</a></li>
+    </ul>
+    <div class="navbar-actions">
+      <button class="navbar-icon-btn" onclick="toggleTheme()" id="theme-toggle"><i class="fas fa-moon"></i></button>
+      <button class="navbar-icon-btn" onclick="toggleLang()" style="font-size:.75rem;font-weight:700" id="lang-toggle">EN</button>
+      <a href="/wishlist.html" class="navbar-icon-btn" title="المفضلة"><i class="far fa-heart"></i></a>
+      <a href="/cart.html" class="navbar-icon-btn"><i class="fas fa-shopping-bag"></i><span class="cart-count" style="display:none">0</span></a>
+      <div id="user-area"></div>
+      <button class="hamburger" onclick="document.getElementById('nav-menu').classList.toggle('open')"><span></span><span></span><span></span></button>
+    </div>
+  </nav>
+
+  <!-- Breadcrumb -->
+  <div class="container" style="padding-top:1rem;padding-bottom:.5rem">
+    <div style="font-size:.85rem;color:var(--text-muted);display:flex;align-items:center;gap:.5rem;flex-wrap:wrap">
+      <a href="/" style="color:var(--text-muted);transition:color .2s" onmouseover="this.style.color='var(--gold)'" onmouseout="this.style.color='var(--text-muted)'">الرئيسية</a>
+      <i class="fas fa-chevron-left" style="font-size:.65rem"></i>
+      <a href="/shop.html" style="color:var(--text-muted);transition:color .2s" onmouseover="this.style.color='var(--gold)'" onmouseout="this.style.color='var(--text-muted)'">المتجر</a>
+      <i class="fas fa-chevron-left" style="font-size:.65rem"></i>
+      <span id="breadcrumb-name" style="color:var(--text)">...</span>
+    </div>
+  </div>
+
+  <!-- Product Container -->
+  <div class="container">
+    <div id="product-container">
+      <div style="text-align:center;padding:5rem"><div class="spinner" style="margin:0 auto"></div></div>
+    </div>
+
+    <!-- Related -->
+    <div class="related-section" id="related-section" style="display:none">
+      <h2 class="section-title" style="margin-bottom:2rem">منتجات مشابهة</h2>
+      <div class="products-grid" id="related-grid"></div>
+    </div>
+
+    <!-- Reviews -->
+    <div class="related-section" id="reviews-section" style="display:none">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;flex-wrap:wrap;gap:1rem">
+        <h3 style="font-family:var(--font-display);font-size:1.4rem" id="reviews-title">آراء العملاء</h3>
+        <button class="btn btn-outline btn-sm" id="write-review-btn" onclick="openReviewModal()">
+          <i class="fas fa-pen"></i> اكتبي رأيك
+        </button>
+      </div>
+      <!-- Rating Summary -->
+      <div class="rating-summary" id="rating-summary" style="display:none">
+        <div style="text-align:center;min-width:70px">
+          <div style="font-size:2.5rem;font-weight:700;color:var(--gold);font-family:var(--font-display);line-height:1" id="avg-rating">0</div>
+          <div id="star-display" style="color:var(--gold);font-size:.8rem;margin:.25rem 0"></div>
+          <div style="font-size:.72rem;color:var(--text-muted)" id="review-count"></div>
+        </div>
+        <div style="flex:1" id="rating-bars"></div>
+      </div>
+      <div id="reviews-list">
+        <div style="text-align:center;padding:2rem;color:var(--text-muted)">
+          <i class="far fa-comment-dots" style="font-size:2rem;display:block;margin-bottom:.75rem;opacity:.4"></i>
+          لا توجد تقييمات بعد — كوني أول من يقيم!
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-bottom">
+        <p style="font-size:.85rem;color:var(--text-muted)">© 2026 أنتيكا جاليري. جميع الحقوق محفوظة</p>
+        <p class="footer-dev">Developed by <a href="https://www.facebook.com/profile.php?id=61552026802548&locale=ar_AR" target="_blank" rel="noopener">Moaz</a></p>
+      </div>
+    </div>
+  </footer>
+
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
   <script src="/js/config.js"></script>
   <script>
     let product = null;
-    let currentMedia = null;
     let quantity = 1;
-
-    function applyLang() {
-      const l = getLang();
-      document.querySelectorAll('[data-ar]').forEach(el => {
-        if (el.tagName === 'INPUT') return;
-        el.textContent = l === 'ar' ? el.dataset.ar : el.dataset.en;
-      });
-      document.getElementById('lang-toggle').textContent = l === 'ar' ? 'EN' : 'ع';
-    }
-
-    function toggleLang() { setLang(getLang() === 'ar' ? 'en' : 'ar'); }
-    function toggleTheme() {
-      const t = getTheme() === 'light' ? 'dark' : 'light';
-      setTheme(t);
-      document.getElementById('theme-toggle').innerHTML = t === 'dark' ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
-    }
-
-    function showMedia(src, isVideo, thumbEl) {
-      currentMedia = src;
-      const main = document.getElementById('main-media-el');
-      if (isVideo) {
-        main.innerHTML = `<video src="${src}" controls style="width:100%;height:100%;object-fit:cover"></video>`;
-        document.getElementById('media-badge').innerHTML = '<i class="fas fa-play"></i> فيديو';
-        document.getElementById('media-badge').style.display = 'flex';
-      } else {
-        main.innerHTML = `<img src="${src}" alt="${product?.name}" id="zoom-img" style="width:100%;height:100%;object-fit:cover;cursor:zoom-in" onclick="openZoom('${src}')">`;
-        document.getElementById('media-badge').style.display = 'none';
-      }
-      document.querySelectorAll('.thumb').forEach(t => t.classList.remove('active'));
-      if (thumbEl) thumbEl.classList.add('active');
-    }
-
-    function openZoom(src) {
-      const overlay = document.createElement('div');
-      overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.95);z-index:9999;display:flex;align-items:center;justify-content:center;cursor:zoom-out';
-      overlay.innerHTML = `<img src="${src}" style="max-width:90vw;max-height:90vh;object-fit:contain;border-radius:8px">`;
-      overlay.onclick = () => overlay.remove();
-      document.body.appendChild(overlay);
-    }
-
-    function updateQty(delta) {
-      quantity = Math.max(1, Math.min(quantity + delta, product?.stock || 99));
-      document.getElementById('qty-display').value = quantity;
-    }
-
-    // ── Stock Alert ───────────────────────────────────────────────
-    async function handleStockAlert(productId) {
-      const user = await getCurrentUser();
-      const l = getLang();
-      const btn = document.getElementById('stock-alert-btn');
-
-      if (!user) {
-        showToast(l === 'ar' ? 'سجلي دخولك أولاً' : 'Please sign in first', 'error');
-        setTimeout(() => window.location.href = '/auth.html', 1200);
-        return;
-      }
-
-      btn.disabled = true;
-      const { error } = await db.from('stock_alerts').insert({
-        product_id: productId, user_id: user.id, email: user.email
-      });
-
-      if (error?.code === '23505') {
-        showToast(l === 'ar' ? 'أنتِ مسجلة بالفعل للإشعار' : 'Already registered for notification');
-      } else if (!error) {
-        btn.innerHTML = `<i class="fas fa-check"></i> ${l === 'ar' ? 'هيتم إشعارك ✓' : 'You\'ll be notified ✓'}`;
-        btn.style.borderColor = '#16a34a';
-        btn.style.color = '#16a34a';
-        showToast(l === 'ar' ? 'هنبلغك لما المنتج يتوفر 🔔' : 'We\'ll notify you when available 🔔');
-      }
-      btn.disabled = false;
-    }
-
-    // ── Reviews ───────────────────────────────────────────────────
-    async function loadReviews(productId) {
-      const { data: reviews } = await db.from('reviews')
-        .select('*, profiles(full_name, avatar_url)')
-        .eq('product_id', productId)
-        .order('created_at', { ascending: false });
-
-      if (!reviews?.length) return;
-      const l = getLang();
-
-      // حساب المتوسط
-      const avg = reviews.reduce((s, r) => s + r.rating, 0) / reviews.length;
-      document.getElementById('avg-rating').textContent = avg.toFixed(1);
-      document.getElementById('star-display').innerHTML = renderStars(avg);
-      document.getElementById('review-count').textContent = `${reviews.length} ${l === 'ar' ? 'تقييم' : 'reviews'}`;
-
-      // شرائط التقييم
-      const counts = [5,4,3,2,1].map(n => reviews.filter(r => r.rating === n).length);
-      document.getElementById('rating-bars').innerHTML = [5,4,3,2,1].map((n, i) => `
-        <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.25rem">
-          <span style="font-size:0.75rem;color:var(--text-muted);width:14px">${n}</span>
-          <i class="fas fa-star" style="color:var(--gold);font-size:0.65rem"></i>
-          <div style="flex:1;height:6px;background:var(--border);border-radius:3px;overflow:hidden">
-            <div style="width:${reviews.length ? (counts[i]/reviews.length*100) : 0}%;height:100%;background:var(--gold);border-radius:3px"></div>
-          </div>
-          <span style="font-size:0.72rem;color:var(--text-muted);width:16px">${counts[i]}</span>
-        </div>`).join('');
-
-      // عرض التقييمات
-      document.getElementById('reviews-list').innerHTML = reviews.map(r => `
-        <div style="padding:1.25rem 0;border-bottom:1px solid var(--border)">
-          <div style="display:flex;align-items:center;gap:0.75rem;margin-bottom:0.75rem">
-            <div style="width:38px;height:38px;border-radius:50%;overflow:hidden;background:rgba(201,168,76,.15);display:flex;align-items:center;justify-content:center;font-weight:700;color:var(--gold);flex-shrink:0">
-              ${r.profiles?.avatar_url
-                ? `<img src="${avatarImage(r.profiles.avatar_url)}" style="width:100%;height:100%;object-fit:cover">`
-                : (r.profiles?.full_name || '?')[0].toUpperCase()}
-            </div>
-            <div>
-              <div style="font-weight:600;font-size:0.9rem">${r.profiles?.full_name || (l==='ar'?'عميل':'Customer')}</div>
-              <div style="color:var(--gold);font-size:0.8rem">${renderStars(r.rating)}</div>
-            </div>
-            <div style="margin-right:auto;font-size:0.78rem;color:var(--text-muted)">${formatDate(r.created_at)}</div>
-          </div>
-          ${r.comment ? `<p style="font-size:0.9rem;color:var(--text-secondary);line-height:1.7">${r.comment}</p>` : ''}
-          ${r.images?.length ? `<div style="display:flex;gap:0.5rem;margin-top:0.75rem;flex-wrap:wrap">${r.images.map(img => `<img src="${cardImage(img)}" style="width:70px;height:70px;object-fit:cover;border-radius:6px;cursor:pointer" onclick="openZoom('${img}')">`).join('')}</div>` : ''}
-        </div>`).join('');
-    }
-
-    function renderStars(rating) {
-      return Array.from({length:5}, (_, i) =>
-        `<i class="${i < Math.floor(rating) ? 'fas' : i < rating ? 'fas fa-star-half-alt' : 'far'} fa-star"></i>`
-      ).join('');
-    }
-
-    // ── Review Modal ──────────────────────────────────────────────
+    let selectedRating = 0;
     let reviewImages = [];
 
-    function openReviewModal() {
+    // ── Helpers ───────────────────────────────────────────────────
+    function toggleTheme(){const t=getTheme()==='light'?'dark':'light';setTheme(t);document.getElementById('theme-toggle').innerHTML=t==='dark'?'<i class="fas fa-sun"></i>':'<i class="fas fa-moon"></i>';}
+    function toggleLang(){setLang(getLang()==='ar'?'en':'ar');}
+    function isVideo(url){return url&&(url.includes('/video/upload/')||/\.(mp4|mov|webm|avi)(\?|$)/i.test(url));}
+    function openZoom(src){document.getElementById('zoom-img').src=src;document.getElementById('zoom-overlay').classList.add('open');}
+    function closeZoom(){document.getElementById('zoom-overlay').classList.remove('open');}
+
+    // ── Load Product ──────────────────────────────────────────────
+    async function loadProduct() {
+      const id = new URLSearchParams(window.location.search).get('id');
+      if (!id) { window.location.href = '/shop.html'; return; }
       const l = getLang();
-      getCurrentUser().then(user => {
-        if (!user) {
-          showToast(l === 'ar' ? 'سجلي دخولك أولاً' : 'Please sign in first', 'error');
-          setTimeout(() => window.location.href = '/auth.html', 1200);
-          return;
-        }
-        reviewImages = [];
-        selectedRating = 0;
-        document.getElementById('review-comment').value = '';
-        document.getElementById('review-images-preview').innerHTML = '';
-        document.querySelectorAll('.star-btn').forEach(btn => btn.style.color = 'var(--border)');
-        document.getElementById('review-modal').classList.add('open');
-      });
-    }
 
-    function closeReviewModal() {
-      document.getElementById('review-modal').classList.remove('open');
-      document.getElementById('review-comment').value = '';
-      document.getElementById('review-images-preview').innerHTML = '';
-      reviewImages = [];
-      setReviewRating(0);
-    }
+      const [{ data: p }, { data: cat }] = await Promise.all([
+        db.from('products').select('*, categories(name, name_ar)').eq('id', id).single(),
+        Promise.resolve({ data: null })
+      ]);
 
-    let selectedRating = 0;
-    function setReviewRating(n) {
-      selectedRating = n;
-      document.querySelectorAll('.star-btn').forEach((btn, i) => {
-        btn.style.color = i < n ? 'var(--gold)' : 'var(--border)';
-      });
-    }
+      if (!p) { window.location.href = '/shop.html'; return; }
+      product = p;
 
-    async function submitReview() {
-      const l = getLang();
-      const user = await getCurrentUser();
-      if (!user || !product) return;
-      if (!selectedRating) { showToast(l === 'ar' ? 'اختاري التقييم أولاً' : 'Please select a rating', 'error'); return; }
-
-      const btn = document.getElementById('submit-review-btn');
-      btn.disabled = true;
-      btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
-
-      const { error } = await db.from('reviews').upsert({
-        product_id: product.id,
-        user_id: user.id,
-        rating: selectedRating,
-        comment: document.getElementById('review-comment').value.trim() || null,
-        images: reviewImages
-      }, { onConflict: 'user_id,product_id' });
-
-      btn.disabled = false;
-      btn.innerHTML = l === 'ar' ? 'إرسال التقييم' : 'Submit Review';
-
-      if (error) { showToast(l === 'ar' ? 'حصل خطأ' : 'Error occurred', 'error'); return; }
-      showToast(l === 'ar' ? '✓ تم إرسال تقييمك' : '✓ Review submitted');
-      closeReviewModal();
-      loadReviews(product.id);
-    }
-
-    async function uploadReviewImages(input) {
-      const files = input.files;
-      if (!files?.length) return;
-      showToast(getLang() === 'ar' ? 'جاري رفع الصور...' : 'Uploading...', 'info');
-      for (const file of files) {
-        try {
-          const url = await uploadToCloudinary(file, 'reviews');
-          reviewImages.push(url);
-        } catch(e) {}
-      }
-      document.getElementById('review-images-preview').innerHTML = reviewImages.map((url, i) =>
-        `<div style="position:relative;display:inline-block">
-          <img src="${cardImage(url)}" style="width:60px;height:60px;object-fit:cover;border-radius:6px;border:1px solid var(--border)">
-          <button onclick="reviewImages.splice(${i},1);uploadReviewImages({files:[]})" style="position:absolute;top:-6px;right:-6px;width:18px;height:18px;border-radius:50%;background:#dc2626;color:#fff;border:none;cursor:pointer;font-size:0.6rem;display:flex;align-items:center;justify-content:center">✕</button>
-        </div>`
-      ).join('');
-      showToast(getLang() === 'ar' ? '✓ تم الرفع' : '✓ Uploaded');
-    }
-
-    function isVideo(url) {
-      if (!url) return false;
-      return url.includes('/video/upload/') ||
-             url.match(/\.(mp4|mov|webm|avi|mkv)(\?|$)/i) !== null;
-    }
-
-    function renderProduct(p, catName) {
-      const l = getLang();
-      const name = l === 'ar' && p.name_ar ? p.name_ar : p.name;
-      const desc = l === 'ar' && p.description_ar ? p.description_ar : p.description;
-      const imgs = p.images || [];
-
-      // كل ملف في الـ array — نحدد هو صورة ولا فيديو
-      const allMedia = imgs.map(src => ({ src, isVideo: isVideo(src) }));
-
-      // لو في video_url منفصل، نضيفه كمان
-      if (p.video_url && !allMedia.find(m => m.src === p.video_url)) {
-        allMedia.push({ src: p.video_url, isVideo: true });
-      }
+      const name = l==='ar'&&p.name_ar ? p.name_ar : p.name;
+      const desc = l==='ar'&&p.description_ar ? p.description_ar : p.description;
+      const catName = p.categories ? (l==='ar'&&p.categories.name_ar ? p.categories.name_ar : p.categories.name) : '';
 
       document.title = `Antika Gallery — ${name}`;
       document.getElementById('breadcrumb-name').textContent = name;
 
-      const firstMedia = allMedia[0];
-      const mainSrc = firstMedia?.isVideo ? firstMedia.src : detailImage(firstMedia?.src || '');
+      // Build media list
+      const allMedia = (p.images||[]).map(src=>({src,isVideo:isVideo(src)}));
+      if(p.video_url&&!allMedia.find(m=>m.src===p.video_url)) allMedia.push({src:p.video_url,isVideo:true});
+      const first = allMedia[0];
 
       document.getElementById('product-container').innerHTML = `
         <div class="product-layout">
-          <!-- Gallery -->
           <div class="product-gallery">
             <div class="main-media">
               <div id="main-media-el">
-                ${firstMedia
-                  ? firstMedia.isVideo
-                    ? `<video src="${firstMedia.src}" controls style="width:100%;height:100%;object-fit:cover"></video>`
-                    : `<img src="${mainSrc}" alt="${name}" style="width:100%;height:100%;object-fit:cover;cursor:zoom-in" onclick="openZoom('${mainSrc}')">`
-                  : `<div style="display:flex;align-items:center;justify-content:height:100%;color:var(--text-muted)"><i class="fas fa-image" style="font-size:3rem"></i></div>`
-                }
+                ${first
+                  ? first.isVideo
+                    ? `<video src="${first.src}" controls style="width:100%;height:100%;object-fit:cover"></video>`
+                    : `<img src="${detailImage(first.src)}" alt="${name}" style="width:100%;height:100%;object-fit:cover;cursor:zoom-in" onclick="openZoom('${detailImage(first.src)}')">`
+                  : `<div style="display:flex;align-items:center;justify-content:center;height:100%;color:var(--text-muted)"><i class="fas fa-image" style="font-size:3rem"></i></div>`}
               </div>
-              <div class="media-badge" id="media-badge" style="display:${firstMedia?.isVideo ? 'flex' : 'none'}">
-                <i class="fas fa-play"></i> ${l === 'ar' ? 'فيديو' : 'Video'}
-              </div>
+              ${first?.isVideo?`<div class="media-badge"><i class="fas fa-play"></i> ${l==='ar'?'فيديو':'Video'}</div>`:''}
             </div>
-            ${allMedia.length > 1 ? `
-              <div class="thumbnails">
-                ${allMedia.map((m, i) => `
-                  <div class="thumb ${i === 0 ? 'active' : ''} ${m.isVideo ? 'thumb-video' : ''}"
-                    onclick="showMedia('${m.isVideo ? m.src : detailImage(m.src)}', ${m.isVideo}, this)">
-                    ${m.isVideo
-                      ? '<i class="fas fa-play" style="color:#fff;font-size:1rem"></i>'
-                      : `<img src="${cardImage(m.src)}" alt="" loading="lazy">`
-                    }
-                  </div>`).join('')}
-              </div>` : ''}
+            ${allMedia.length>1?`<div class="thumbnails">${allMedia.map((m,i)=>`
+              <div class="thumb ${i===0?'active':''} ${m.isVideo?'thumb-video':''}" onclick="showMedia('${m.isVideo?m.src:detailImage(m.src)}',${m.isVideo},this)">
+                ${m.isVideo?'<i class="fas fa-play"></i>':`<img src="${cardImage(m.src)}" alt="" loading="lazy">`}
+              </div>`).join('')}</div>`:''}
           </div>
 
-          <!-- Info -->
           <div class="product-info">
-            <div class="product-category">${catName}</div>
+            ${catName?`<div class="product-category">${catName}</div>`:''}
             <h1 class="product-title">${name}</h1>
+            <div class="product-price">${formatPrice(p.price)}</div>
+            ${desc?`<p class="product-desc">${desc}</p>`:''}
 
-            <div style="display:flex;align-items:center;gap:1rem;margin-bottom:1.5rem;flex-wrap:wrap">
-              <div class="product-price">${formatPrice(p.price)}</div>
-              ${p.stock > 0
-                ? `<span class="stock-badge" style="color:#16a34a"><i class="fas fa-circle" style="font-size:0.5rem"></i> ${l === 'ar' ? 'متاح' : 'In Stock'} (${p.stock})</span>`
-                : `<span class="stock-badge" style="color:#dc2626"><i class="fas fa-circle" style="font-size:0.5rem"></i> ${l === 'ar' ? 'غير متاح' : 'Out of Stock'}</span>`}
+            <div style="display:flex;align-items:center;gap:.75rem;margin-bottom:1.5rem">
+              ${p.stock>0
+                ?`<span style="display:flex;align-items:center;gap:.4rem;font-size:.85rem;font-weight:600;color:#16a34a"><i class="fas fa-check-circle"></i>${l==='ar'?'متوفر':'In Stock'} (${p.stock})</span>`
+                :`<span style="display:flex;align-items:center;gap:.4rem;font-size:.85rem;font-weight:600;color:#dc2626"><i class="fas fa-times-circle"></i>${l==='ar'?'غير متاح':'Out of Stock'}</span>`}
             </div>
 
-            ${desc ? `<div class="product-desc">${desc}</div>` : ''}
-
-            ${p.stock > 0 ? `
-              <div style="margin-bottom:1.5rem">
-                <label style="font-size:0.85rem;font-weight:700;color:var(--text-muted);display:block;margin-bottom:0.75rem;letter-spacing:0.05em">
-                  ${l === 'ar' ? 'الكمية' : 'QUANTITY'}
-                </label>
-                <div class="quantity-selector">
-                  <button class="qty-btn" onclick="updateQty(-1)"><i class="fas fa-minus"></i></button>
-                  <input type="number" class="qty-display" id="qty-display" value="1" min="1" max="${p.stock}" readonly>
-                  <button class="qty-btn" onclick="updateQty(1)"><i class="fas fa-plus"></i></button>
-                </div>
-              </div>
-              <div class="product-actions">
-                <button class="btn btn-primary btn-lg" style="flex:1" onclick="handleAddToCart()">
-                  <i class="fas fa-shopping-bag"></i>
-                  ${l === 'ar' ? 'أضيفي للسلة' : 'Add to Cart'}
-                </button>
-                <a href="/checkout.html" class="btn btn-outline btn-lg" onclick="handleBuyNow(event)">
-                  ${l === 'ar' ? 'اشتري الآن' : 'Buy Now'}
-                </a>
-                <button class="wishlist-btn" id="wishlist-btn" onclick="handleWishlist()" title="${l === 'ar' ? 'أضيفي للمفضلة' : 'Add to Wishlist'}">
-                  <i class="far fa-heart"></i>
-                </button>
-              </div>` : `
-              <div class="btn btn-ghost btn-lg btn-block" style="cursor:default;opacity:0.6;margin-bottom:1rem">
-                ${l === 'ar' ? 'غير متاح حالياً' : 'Currently Unavailable'}
-              </div>
-              <button class="btn btn-outline btn-block" onclick="handleStockAlert('${p.id}')" id="stock-alert-btn">
-                <i class="fas fa-bell"></i> ${l === 'ar' ? 'أبلغيني لما يتوفر' : 'Notify me when available'}
-              </button>`}
-
-            <!-- Reviews Summary -->
-            <div id="rating-summary" style="display:flex;align-items:center;gap:0.75rem;margin:1.5rem 0;padding:1rem;background:var(--bg-secondary);border-radius:var(--radius-sm)">
-              <div style="text-align:center">
-                <div style="font-size:2rem;font-weight:700;color:var(--gold);font-family:var(--font-display)" id="avg-rating">—</div>
-                <div id="star-display" style="color:var(--gold);font-size:0.85rem"></div>
-                <div style="font-size:0.75rem;color:var(--text-muted)" id="review-count"></div>
-              </div>
-              <div style="flex:1" id="rating-bars"></div>
+            ${p.stock>0?`
+            <div class="quantity-selector">
+              <button class="qty-btn" onclick="updateQty(-1)"><i class="fas fa-minus"></i></button>
+              <input type="number" class="qty-display" id="qty-display" value="1" min="1" max="${p.stock}" readonly>
+              <button class="qty-btn" onclick="updateQty(1)"><i class="fas fa-plus"></i></button>
             </div>
+            <div class="product-actions">
+              <button class="btn btn-primary btn-lg" style="flex:1" onclick="handleAddToCart()">
+                <i class="fas fa-shopping-bag"></i> ${l==='ar'?'أضيفي للسلة':'Add to Cart'}
+              </button>
+              <button class="btn btn-outline btn-lg" onclick="handleBuyNow()">
+                ${l==='ar'?'اشتري الآن':'Buy Now'}
+              </button>
+              <button class="wishlist-btn" id="wishlist-btn" onclick="handleWishlist()">
+                <i class="far fa-heart"></i>
+              </button>
+            </div>`:`
+            <button class="btn btn-outline btn-block" style="margin-bottom:1rem" onclick="handleStockAlert('${p.id}')">
+              <i class="fas fa-bell"></i> ${l==='ar'?'أبلغيني لما يتوفر':'Notify me when available'}
+            </button>`}
 
             <div class="product-meta">
-              <div class="meta-row">
-                <div class="meta-icon"><i class="fas fa-truck"></i></div>
-                <span>${l === 'ar' ? 'توصيل لكل المحافظات — كاش عند الاستلام' : 'Delivery to all governorates — Cash on delivery'}</span>
-              </div>
-              <div class="meta-row">
-                <div class="meta-icon"><i class="fab fa-whatsapp"></i></div>
-                <span>${l === 'ar' ? 'تواصل معنا على واتساب للاستفسار' : 'Contact us on WhatsApp for inquiries'}</span>
-              </div>
-              <div class="meta-row">
-                <div class="meta-icon"><i class="fas fa-shield-alt"></i></div>
-                <span>${l === 'ar' ? 'منتجات أصلية 100% مصورة على الطبيعة' : '100% authentic products, real photos'}</span>
-              </div>
+              <div class="meta-row"><div class="meta-icon"><i class="fas fa-truck"></i></div><span>${l==='ar'?'توصيل لكل المحافظات — كاش عند الاستلام':'Nationwide delivery — Cash on delivery'}</span></div>
+              <div class="meta-row"><div class="meta-icon"><i class="fab fa-whatsapp"></i></div><span>${l==='ar'?'تواصل معنا على واتساب للاستفسار':'Contact us on WhatsApp'}</span></div>
+              <div class="meta-row"><div class="meta-icon"><i class="fas fa-shield-alt"></i></div><span>${l==='ar'?'منتجات أصلية 100% مصورة على الطبيعة':'100% authentic — real photos'}</span></div>
             </div>
           </div>
-        </div>
-      `;
+        </div>`;
 
-      // إظهار قسم التقييمات
-      const reviewsSection = document.getElementById('reviews-section');
-      if (reviewsSection) {
-        reviewsSection.style.display = 'block';
-        const l2 = getLang();
-        const title = document.getElementById('reviews-title');
-        const label = document.getElementById('write-review-label');
-        if (title) title.textContent = l2 === 'ar' ? 'آراء العملاء' : 'Customer Reviews';
-        if (label) label.textContent = l2 === 'ar' ? 'اكتبي رأيك' : 'Write a Review';
-      }
-    }
-
-    function handleAddToCart() {
-      if (!product) return;
-      const l = getLang();
-      const name = l === 'ar' && product.name_ar ? product.name_ar : product.name;
-      addToCart({ id: product.id, name, price: product.price, image: product.images?.[0] }, quantity);
-    }
-
-    async function handleWishlist() {
-      if (!product) return;
-      const btn = document.getElementById('wishlist-btn');
-      await toggleWishlist(product.id, btn);
-      const wishlisted = await isWishlisted(product.id);
-      btn.innerHTML = wishlisted ? '<i class="fas fa-heart"></i>' : '<i class="far fa-heart"></i>';
-    }
-
-    // Swipe gestures للصور على الموبايل
-    function initSwipe() {
-      const mainMedia = document.querySelector('.main-media');
-      if (!mainMedia) return;
-      let startX = 0;
-      mainMedia.addEventListener('touchstart', e => { startX = e.touches[0].clientX; }, { passive: true });
-      mainMedia.addEventListener('touchend', e => {
-        const diff = startX - e.changedTouches[0].clientX;
-        if (Math.abs(diff) < 50) return;
-        const thumbs = document.querySelectorAll('.thumb');
-        if (!thumbs.length) return;
-        const active = document.querySelector('.thumb.active');
-        const idx = [...thumbs].indexOf(active);
-        if (diff > 0 && idx < thumbs.length - 1) thumbs[idx + 1].click();
-        if (diff < 0 && idx > 0) thumbs[idx - 1].click();
-      }, { passive: true });
-    }
-
-    async function loadProduct() {
-      const id = new URLSearchParams(window.location.search).get('id');
-      if (!id) { window.location.href = '/shop.html'; return; }
-
-      const { data: p, error } = await db.from('products').select('*, categories(name, name_ar, slug)').eq('id', id).eq('is_published', true).single();
-
-      if (error || !p) { window.location.href = '/shop.html'; return; }
-
-      product = p;
-      const l = getLang();
-      const catName = l === 'ar' && p.categories?.name_ar ? p.categories.name_ar : (p.categories?.name || '');
-      renderProduct(p, catName);
+      // Show reviews section
+      document.getElementById('reviews-section').style.display = 'block';
 
       // Load related
-      if (p.category_id) {
-        const { data: related } = await db.from('products')
-          .select('id, name, name_ar, price, images')
-          .eq('category_id', p.category_id)
-          .eq('is_published', true)
-          .neq('id', id)
-          .limit(4);
-        if (related?.length) {
-          document.getElementById('related-section').style.display = 'block';
-          document.getElementById('related-grid').innerHTML = related.map(r => {
-            const rname = l === 'ar' && r.name_ar ? r.name_ar : r.name;
-            const rfirst = r.images?.[0];
-            const risVid = rfirst && (rfirst.includes('/video/upload/') || rfirst.match(/\.(mp4|mov|webm)(\?|$)/i));
-            const rimg = rfirst ? (risVid ? rfirst : cardImage(rfirst)) : 'https://res.cloudinary.com/df3ffyrsg/image/upload/v1/antika/placeholder';
-            return `
-              <a href="/product.html?id=${r.id}" class="product-card">
-                <div class="product-card-image" style="position:relative">
-                  ${risVid
-                    ? `<video src="${rimg}" muted loop playsinline style="width:100%;height:100%;object-fit:cover"></video><span style="position:absolute;top:8px;left:8px;background:rgba(0,0,0,.6);color:#fff;border-radius:4px;padding:2px 8px;font-size:.7rem"><i class="fas fa-play"></i></span>`
-                    : `<img src="${rimg}" alt="${rname}" loading="lazy">`
-                  }
-                </div>
-                <div class="product-card-body">
-                  <div class="product-card-title">${rname}</div>
-                  <div class="product-card-price">${formatPrice(r.price)}</div>
-                </div>
-              </a>`;
+      if(p.category_id){
+        const{data:related}=await db.from('products').select('id,name,name_ar,price,images').eq('category_id',p.category_id).eq('is_published',true).neq('id',id).limit(4);
+        if(related?.length){
+          document.getElementById('related-section').style.display='block';
+          document.getElementById('related-grid').innerHTML=related.map(r=>{
+            const rname=l==='ar'&&r.name_ar?r.name_ar:r.name;
+            const rf=r.images?.[0];
+            const rv=rf&&isVideo(rf);
+            const rsrc=rf?(rv?rf:cardImage(rf)):'https://res.cloudinary.com/df3ffyrsg/image/upload/v1/antika/placeholder';
+            return`<a href="/product.html?id=${r.id}" class="product-card"><div class="product-card-image" style="position:relative">${rv?`<video src="${rsrc}" muted loop playsinline style="width:100%;height:100%;object-fit:cover"></video>`:`<img src="${rsrc}" alt="${rname}" loading="lazy">`}</div><div class="product-card-body"><div class="product-card-title">${rname}</div><div class="product-card-price">${formatPrice(r.price)}</div></div></a>`;
           }).join('');
         }
       }
 
-      // زر واتساب عائم
-      const waNum = await getSetting('whatsapp_number');
-      if (waNum) {
-        const waName = encodeURIComponent(name);
-        const waMsg = encodeURIComponent(`أهلاً، أنا مهتمة بالمنتج: ${name} — ${window.location.href}`);
-        const waBtn = document.createElement('a');
-        waBtn.href = `https://wa.me/2${waNum}?text=${waMsg}`;
-        waBtn.target = '_blank';
-        waBtn.title = l === 'ar' ? 'تواصل عبر واتساب' : 'Contact via WhatsApp';
-        waBtn.style.cssText = `
-          position:fixed;bottom:2rem;left:2rem;width:56px;height:56px;
-          background:#25d366;color:#fff;border-radius:50%;
-          display:flex;align-items:center;justify-content:center;
-          font-size:1.5rem;box-shadow:0 4px 20px rgba(37,211,102,0.4);
-          z-index:999;transition:transform 0.2s,box-shadow 0.2s;
-          text-decoration:none;
-        `;
-        waBtn.innerHTML = '<i class="fab fa-whatsapp"></i>';
-        waBtn.onmouseover = () => { waBtn.style.transform = 'scale(1.1)'; waBtn.style.boxShadow = '0 6px 28px rgba(37,211,102,0.5)'; };
-        waBtn.onmouseout = () => { waBtn.style.transform = 'scale(1)'; waBtn.style.boxShadow = '0 4px 20px rgba(37,211,102,0.4)'; };
-        document.body.appendChild(waBtn);
+      // WhatsApp float button
+      const waNum=await getSetting('whatsapp_number');
+      if(waNum){
+        const msg=encodeURIComponent(`أهلاً، أنا مهتمة بالمنتج: ${name}\n${window.location.href}`);
+        const btn=document.createElement('a');
+        btn.href=`https://wa.me/2${waNum}?text=${msg}`;
+        btn.target='_blank';
+        btn.style.cssText='position:fixed;bottom:2rem;left:2rem;width:56px;height:56px;background:#25d366;color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.5rem;box-shadow:0 4px 20px rgba(37,211,102,.4);z-index:999;transition:transform .2s;text-decoration:none';
+        btn.innerHTML='<i class="fab fa-whatsapp"></i>';
+        btn.onmouseover=()=>btn.style.transform='scale(1.1)';
+        btn.onmouseout=()=>btn.style.transform='scale(1)';
+        document.body.appendChild(btn);
+      }
+
+      // Wishlist check
+      isWishlisted(id).then(w=>{
+        const btn=document.getElementById('wishlist-btn');
+        if(btn){btn.innerHTML=w?'<i class="fas fa-heart"></i>':'<i class="far fa-heart"></i>';if(w)btn.classList.add('wishlisted');}
+      });
+
+      // Load reviews
+      loadReviews(id);
+
+      // Swipe
+      initSwipe();
+    }
+
+    // ── Media ─────────────────────────────────────────────────────
+    function showMedia(src, isVid, thumb) {
+      const el = document.getElementById('main-media-el');
+      el.innerHTML = isVid
+        ? `<video src="${src}" controls style="width:100%;height:100%;object-fit:cover"></video>`
+        : `<img src="${src}" alt="" style="width:100%;height:100%;object-fit:cover;cursor:zoom-in" onclick="openZoom('${src}')">`;
+      document.querySelectorAll('.thumb').forEach(t=>t.classList.remove('active'));
+      thumb?.classList.add('active');
+    }
+
+    function updateQty(d){quantity=Math.max(1,Math.min(quantity+d,product?.stock||99));document.getElementById('qty-display').value=quantity;}
+
+    function handleAddToCart(){
+      if(!product)return;
+      const l=getLang();
+      const name=l==='ar'&&product.name_ar?product.name_ar:product.name;
+      addToCart({id:product.id,name,price:product.price,image:product.images?.[0]||''},quantity);
+    }
+
+    function handleBuyNow(){handleAddToCart();window.location.href='/checkout.html';}
+
+    async function handleWishlist(){
+      if(!product)return;
+      const btn=document.getElementById('wishlist-btn');
+      await toggleWishlist(product.id,btn);
+      const w=await isWishlisted(product.id);
+      if(btn){btn.innerHTML=w?'<i class="fas fa-heart"></i>':'<i class="far fa-heart"></i>';btn.classList.toggle('wishlisted',w);}
+    }
+
+    async function handleStockAlert(productId){
+      const user=await getCurrentUser();
+      const l=getLang();
+      if(!user){showToast(l==='ar'?'سجلي دخولك أولاً':'Please sign in first','error');setTimeout(()=>window.location.href='/auth.html',1200);return;}
+      const{error}=await db.from('stock_alerts').insert({product_id:productId,user_id:user.id,email:user.email});
+      if(error?.code==='23505'){showToast(l==='ar'?'أنتِ مسجلة بالفعل':'Already registered');}
+      else if(!error){showToast(l==='ar'?'هنبلغك لما يتوفر 🔔':'We\'ll notify you 🔔');}
+    }
+
+    // ── Swipe ─────────────────────────────────────────────────────
+    function initSwipe(){
+      const m=document.querySelector('.main-media');if(!m)return;
+      let sx=0;
+      m.addEventListener('touchstart',e=>{sx=e.touches[0].clientX;},{passive:true});
+      m.addEventListener('touchend',e=>{
+        const diff=sx-e.changedTouches[0].clientX;if(Math.abs(diff)<50)return;
+        const thumbs=document.querySelectorAll('.thumb');if(!thumbs.length)return;
+        const active=document.querySelector('.thumb.active');
+        const idx=[...thumbs].indexOf(active);
+        if(diff>0&&idx<thumbs.length-1)thumbs[idx+1].click();
+        if(diff<0&&idx>0)thumbs[idx-1].click();
+      },{passive:true});
+    }
+
+    // ── Reviews ───────────────────────────────────────────────────
+    async function loadReviews(productId){
+      const{data:reviews}=await db.from('reviews').select('*,profiles(full_name,avatar_url)').eq('product_id',productId).order('created_at',{ascending:false});
+      if(!reviews?.length)return;
+      const l=getLang();
+      const avg=reviews.reduce((s,r)=>s+r.rating,0)/reviews.length;
+
+      document.getElementById('rating-summary').style.display='flex';
+      document.getElementById('avg-rating').textContent=avg.toFixed(1);
+      document.getElementById('star-display').innerHTML=renderStars(avg);
+      document.getElementById('review-count').textContent=`${reviews.length} ${l==='ar'?'تقييم':'reviews'}`;
+
+      const counts=[5,4,3,2,1].map(n=>reviews.filter(r=>r.rating===n).length);
+      document.getElementById('rating-bars').innerHTML=[5,4,3,2,1].map((n,i)=>`
+        <div style="display:flex;align-items:center;gap:.5rem;margin-bottom:.2rem">
+          <span style="font-size:.72rem;color:var(--text-muted);width:12px">${n}</span>
+          <i class="fas fa-star" style="color:var(--gold);font-size:.6rem"></i>
+          <div style="flex:1;height:6px;background:var(--border);border-radius:3px;overflow:hidden">
+            <div style="width:${reviews.length?(counts[i]/reviews.length*100):0}%;height:100%;background:var(--gold);border-radius:3px"></div>
+          </div>
+          <span style="font-size:.7rem;color:var(--text-muted);width:14px">${counts[i]}</span>
+        </div>`).join('');
+
+      document.getElementById('reviews-list').innerHTML=reviews.map(r=>`
+        <div style="padding:1.25rem 0;border-bottom:1px solid var(--border)">
+          <div style="display:flex;align-items:center;gap:.75rem;margin-bottom:.75rem">
+            <div style="width:38px;height:38px;border-radius:50%;overflow:hidden;background:rgba(201,168,76,.15);display:flex;align-items:center;justify-content:center;font-weight:700;color:var(--gold);flex-shrink:0">
+              ${r.profiles?.avatar_url?`<img src="${avatarImage(r.profiles.avatar_url)}" style="width:100%;height:100%;object-fit:cover">`:(r.profiles?.full_name||'?')[0].toUpperCase()}
+            </div>
+            <div>
+              <div style="font-weight:600;font-size:.9rem">${r.profiles?.full_name||(l==='ar'?'عميل':'Customer')}</div>
+              <div style="color:var(--gold);font-size:.8rem">${renderStars(r.rating)}</div>
+            </div>
+            <div style="margin-right:auto;font-size:.75rem;color:var(--text-muted)">${formatDate(r.created_at)}</div>
+          </div>
+          ${r.comment?`<p style="font-size:.9rem;color:var(--text-secondary);line-height:1.7">${r.comment}</p>`:''}
+          ${r.images?.length?`<div style="display:flex;gap:.5rem;margin-top:.75rem;flex-wrap:wrap">${r.images.map(img=>`<img src="${cardImage(img)}" style="width:70px;height:70px;object-fit:cover;border-radius:6px;cursor:pointer" onclick="openZoom('${img}')">`).join('')}</div>`:''}
+        </div>`).join('');
+    }
+
+    function renderStars(n){
+      return Array.from({length:5},(_,i)=>`<i class="${i<Math.floor(n)?'fas':i<n?'fas fa-star-half-alt':'far'} fa-star"></i>`).join('');
+    }
+
+    // ── Review Modal ──────────────────────────────────────────────
+    function openReviewModal(){
+      const l=getLang();
+      getCurrentUser().then(user=>{
+        if(!user){
+          showToast(l==='ar'?'سجلي دخولك أولاً':'Please sign in first','error');
+          setTimeout(()=>window.location.href='/auth.html',1200);
+          return;
+        }
+        // reset form
+        selectedRating=0;
+        reviewImages=[];
+        document.getElementById('review-comment').value='';
+        document.getElementById('review-images-preview').innerHTML='';
+        document.getElementById('review-error').style.display='none';
+        document.querySelectorAll('.star-btn').forEach(b=>b.style.color='var(--border)');
+        document.getElementById('rating-hint').textContent='';
+        // open
+        document.getElementById('review-modal').classList.add('active');
+      });
+    }
+
+    function closeReviewModal(){
+      document.getElementById('review-modal').classList.remove('active');
+    }
+
+    // Star rating clicks
+    document.querySelectorAll('.star-btn').forEach(btn=>{
+      btn.addEventListener('click',()=>{
+        const n=parseInt(btn.dataset.rating);
+        setReviewRating(n);
+      });
+    });
+
+    function setReviewRating(n){
+      selectedRating=n;
+      const labels=['','ضعيف','مقبول','جيد','جيد جداً','ممتاز'];
+      document.querySelectorAll('.star-btn').forEach((b,i)=>{
+        b.style.color=i<n?'var(--gold)':'var(--border)';
+      });
+      document.getElementById('rating-hint').textContent=labels[n]||'';
+    }
+
+    async function submitReview(){
+      const l=getLang();
+      const user=await getCurrentUser();
+      if(!user||!product)return;
+      const errEl=document.getElementById('review-error');
+
+      if(!selectedRating){
+        errEl.textContent=l==='ar'?'اختاري التقييم أولاً':'Please select a rating';
+        errEl.style.display='block';return;
+      }
+      errEl.style.display='none';
+
+      const btn=document.getElementById('submit-review-btn');
+      btn.disabled=true;
+      btn.innerHTML='<i class="fas fa-spinner fa-spin"></i>';
+
+      const{error}=await db.from('reviews').upsert({
+        product_id:product.id,
+        user_id:user.id,
+        rating:selectedRating,
+        comment:document.getElementById('review-comment').value.trim()||null,
+        images:reviewImages
+      },{onConflict:'user_id,product_id'});
+
+      btn.disabled=false;
+      btn.innerHTML='<i class="fas fa-paper-plane"></i> إرسال التقييم';
+
+      if(error){errEl.textContent=l==='ar'?'حصل خطأ، حاولي تاني':'Error occurred';errEl.style.display='block';return;}
+      showToast(l==='ar'?'✓ تم إرسال تقييمك':'✓ Review submitted');
+      closeReviewModal();
+      loadReviews(product.id);
+    }
+
+    async function uploadReviewImages(input){
+      const files=input.files;if(!files?.length)return;
+      showToast(getLang()==='ar'?'جاري رفع الصور...':'Uploading...','info');
+      for(const file of files){
+        try{const url=await uploadToCloudinary(file,'reviews');reviewImages.push(url);}catch(e){}
+      }
+      document.getElementById('review-images-preview').innerHTML=reviewImages.map((url,i)=>`
+        <div style="position:relative;display:inline-block">
+          <img src="${cardImage(url)}" style="width:60px;height:60px;object-fit:cover;border-radius:6px;border:1px solid var(--border)">
+          <button onclick="reviewImages.splice(${i},1);document.getElementById('review-images-preview').innerHTML='';uploadReviewImages({files:[]})" style="position:absolute;top:-6px;right:-6px;width:18px;height:18px;border-radius:50%;background:#dc2626;color:#fff;border:none;cursor:pointer;font-size:.6rem;display:flex;align-items:center;justify-content:center">✕</button>
+        </div>`).join('');
+      showToast(getLang()==='ar'?'✓ تم الرفع':'✓ Uploaded');
+    }
+
+    // ── User Area ─────────────────────────────────────────────────
+    async function initUserArea(){
+      const user=await getCurrentUser();
+      const area=document.getElementById('user-area');
+      if(user){
+        const{data:p}=await db.from('profiles').select('full_name,avatar_url').eq('id',user.id).single();
+        const initial=(p?.full_name||'U')[0];
+        area.innerHTML=p?.avatar_url
+          ?`<a href="/profile.html" class="navbar-icon-btn" style="padding:0"><img src="${avatarImage(p.avatar_url)}" style="width:36px;height:36px;border-radius:50%;object-fit:cover;border:2px solid var(--gold)"></a>`
+          :`<a href="/profile.html" class="navbar-icon-btn" style="padding:0"><div style="width:36px;height:36px;border-radius:50%;background:var(--gold);color:#fff;display:flex;align-items:center;justify-content:center;font-size:.8rem;font-weight:700">${initial}</div></a>`;
+      }else{
+        area.innerHTML=`<a href="/auth.html" class="btn btn-primary btn-sm">${getLang()==='ar'?'دخول':'Sign In'}</a>`;
       }
     }
 
-    async function initUserArea() {
-      const user = await getCurrentUser();
-      const area = document.getElementById('user-area');
-      if (user) {
-        const { data: profile } = await db.from('profiles').select('*').eq('id', user.id).single();
-        const avatar = profile?.avatar_url
-          ? `<img src="${profile.avatar_url}" style="width:36px;height:36px;border-radius:50%;object-fit:cover;border:2px solid var(--gold)">`
-          : `<div style="width:36px;height:36px;border-radius:50%;background:var(--gold);color:#fff;display:flex;align-items:center;justify-content:center;font-size:0.8rem;font-weight:700">${(profile?.full_name||'U')[0]}</div>`;
-        area.innerHTML = `<a href="/profile.html" class="navbar-icon-btn" style="padding:0">${avatar}</a>`;
-      } else {
-        area.innerHTML = `<a href="/auth.html" class="btn btn-primary btn-sm">${getLang()==='ar'?'دخول':'Sign In'}</a>`;
-      }
-    }
-
+    // ── Init ──────────────────────────────────────────────────────
+    initTheme();
+    document.getElementById('theme-toggle').innerHTML=getTheme()==='dark'?'<i class="fas fa-sun"></i>':'<i class="fas fa-moon"></i>';
+    document.getElementById('lang-toggle').textContent=getLang()==='ar'?'EN':'ع';
+    window.addEventListener('scroll',()=>document.getElementById('navbar').classList.toggle('scrolled',window.scrollY>20));
     checkMaintenance();
-    applyLang();
     updateCartCount();
     initUserArea();
-    loadProduct().then(() => {
-      initSwipe();
-      const id = new URLSearchParams(window.location.search).get('id');
-      if (id) {
-        // تحقق من المفضلة
-        isWishlisted(id).then(wishlisted => {
-          const btn = document.getElementById('wishlist-btn');
-          if (btn) {
-            btn.innerHTML = wishlisted ? '<i class="fas fa-heart"></i>' : '<i class="far fa-heart"></i>';
-            if (wishlisted) btn.classList.add('wishlisted');
-          }
-        });
-        // تحميل التقييمات
-        loadReviews(id);
-      }
-    });
-
-    document.getElementById('theme-toggle').innerHTML =
-      getTheme() === 'dark' ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
-
-    window.addEventListener('scroll', () => {
-      document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 20);
-    });
+    loadProduct();
   </script>
 </body>
 </html>

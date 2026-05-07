@@ -45,7 +45,6 @@
     .qv-info { padding:2rem;overflow-y:auto;display:flex;flex-direction:column;gap:1rem; }
     .qv-close { position:absolute;top:1rem;right:1rem;width:36px;height:36px;border-radius:50%;background:var(--bg-card);border:1px solid var(--border);cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--text-muted);transition:all .2s;z-index:10; }
     .qv-close:hover { border-color:var(--gold);color:var(--gold); }
-    @media(max-width:600px){ .qv-box{grid-template-columns:1fr;max-height:95vh} .qv-media{height:260px;} }
     .product-card:hover .qv-btn { opacity: 1 !important; }
     @media (max-width: 900px) {
       .shop-layout { grid-template-columns: 1fr; }
@@ -54,6 +53,7 @@
       .filter-overlay { display: block; opacity: 0; visibility: hidden; transition: all var(--transition); }
       .filter-overlay.open { opacity: 1; visibility: visible; }
     }
+    @media(max-width:600px){ .qv-box{grid-template-columns:1fr;max-height:95vh} .qv-media{height:260px;} }
   </style>
 </head>
 <body>
@@ -67,16 +67,14 @@
     <div class="navbar-actions">
       <button class="navbar-icon-btn" onclick="toggleTheme()" id="theme-toggle"><i class="fas fa-moon"></i></button>
       <button class="navbar-icon-btn" onclick="toggleLang()" style="font-size:0.75rem;font-weight:700" id="lang-toggle">EN</button>
-      <a href="/wishlist.html" class="navbar-icon-btn" title="المفضلة">
-        <i class="far fa-heart"></i>
-      </a>
+      <a href="/wishlist.html" class="navbar-icon-btn" title="المفضلة"><i class="far fa-heart"></i></a>
       <a href="/cart.html" class="navbar-icon-btn"><i class="fas fa-shopping-bag"></i><span class="cart-count" style="display:none">0</span></a>
       <div id="user-area"></div>
       <button class="hamburger" onclick="document.getElementById('nav-menu').classList.toggle('open')"><span></span><span></span><span></span></button>
     </div>
   </nav>
 
-  <!-- Mobile filter overlay -->
+  <!-- Mobile filter -->
   <div class="filter-overlay" id="filter-overlay" onclick="closeFilterDrawer()"></div>
   <div class="filter-drawer" id="filter-drawer">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem">
@@ -87,28 +85,25 @@
   </div>
 
   <div class="container page-enter" style="padding-top:2rem;padding-bottom:4rem">
-    <!-- Page header -->
     <div style="margin-bottom:2rem">
       <h1 style="font-family:var(--font-display);font-size:2rem;font-style:italic;margin-bottom:0.25rem" data-ar="المتجر" data-en="Shop">المتجر</h1>
       <p style="color:var(--text-muted);font-size:0.9rem" data-ar="اكتشفي أحدث التريندات" data-en="Discover the latest trends">اكتشفي أحدث التريندات</p>
     </div>
 
-    <!-- Search -->
     <div class="search-bar">
-      <input type="text" class="form-control" id="search-input" placeholder="" data-placeholder-ar="ابحثي عن منتج..." data-placeholder-en="Search products...">
+      <input type="text" class="form-control" id="search-input" placeholder=""
+        data-placeholder-ar="ابحثي عن منتج..." data-placeholder-en="Search products..."
+        maxlength="100">
       <i class="fas fa-search"></i>
     </div>
 
-    <!-- Active filters -->
     <div class="active-filters" id="active-filters"></div>
 
     <div class="shop-layout">
-      <!-- Sidebar -->
       <aside class="sidebar">
         <div id="sidebar-content"></div>
       </aside>
 
-      <!-- Products -->
       <div>
         <div class="shop-header">
           <div style="display:flex;align-items:center;gap:1rem;flex-wrap:wrap">
@@ -118,7 +113,7 @@
               <span data-ar="فلتر" data-en="Filter">فلتر</span>
             </button>
           </div>
-          <select class="sort-select" id="sort-select" onchange="applyFilters()">
+          <select class="sort-select" id="sort-select" onchange="goPage(1)">
             <option value="newest" data-ar="الأحدث" data-en="Newest">الأحدث</option>
             <option value="oldest" data-ar="الأقدم" data-en="Oldest">الأقدم</option>
             <option value="price_asc" data-ar="السعر: الأقل أولاً" data-en="Price: Low to High">السعر: الأقل أولاً</option>
@@ -127,8 +122,6 @@
         </div>
 
         <div class="products-grid" id="products-grid">
-          <div class="product-card skeleton" style="height:380px"></div>
-          <div class="product-card skeleton" style="height:380px"></div>
           <div class="product-card skeleton" style="height:380px"></div>
           <div class="product-card skeleton" style="height:380px"></div>
           <div class="product-card skeleton" style="height:380px"></div>
@@ -147,19 +140,34 @@
     </div>
   </footer>
 
+  <!-- Quick View Modal -->
+  <div class="qv-overlay" id="qv-overlay" onclick="if(event.target===this)closeQuickView()">
+    <div style="position:relative;width:100%;max-width:820px">
+      <button class="qv-close" onclick="closeQuickView()"><i class="fas fa-times"></i></button>
+      <div class="qv-box">
+        <div class="qv-media" id="qv-media"></div>
+        <div class="qv-info" id="qv-info"></div>
+      </div>
+    </div>
+  </div>
+
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
   <script src="/js/config.js"></script>
   <script>
+    // ── Config ────────────────────────────────────────────────────
     const ITEMS_PER_PAGE = 12;
-    let allProducts = [], allCategories = [];
+    let allCategories = [];
+    let totalCount = 0;
     let currentPage = 1;
-    let selectedCategory = '', minPrice = '', maxPrice = '', searchQuery = '';
+    let selectedCategory = '';
+    let minPrice = '', maxPrice = '';
+    let searchQuery = '';
 
-    // URL params
     const params = new URLSearchParams(window.location.search);
     if (params.get('cat')) selectedCategory = params.get('cat');
     if (params.get('sort')) document.getElementById('sort-select').value = params.get('sort');
 
+    // ── Lang/Theme ────────────────────────────────────────────────
     function applyLang() {
       const l = getLang();
       document.querySelectorAll('[data-ar]').forEach(el => {
@@ -171,7 +179,6 @@
       const inp = document.getElementById('search-input');
       inp.placeholder = l === 'ar' ? inp.dataset.placeholderAr : inp.dataset.placeholderEn;
     }
-
     function toggleLang() { setLang(getLang() === 'ar' ? 'en' : 'ar'); }
     function toggleTheme() {
       const t = getTheme() === 'light' ? 'dark' : 'light';
@@ -179,6 +186,7 @@
       document.getElementById('theme-toggle').innerHTML = t === 'dark' ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
     }
 
+    // ── Sidebar ───────────────────────────────────────────────────
     function buildSidebarHTML() {
       const l = getLang();
       return `
@@ -196,9 +204,13 @@
         <div class="sidebar-section">
           <div class="sidebar-title">${l === 'ar' ? 'نطاق السعر' : 'Price Range'}</div>
           <div class="price-range">
-            <input type="number" class="form-control price-input" id="min-price" placeholder="${l === 'ar' ? 'من' : 'Min'}" value="${minPrice}" oninput="minPrice=this.value;applyFilters()">
+            <input type="number" class="form-control price-input" id="min-price"
+              placeholder="${l === 'ar' ? 'من' : 'Min'}" value="${minPrice}" min="0" max="999999"
+              oninput="minPrice=this.value;goPage(1)">
             <span style="color:var(--text-muted)">—</span>
-            <input type="number" class="form-control price-input" id="max-price" placeholder="${l === 'ar' ? 'إلى' : 'Max'}" value="${maxPrice}" oninput="maxPrice=this.value;applyFilters()">
+            <input type="number" class="form-control price-input" id="max-price"
+              placeholder="${l === 'ar' ? 'إلى' : 'Max'}" value="${maxPrice}" min="0" max="999999"
+              oninput="maxPrice=this.value;goPage(1)">
           </div>
         </div>
         <button class="btn btn-ghost btn-sm btn-block" onclick="clearFilters()" style="margin-top:0.5rem">
@@ -212,70 +224,73 @@
       document.getElementById('drawer-filters').innerHTML = html;
     }
 
-    function setCategory(slug) {
-      selectedCategory = slug;
-      currentPage = 1;
-      renderSidebars();
-      applyFilters();
-      renderActiveFilters();
-    }
-
-    function clearFilters() {
-      selectedCategory = ''; minPrice = ''; maxPrice = '';
-      currentPage = 1;
-      renderSidebars();
-      applyFilters();
-      renderActiveFilters();
-    }
+    function setCategory(slug) { selectedCategory = slug; currentPage = 1; renderSidebars(); loadProducts(); renderActiveFilters(); }
+    function clearFilters() { selectedCategory = ''; minPrice = ''; maxPrice = ''; currentPage = 1; renderSidebars(); loadProducts(); renderActiveFilters(); }
 
     function renderActiveFilters() {
       const l = getLang();
       const tags = [];
       if (selectedCategory) {
         const cat = allCategories.find(c => c.slug === selectedCategory);
-        if (cat) tags.push(`<span class="filter-tag" onclick="setCategory('')">
-          ${l === 'ar' && cat.name_ar ? cat.name_ar : cat.name} <i class="fas fa-times"></i></span>`);
+        if (cat) tags.push(`<span class="filter-tag" onclick="setCategory('')">${l === 'ar' && cat.name_ar ? cat.name_ar : cat.name} <i class="fas fa-times"></i></span>`);
       }
-      if (minPrice) tags.push(`<span class="filter-tag" onclick="minPrice='';applyFilters();renderActiveFilters()">
-        ${l === 'ar' ? 'من' : 'From'} ${formatPrice(minPrice)} <i class="fas fa-times"></i></span>`);
-      if (maxPrice) tags.push(`<span class="filter-tag" onclick="maxPrice='';applyFilters();renderActiveFilters()">
-        ${l === 'ar' ? 'إلى' : 'To'} ${formatPrice(maxPrice)} <i class="fas fa-times"></i></span>`);
+      if (minPrice) tags.push(`<span class="filter-tag" onclick="minPrice='';goPage(1);renderActiveFilters()">${l === 'ar' ? 'من' : 'From'} ${formatPrice(minPrice)} <i class="fas fa-times"></i></span>`);
+      if (maxPrice) tags.push(`<span class="filter-tag" onclick="maxPrice='';goPage(1);renderActiveFilters()">${l === 'ar' ? 'إلى' : 'To'} ${formatPrice(maxPrice)} <i class="fas fa-times"></i></span>`);
       document.getElementById('active-filters').innerHTML = tags.join('');
     }
 
-    function applyFilters() {
+    // ── FIX: Server-side pagination — مش بنجيب كل المنتجات دفعة واحدة
+    async function loadProducts() {
       const l = getLang();
       const sort = document.getElementById('sort-select').value;
-      let filtered = [...allProducts];
+      const grid = document.getElementById('products-grid');
+
+      // Loading state
+      grid.innerHTML = Array(4).fill('<div class="product-card skeleton" style="height:380px"></div>').join('');
+
+      // Build query
+      let query = db.from('products').select('*,categories(name,name_ar)', { count: 'exact' }).eq('is_published', true);
 
       if (searchQuery) {
-        const q = searchQuery.toLowerCase();
-        filtered = filtered.filter(p =>
-          p.name?.toLowerCase().includes(q) || p.name_ar?.includes(q) || p.description?.toLowerCase().includes(q)
-        );
+        query = query.or(`name.ilike.%${searchQuery}%,name_ar.ilike.%${searchQuery}%`);
       }
 
       if (selectedCategory) {
         const cat = allCategories.find(c => c.slug === selectedCategory);
-        if (cat) filtered = filtered.filter(p => p.category_id === cat.id);
+        if (cat) query = query.eq('category_id', cat.id);
       }
 
-      if (minPrice) filtered = filtered.filter(p => p.price >= parseFloat(minPrice));
-      if (maxPrice) filtered = filtered.filter(p => p.price <= parseFloat(maxPrice));
+      if (minPrice) query = query.gte('price', parseFloat(minPrice));
+      if (maxPrice) query = query.lte('price', parseFloat(maxPrice));
 
-      if (sort === 'newest') filtered.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
-      else if (sort === 'oldest') filtered.sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
-      else if (sort === 'price_asc') filtered.sort((a, b) => a.price - b.price);
-      else if (sort === 'price_desc') filtered.sort((a, b) => b.price - a.price);
+      // Sort
+      if (sort === 'newest') query = query.order('created_at', { ascending: false });
+      else if (sort === 'oldest') query = query.order('created_at', { ascending: true });
+      else if (sort === 'price_asc') query = query.order('price', { ascending: true });
+      else if (sort === 'price_desc') query = query.order('price', { ascending: false });
 
-      const total = filtered.length;
-      document.getElementById('results-count').textContent =
-        l === 'ar' ? `${total} منتج` : `${total} products`;
+      // Pagination
+      const from = (currentPage - 1) * ITEMS_PER_PAGE;
+      const to = from + ITEMS_PER_PAGE - 1;
+      query = query.range(from, to);
 
-      const start = (currentPage - 1) * ITEMS_PER_PAGE;
-      const paged = filtered.slice(start, start + ITEMS_PER_PAGE);
-      renderProducts(paged);
-      renderPagination(Math.ceil(total / ITEMS_PER_PAGE));
+      const { data: products, count, error } = await query;
+
+      if (error) {
+        grid.innerHTML = `<div class="empty-state" style="grid-column:1/-1"><i class="fas fa-exclamation-circle"></i><p>${l === 'ar' ? 'حصل خطأ في تحميل المنتجات' : 'Error loading products'}</p></div>`;
+        return;
+      }
+
+      totalCount = count || 0;
+      document.getElementById('results-count').textContent = l === 'ar' ? `${totalCount} منتج` : `${totalCount} products`;
+
+      renderProducts(products || []);
+      renderPagination(Math.ceil(totalCount / ITEMS_PER_PAGE));
+    }
+
+    function getCatName(catData, l) {
+      if (!catData) return '';
+      return l === 'ar' && catData.name_ar ? catData.name_ar : catData.name;
     }
 
     function renderProducts(products) {
@@ -288,34 +303,43 @@
         </div>`;
         return;
       }
+
+      const placeholder = 'https://res.cloudinary.com/df3ffyrsg/image/upload/v1/antika/placeholder';
+
+      // FIX: HTML مكتوب صح بدون </div> زيادة
       grid.innerHTML = products.map(p => {
         const name = l === 'ar' && p.name_ar ? p.name_ar : p.name;
         const firstMedia = p.images?.[0];
-        const placeholder = 'https://res.cloudinary.com/df3ffyrsg/image/upload/v1/antika/placeholder';
-        const isVid = firstMedia && (firstMedia.includes('/video/upload/') || firstMedia.match(/\.(mp4|mov|webm|avi)(\?|$)/i));
+        const isVid = firstMedia && isVideoUrl(firstMedia);
         const mediaSrc = firstMedia ? (isVid ? firstMedia : cardImage(firstMedia)) : placeholder;
-        const isNew = new Date(p.created_at) > new Date(Date.now() - 7*24*60*60*1000);
+        const isNew = new Date(p.created_at) > new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+        const catName = getCatName(p.categories, l);
+        const safeName = name.replace(/'/g, "\\'").replace(/"/g, '&quot;');
+        const safeMediaSrc = isVid ? '' : mediaSrc; // مش بنحط فيديو في السلة
+
         const mediaEl = isVid
-          ? `<video src="${mediaSrc}" muted loop playsinline style="width:100%;height:100%;object-fit:cover"></video><span style="position:absolute;top:8px;left:8px;background:rgba(0,0,0,.6);color:#fff;border-radius:4px;padding:2px 8px;font-size:.7rem"><i class="fas fa-play"></i></span>`
+          ? `<video src="${mediaSrc}" muted loop playsinline style="width:100%;height:100%;object-fit:cover"></video>
+             <span style="position:absolute;top:8px;left:8px;background:rgba(0,0,0,.6);color:#fff;border-radius:4px;padding:2px 8px;font-size:.7rem"><i class="fas fa-play"></i></span>`
           : `<img src="${mediaSrc}" alt="${name}" loading="lazy">`;
+
         return `
           <a href="/product.html?id=${p.id}" class="product-card">
             <div class="product-card-image" style="position:relative">
               ${mediaEl}
               ${isNew ? `<span class="product-card-badge">${l === 'ar' ? 'جديد' : 'New'}</span>` : ''}
               <button onclick="event.preventDefault();event.stopPropagation();openQuickView('${p.id}')"
-                style="position:absolute;bottom:8px;right:8px;background:rgba(255,255,255,0.92);border:none;border-radius:20px;padding:5px 12px;font-size:0.75rem;font-weight:700;cursor:pointer;color:var(--charcoal);opacity:0;transition:opacity 0.2s;display:flex;align-items:center;gap:4px"
+                style="position:absolute;bottom:8px;right:8px;background:rgba(255,255,255,0.92);border:none;border-radius:20px;padding:5px 12px;font-size:0.75rem;font-weight:700;cursor:pointer;color:#1a1510;opacity:0;transition:opacity 0.2s;display:flex;align-items:center;gap:4px"
                 class="qv-btn">
                 <i class="fas fa-eye"></i> ${l === 'ar' ? 'عرض سريع' : 'Quick View'}
               </button>
             </div>
-            </div>
             <div class="product-card-body">
               <div class="product-card-title">${name}</div>
-              <div style="font-size:0.8rem;color:var(--text-muted);margin-bottom:0.5rem">${getCatName(p.category_id, l)}</div>
+              ${catName ? `<div style="font-size:0.8rem;color:var(--text-muted);margin-bottom:0.5rem">${catName}</div>` : ''}
               <div class="product-card-price">${formatPrice(p.price)}</div>
               <div class="product-card-actions">
-                <button class="btn btn-primary btn-sm" style="flex:1" onclick="event.preventDefault();addToCart({id:'${p.id}',name:'${name.replace(/'/g,"\\'")}',price:${p.price},image:'${mediaSrc}'})">
+                <button class="btn btn-primary btn-sm" style="flex:1"
+                  onclick="event.preventDefault();addToCart({id:'${p.id}',name:'${safeName}',price:${p.price},image:'${safeMediaSrc}'})">
                   <i class="fas fa-shopping-bag"></i> ${l === 'ar' ? 'أضيفي للسلة' : 'Add to Cart'}
                 </button>
               </div>
@@ -324,107 +348,70 @@
       }).join('');
     }
 
-    function getCatName(catId, l) {
-      const cat = allCategories.find(c => c.id === catId);
-      if (!cat) return '';
-      return l === 'ar' && cat.name_ar ? cat.name_ar : cat.name;
-    }
-
     function renderPagination(totalPages) {
       const el = document.getElementById('pagination');
       if (totalPages <= 1) { el.innerHTML = ''; return; }
       let html = '';
+      // Previous
+      if (currentPage > 1) html += `<button class="page-btn" onclick="goPage(${currentPage - 1})"><i class="fas fa-chevron-right"></i></button>`;
+      // Pages
       for (let i = 1; i <= totalPages; i++) {
-        html += `<button class="page-btn ${i === currentPage ? 'active' : ''}" onclick="goPage(${i})">${i}</button>`;
+        if (i === 1 || i === totalPages || (i >= currentPage - 1 && i <= currentPage + 1)) {
+          html += `<button class="page-btn ${i === currentPage ? 'active' : ''}" onclick="goPage(${i})">${i}</button>`;
+        } else if (i === currentPage - 2 || i === currentPage + 2) {
+          html += `<span style="padding:0 0.25rem;color:var(--text-muted)">...</span>`;
+        }
       }
+      // Next
+      if (currentPage < totalPages) html += `<button class="page-btn" onclick="goPage(${currentPage + 1})"><i class="fas fa-chevron-left"></i></button>`;
       el.innerHTML = html;
     }
 
     function goPage(p) {
       currentPage = p;
-      applyFilters();
+      loadProducts();
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
-    function openFilterDrawer() {
-      document.getElementById('filter-drawer').classList.add('open');
-      document.getElementById('filter-overlay').classList.add('open');
-    }
-
-    function closeFilterDrawer() {
-      document.getElementById('filter-drawer').classList.remove('open');
-      document.getElementById('filter-overlay').classList.remove('open');
-    }
+    // Filter drawer
+    function openFilterDrawer() { document.getElementById('filter-drawer').classList.add('open'); document.getElementById('filter-overlay').classList.add('open'); }
+    function closeFilterDrawer() { document.getElementById('filter-drawer').classList.remove('open'); document.getElementById('filter-overlay').classList.remove('open'); }
 
     // Search debounce
     let searchTimer;
-    document.getElementById('search-input').addEventListener('input', function() {
+    document.getElementById('search-input').addEventListener('input', function () {
       clearTimeout(searchTimer);
       searchTimer = setTimeout(() => {
         searchQuery = this.value.trim();
         currentPage = 1;
-        applyFilters();
-      }, 300);
-    });
-
-    async function initUserArea() {
-      const user = await getCurrentUser();
-      const area = document.getElementById('user-area');
-      if (user) {
-        const { data: profile } = await db.from('profiles').select('*').eq('id', user.id).single();
-        const avatar = profile?.avatar_url
-          ? `<img src="${profile.avatar_url}" style="width:36px;height:36px;border-radius:50%;object-fit:cover;border:2px solid var(--gold)">`
-          : `<div style="width:36px;height:36px;border-radius:50%;background:var(--gold);color:#fff;display:flex;align-items:center;justify-content:center;font-size:0.8rem;font-weight:700">${(profile?.full_name||'U')[0]}</div>`;
-        area.innerHTML = `<a href="/profile.html" class="navbar-icon-btn" style="padding:0">${avatar}</a>`;
-      } else {
-        area.innerHTML = `<a href="/auth.html" class="btn btn-primary btn-sm">${getLang()==='ar'?'دخول':'Sign In'}</a>`;
-      }
-    }
-
-    async function init() {
-      checkMaintenance();
-      applyLang();
-      updateCartCount();
-      initUserArea();
-
-      document.getElementById('theme-toggle').innerHTML =
-        getTheme() === 'dark' ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
-
-      const [{ data: products }, { data: categories }] = await Promise.all([
-        db.from('products').select('*').eq('is_published', true),
-        db.from('categories').select('*').order('name')
-      ]);
-
-      allProducts = products || [];
-      allCategories = categories || [];
-
-      renderSidebars();
-      renderActiveFilters();
-      applyFilters();
-    }
-
-    window.addEventListener('scroll', () => {
-      document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 20);
+        loadProducts();
+      }, 400);
     });
 
     // ── Quick View ────────────────────────────────────────────────
     async function openQuickView(productId) {
-      const product = allProducts.find(p => p.id === productId);
+      // FIX: بنجيب المنتج من Supabase مباشرة عشان البيانات دايماً حديثة
+      const { data: product } = await db.from('products')
+        .select('*,categories(name,name_ar)')
+        .eq('id', productId).single();
       if (!product) return;
+
       const l = getLang();
       const name = l === 'ar' && product.name_ar ? product.name_ar : product.name;
       const desc = l === 'ar' && product.description_ar ? product.description_ar : product.description;
       const firstMedia = product.images?.[0];
-      const isVid = firstMedia && (firstMedia.includes('/video/upload/') || firstMedia.match(/\.(mp4|mov|webm)(\?|$)/i));
-      const cat = allCategories.find(c => c.id === product.category_id);
-      const catName = cat ? (l === 'ar' && cat.name_ar ? cat.name_ar : cat.name) : '';
+      const isVid = firstMedia && isVideoUrl(firstMedia);
+      const catName = product.categories ? (l === 'ar' && product.categories.name_ar ? product.categories.name_ar : product.categories.name) : '';
+      const placeholder = 'https://res.cloudinary.com/df3ffyrsg/image/upload/v1/antika/placeholder';
+      const safeImage = !isVid && firstMedia ? firstMedia : '';
 
       document.getElementById('qv-media').innerHTML = firstMedia
         ? isVid
           ? `<video src="${firstMedia}" controls style="width:100%;height:100%;object-fit:cover"></video>`
-          : `<img src="${detailImage(firstMedia)}" alt="${name}">`
+          : `<img src="${detailImage(firstMedia)}" alt="${name}" style="width:100%;height:100%;object-fit:cover">`
         : `<div style="display:flex;align-items:center;justify-content:center;height:100%;color:var(--text-muted)"><i class="fas fa-image" style="font-size:3rem"></i></div>`;
 
+      const safeName = name.replace(/'/g, "\\'").replace(/"/g, '&quot;');
       document.getElementById('qv-info').innerHTML = `
         ${catName ? `<div style="font-size:0.78rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--gold)">${catName}</div>` : ''}
         <h2 style="font-family:var(--font-display);font-size:1.5rem;line-height:1.3">${name}</h2>
@@ -432,21 +419,21 @@
         ${desc ? `<p style="color:var(--text-secondary);font-size:0.9rem;line-height:1.8">${desc}</p>` : ''}
         <div style="display:flex;align-items:center;gap:0.5rem;font-size:0.85rem">
           ${product.stock > 0
-            ? `<i class="fas fa-check-circle" style="color:#16a34a"></i><span style="color:#16a34a;font-weight:600">${l==='ar'?'متوفر':'In Stock'} (${product.stock})</span>`
-            : `<i class="fas fa-times-circle" style="color:#dc2626"></i><span style="color:#dc2626;font-weight:600">${l==='ar'?'غير متاح':'Out of Stock'}</span>`}
+            ? `<i class="fas fa-check-circle" style="color:#16a34a"></i><span style="color:#16a34a;font-weight:600">${l === 'ar' ? 'متوفر' : 'In Stock'} (${product.stock})</span>`
+            : `<i class="fas fa-times-circle" style="color:#dc2626"></i><span style="color:#dc2626;font-weight:600">${l === 'ar' ? 'غير متاح' : 'Out of Stock'}</span>`}
         </div>
         <div style="display:flex;gap:0.75rem;margin-top:0.5rem">
-          <button class="btn btn-primary btn-lg" style="flex:1" ${product.stock===0?'disabled':''} onclick="addToCart({id:'${product.id}',name:'${name.replace(/'/g,"\\'")}',price:${product.price},image:'${firstMedia||''}'}); showToast('${l==='ar'?'تمت الإضافة':'Added to cart'}')">
-            <i class="fas fa-shopping-bag"></i> ${l==='ar'?'أضيفي للسلة':'Add to Cart'}
+          <button class="btn btn-primary btn-lg" style="flex:1" ${product.stock === 0 ? 'disabled' : ''}
+            onclick="addToCart({id:'${product.id}',name:'${safeName}',price:${product.price},image:'${safeImage}'})">
+            <i class="fas fa-shopping-bag"></i> ${l === 'ar' ? 'أضيفي للسلة' : 'Add to Cart'}
           </button>
           <button class="btn btn-outline btn-lg" onclick="closeQuickView();window.location.href='/product.html?id=${product.id}'">
-            ${l==='ar'?'عرض الكامل':'View Full'}
+            ${l === 'ar' ? 'عرض الكامل' : 'View Full'}
           </button>
         </div>
         <a href="/product.html?id=${product.id}" style="text-align:center;font-size:0.85rem;color:var(--text-muted);text-decoration:underline">
-          ${l==='ar'?'التفاصيل الكاملة والتقييمات':'Full details & reviews'}
-        </a>
-      `;
+          ${l === 'ar' ? 'التفاصيل الكاملة والتقييمات' : 'Full details & reviews'}
+        </a>`;
 
       document.getElementById('qv-overlay').classList.add('open');
       document.body.style.overflow = 'hidden';
@@ -457,18 +444,38 @@
       document.body.style.overflow = '';
     }
 
+    // ── User Area ─────────────────────────────────────────────────
+    async function initUserArea() {
+      const user = await getCurrentUser();
+      const area = document.getElementById('user-area');
+      if (user) {
+        const { data: profile } = await db.from('profiles').select('full_name,avatar_url').eq('id', user.id).single();
+        const avatar = profile?.avatar_url
+          ? `<img src="${avatarImage(profile.avatar_url)}" style="width:36px;height:36px;border-radius:50%;object-fit:cover;border:2px solid var(--gold)">`
+          : `<div style="width:36px;height:36px;border-radius:50%;background:var(--gold);color:#fff;display:flex;align-items:center;justify-content:center;font-size:0.8rem;font-weight:700">${(profile?.full_name || 'U')[0]}</div>`;
+        area.innerHTML = `<a href="/profile.html" class="navbar-icon-btn" style="padding:0">${avatar}</a>`;
+      } else {
+        area.innerHTML = `<a href="/auth.html" class="btn btn-primary btn-sm">${getLang() === 'ar' ? 'دخول' : 'Sign In'}</a>`;
+      }
+    }
+
+    // ── Init ──────────────────────────────────────────────────────
+    async function init() {
+      checkMaintenance();
+      applyLang();
+      updateCartCount();
+      initUserArea();
+      document.getElementById('theme-toggle').innerHTML = getTheme() === 'dark' ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
+
+      const { data: categories } = await db.from('categories').select('*').order('name');
+      allCategories = categories || [];
+      renderSidebars();
+      renderActiveFilters();
+      loadProducts();
+    }
+
+    window.addEventListener('scroll', () => document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 20));
     init();
   </script>
-
-  <!-- Quick View Modal -->
-  <div class="qv-overlay" id="qv-overlay" onclick="if(event.target===this)closeQuickView()">
-    <div style="position:relative;width:100%;max-width:820px">
-      <button class="qv-close" onclick="closeQuickView()"><i class="fas fa-times"></i></button>
-      <div class="qv-box">
-        <div class="qv-media" id="qv-media"></div>
-        <div class="qv-info" id="qv-info"></div>
-      </div>
-    </div>
-  </div>
 </body>
 </html>

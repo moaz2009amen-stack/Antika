@@ -17,10 +17,9 @@ const { createClient } = supabase;
 const db = createClient(CONFIG.supabase.url, CONFIG.supabase.key);
 
 // ── Cloudinary Image Optimization ─────────────────────────────
-// بيضيف transformations تلقائي للصور عشان تكون أسرع وأخف
 function optimizeImage(url, options = {}) {
   if (!url || !url.includes('cloudinary.com')) return url;
-  if (url.includes('/video/upload/')) return url; // فيديوهات مش بنحتاج نحولها
+  if (url.includes('/video/upload/')) return url;
 
   const {
     width = 600,
@@ -30,29 +29,30 @@ function optimizeImage(url, options = {}) {
     crop = 'fill'
   } = options;
 
-  // بنبني الـ transformation string
   let transforms = `q_${quality},f_${format}`;
   if (width) transforms += `,w_${width}`;
   if (height) transforms += `,h_${height}`;
   if (width || height) transforms += `,c_${crop}`;
 
-  // نضيف الـ transforms بعد /upload/
   return url.replace('/upload/', `/upload/${transforms}/`);
 }
 
-// صور المنتجات في الكارد — مصغرة وسريعة
 function cardImage(url) {
   return optimizeImage(url, { width: 400, height: 520, quality: 'auto', format: 'auto' });
 }
 
-// صور المنتجات في صفحة التفاصيل — جودة أعلى
 function detailImage(url) {
   return optimizeImage(url, { width: 800, quality: 'auto', format: 'auto', crop: 'limit' });
 }
 
-// صور البروفايل — صغيرة جداً
 function avatarImage(url) {
   return optimizeImage(url, { width: 100, height: 100, quality: 'auto', format: 'auto' });
+}
+
+// ── FIX: helper يحدد لو URL ده فيديو ──────────────────────────
+function isVideoUrl(url) {
+  if (!url) return false;
+  return url.includes('/video/upload/') || /\.(mp4|mov|webm|avi)(\?|$)/i.test(url);
 }
 
 // ── Cloudinary Upload ──────────────────────────────────────────
@@ -104,13 +104,21 @@ async function requireAdmin() {
 }
 
 // ── Site Settings ──────────────────────────────────────────────
+// FIX: بنكاش الـ settings في sessionStorage عشان منعملش call كل مرة
+const _settingsCache = {};
+
 async function getSetting(key) {
+  if (_settingsCache[key] !== undefined) return _settingsCache[key];
   const { data } = await db.from('settings').select('value').eq('key', key).single();
-  return data?.value;
+  _settingsCache[key] = data?.value ?? null;
+  return _settingsCache[key];
+}
+
+function clearSettingsCache() {
+  Object.keys(_settingsCache).forEach(k => delete _settingsCache[k]);
 }
 
 async function checkMaintenance() {
-  // مش نعمل redirect لو احنا على maintenance.html أو admin
   const path = window.location.pathname;
   if (path.includes('admin') || path.includes('maintenance')) return;
   const mode = await getSetting('maintenance_mode');
@@ -159,6 +167,7 @@ function showToast(message, type = 'success') {
 
   const toast = document.createElement('div');
   toast.className = `toast toast-${type}`;
+  // FIX: escape HTML في الـ message منعاً لـ XSS
   toast.textContent = message;
   document.body.appendChild(toast);
 
@@ -186,7 +195,11 @@ function formatDate(date) {
 
 // ── Cart ───────────────────────────────────────────────────────
 function getCart() {
-  return JSON.parse(localStorage.getItem('antika_cart') || '[]');
+  try {
+    return JSON.parse(localStorage.getItem('antika_cart') || '[]');
+  } catch {
+    return [];
+  }
 }
 
 function saveCart(cart) {
@@ -206,10 +219,14 @@ function updateCartCount() {
 function addToCart(product, quantity = 1) {
   const cart = getCart();
   const existing = cart.find(i => i.id === product.id);
+
+  // FIX: لو الصورة فيديو، مش بنحفظها كصورة في السلة
+  const safeImage = product.image && !isVideoUrl(product.image) ? product.image : null;
+
   if (existing) {
     existing.quantity += quantity;
   } else {
-    cart.push({ ...product, quantity });
+    cart.push({ ...product, image: safeImage, quantity });
   }
   saveCart(cart);
   showToast(getLang() === 'ar' ? 'تمت الإضافة للسلة' : 'Added to cart');
@@ -229,7 +246,11 @@ if ('serviceWorker' in navigator) {
 // ── Wishlist ───────────────────────────────────────────────────
 async function getWishlist() {
   const user = await getCurrentUser();
-  if (!user) return JSON.parse(localStorage.getItem('antika_wishlist') || '[]');
+  if (!user) {
+    try {
+      return JSON.parse(localStorage.getItem('antika_wishlist') || '[]');
+    } catch { return []; }
+  }
   const { data } = await db.from('wishlist').select('product_id').eq('user_id', user.id);
   return data?.map(w => w.product_id) || [];
 }
@@ -239,8 +260,8 @@ async function toggleWishlist(productId, btn) {
   const l = getLang();
 
   if (!user) {
-    // للزوار — localStorage
-    const list = JSON.parse(localStorage.getItem('antika_wishlist') || '[]');
+    let list = [];
+    try { list = JSON.parse(localStorage.getItem('antika_wishlist') || '[]'); } catch {}
     const idx = list.indexOf(productId);
     if (idx > -1) {
       list.splice(idx, 1);
@@ -255,7 +276,6 @@ async function toggleWishlist(productId, btn) {
     return;
   }
 
-  // للمستخدمين المسجلين — Supabase
   const { data: existing } = await db.from('wishlist')
     .select('id').eq('user_id', user.id).eq('product_id', productId).single();
 
@@ -277,35 +297,32 @@ async function isWishlisted(productId) {
 
 // ── Coupon ─────────────────────────────────────────────────────
 async function validateCoupon(code, orderTotal) {
+  const l = getLang();
   const { data, error } = await db.from('coupons')
     .select('*')
     .eq('code', code.toUpperCase().trim())
     .eq('is_active', true)
     .single();
 
-  if (error || !data) return { valid: false, msg: getLang() === 'ar' ? 'كود غير صحيح' : 'Invalid coupon' };
+  if (error || !data) return { valid: false, msg: l === 'ar' ? 'كود غير صحيح' : 'Invalid coupon' };
 
-  // تحقق من تاريخ الانتهاء
   if (data.expires_at && new Date(data.expires_at) < new Date()) {
-    return { valid: false, msg: getLang() === 'ar' ? 'الكود منتهي الصلاحية' : 'Coupon expired' };
+    return { valid: false, msg: l === 'ar' ? 'الكود منتهي الصلاحية' : 'Coupon expired' };
   }
 
-  // تحقق من عدد الاستخدامات
   if (data.max_uses !== null && data.used_count >= data.max_uses) {
-    return { valid: false, msg: getLang() === 'ar' ? 'الكود وصل لأقصى استخدام' : 'Coupon usage limit reached' };
+    return { valid: false, msg: l === 'ar' ? 'الكود وصل لأقصى استخدام' : 'Coupon usage limit reached' };
   }
 
-  // تحقق من الحد الأدنى للطلب
   if (orderTotal < data.min_order) {
     return {
       valid: false,
-      msg: getLang() === 'ar'
+      msg: l === 'ar'
         ? `الحد الأدنى للطلب ${formatPrice(data.min_order)}`
         : `Minimum order is ${formatPrice(data.min_order)}`
     };
   }
 
-  // احسب الخصم
   let discount = 0;
   if (data.type === 'percentage') {
     discount = (orderTotal * data.value) / 100;
@@ -320,45 +337,19 @@ async function validateCoupon(code, orderTotal) {
     couponId: data.id,
     type: data.type,
     value: data.value,
-    msg: getLang() === 'ar'
+    msg: l === 'ar'
       ? `✓ خصم ${data.type === 'percentage' ? data.value + '%' : formatPrice(data.value)}`
       : `✓ ${data.type === 'percentage' ? data.value + '%' : formatPrice(data.value)} off`
   };
 }
 
+// FIX: useCoupon — بيستخدم RPC function بدل db.raw اللي مش موجودة
 async function useCoupon(couponId) {
-  await db.from('coupons').update({ used_count: db.raw('used_count + 1') }).eq('id', couponId);
+  await db.rpc('increment_coupon_usage', { coupon_id: couponId });
 }
 
-// ── Admin Auth (reliable session check) ───────────────────────
-function adminAuthCheck() {
-  document.body.style.opacity = '0';
-  document.body.style.transition = 'opacity 0.2s';
-
-  return new Promise(resolve => {
-    const { data: { subscription } } = db.auth.onAuthStateChange((event, session) => {
-      subscription.unsubscribe();
-
-      if (!session) {
-        window.location.href = '/auth.html';
-        resolve(false);
-        return;
-      }
-
-      const role = session.user.user_metadata?.role;
-      if (role !== 'admin' && role !== 'moderator') {
-        window.location.href = '/';
-        resolve(false);
-        return;
-      }
-
-      document.body.style.opacity = '1';
-      resolve(true);
-    });
-  });
-}
-
-// ── Admin Auth v3 (with retry) ─────────────────────────────────
+// ── Admin Auth ─────────────────────────────────────────────────
+// FIX: دالة واحدة بس — حذفنا التعريف المكرر
 async function adminAuthCheck() {
   document.body.style.opacity = '0';
   document.body.style.transition = 'opacity 0.3s';
@@ -366,14 +357,21 @@ async function adminAuthCheck() {
   let { data: { session } } = await db.auth.getSession();
 
   if (!session) {
-    await new Promise(r => setTimeout(r, 1000));
+    await new Promise(r => setTimeout(r, 900));
     const res = await db.auth.getSession();
     session = res.data.session;
   }
 
-  if (!session) { window.location.href = '/auth.html'; return false; }
+  if (!session) {
+    window.location.href = '/admin-antika-ctrl/login.html';
+    return false;
+  }
+
   const role = session.user.user_metadata?.role;
-  if (role !== 'admin' && role !== 'moderator') { window.location.href = '/'; return false; }
+  if (role !== 'admin' && role !== 'moderator') {
+    window.location.href = '/admin-antika-ctrl/login.html';
+    return false;
+  }
 
   document.body.style.opacity = '1';
   return true;

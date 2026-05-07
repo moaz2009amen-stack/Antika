@@ -7,7 +7,6 @@
   <link rel="stylesheet" href="/css/main.css">
   <link rel="stylesheet" href="/css/admin.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-  
   <style>
     .order-detail-panel{position:fixed;top:0;left:0;bottom:0;width:420px;background:var(--bg-card);border-right:1px solid var(--border);z-index:500;transform:translateX(-100%);transition:transform .3s;overflow-y:auto;padding:1.5rem}
     [dir="rtl"] .order-detail-panel{left:auto;right:0;border-right:none;border-left:1px solid var(--border);transform:translateX(100%)}
@@ -44,6 +43,7 @@
       </button>
     </div>
   </aside>
+
   <main class="admin-main">
     <div class="admin-topbar">
       <div class="admin-topbar-right">
@@ -55,6 +55,7 @@
         <button class="navbar-icon-btn" onclick="toggleTheme()" id="theme-toggle"><i class="fas fa-moon"></i></button>
       </div>
     </div>
+
     <div class="admin-content">
       <div class="filter-tabs">
         <button class="filter-tab active" onclick="filterOrders('',this)">الكل</button>
@@ -69,131 +70,198 @@
       <div class="admin-card">
         <div style="overflow-x:auto">
           <table class="admin-table">
-            <thead><tr><th>رقم الطلب</th><th>العميل</th><th>المبلغ</th><th>الدفع</th><th>الحالة</th><th>التاريخ</th><th>إجراءات</th></tr></thead>
-            <tbody id="orders-tbody"><tr><td colspan="7" style="text-align:center;padding:2rem"><div class="spinner" style="margin:0 auto"></div></td></tr></tbody>
+            <thead>
+              <tr>
+                <th>رقم الطلب</th>
+                <th>العميل</th>
+                <th>المبلغ</th>
+                <th>الدفع</th>
+                <th>الحالة</th>
+                <th>التاريخ</th>
+                <th>إجراءات</th>
+              </tr>
+            </thead>
+            <tbody id="orders-tbody">
+              <tr><td colspan="7" style="text-align:center;padding:2rem"><div class="spinner" style="margin:0 auto"></div></td></tr>
+            </tbody>
           </table>
         </div>
       </div>
     </div>
   </main>
+
+  <!-- Detail Panel -->
+  <div class="order-detail-panel" id="detail-panel">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem">
+      <h3 style="font-family:var(--font-display);font-size:1.1rem">تفاصيل الطلب</h3>
+      <button onclick="closeDetail()" style="width:32px;height:32px;border-radius:50%;border:1.5px solid var(--border);background:none;cursor:pointer;color:var(--text-muted);display:flex;align-items:center;justify-content:center">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+    <div id="detail-content"></div>
+  </div>
+
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
   <script src="/js/config.js"></script>
   <script>
+    // ── Sidebar & Theme ───────────────────────────────────────────
+    function openSidebar() { document.getElementById('admin-sidebar').classList.add('open'); document.getElementById('sidebar-overlay').classList.add('active'); }
+    function closeSidebar() { document.getElementById('admin-sidebar').classList.remove('open'); document.getElementById('sidebar-overlay').classList.remove('active'); }
+    function toggleTheme() {
+      const t = getTheme() === 'light' ? 'dark' : 'light';
+      setTheme(t);
+      document.getElementById('theme-toggle').innerHTML = t === 'dark' ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
+    }
+    async function logout() { await db.auth.signOut(); window.location.href = '/admin-antika-ctrl/login.html'; }
 
-    function openSidebar(){document.getElementById('admin-sidebar').classList.add('open');document.getElementById('sidebar-overlay').classList.add('active');}
-    function closeSidebar(){document.getElementById('admin-sidebar').classList.remove('open');document.getElementById('sidebar-overlay').classList.remove('active');}
-    function toggleTheme(){const t=getTheme()==='light'?'dark':'light';setTheme(t);document.getElementById('theme-toggle').innerHTML=t==='dark'?'<i class="fas fa-sun"></i>':'<i class="fas fa-moon"></i>';}
-    async function logout(){await db.auth.signOut();window.location.href='/admin-antika-ctrl/login.html';}
-    async function adminAuth(){
-      document.body.style.opacity='0';document.body.style.transition='opacity 0.25s';
-      let {data:{session}}=await db.auth.getSession();
-      if(!session){await new Promise(r=>setTimeout(r,900));const r=await db.auth.getSession();session=r.data.session;}
-      if(!session){window.location.href='/admin-antika-ctrl/login.html';return false;}
-      const role=session.user.user_metadata?.role;
-      if(role!=='admin'&&role!=='moderator'){window.location.href='/admin-antika-ctrl/login.html';return false;}
-      document.body.style.opacity='1';
+    // ── FIX: دالة auth واحدة بس ──────────────────────────────────
+    async function adminAuth() {
+      document.body.style.opacity = '0';
+      document.body.style.transition = 'opacity 0.25s';
+      let { data: { session } } = await db.auth.getSession();
+      if (!session) {
+        await new Promise(r => setTimeout(r, 900));
+        const r = await db.auth.getSession();
+        session = r.data.session;
+      }
+      if (!session) { window.location.href = '/admin-antika-ctrl/login.html'; return false; }
+      const role = session.user.user_metadata?.role;
+      if (role !== 'admin' && role !== 'moderator') { window.location.href = '/admin-antika-ctrl/login.html'; return false; }
+      document.body.style.opacity = '1';
       initTheme();
-      document.getElementById('theme-toggle').innerHTML=getTheme()==='dark'?'<i class="fas fa-sun"></i>':'<i class="fas fa-moon"></i>';
+      document.getElementById('theme-toggle').innerHTML = getTheme() === 'dark' ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
       return true;
     }
-    async function loadPendingBadge(){
-      const {count}=await db.from('orders').select('*',{count:'exact',head:true}).eq('status','pending');
-      const b=document.getElementById('pending-badge');
-      if(b&&count>0){b.textContent=count;b.style.display='inline';}
+
+    // ── FIX: دالة loadPendingBadge واحدة بس ──────────────────────
+    async function loadPendingBadge() {
+      const { count } = await db.from('orders').select('*', { count: 'exact', head: true }).eq('status', 'pending');
+      const b = document.getElementById('pending-badge');
+      if (b && count > 0) { b.textContent = count; b.style.display = 'inline'; }
     }
 
-async function loadPendingBadge(){const{count}=await db.from('orders').select('*',{count:'exact',head:true}).eq('status','pending');const b=document.getElementById('pending-badge');if(b&&count>0){b.textContent=count;b.style.display='inline';}}
-    async function adminCheck(){
-      document.body.style.opacity='0';
-      let{data:{session}}=await db.auth.getSession();
-      if(!session){await new Promise(r=>setTimeout(r,800));const res=await db.auth.getSession();session=res.data.session;}
-      if(!session){window.location.href='/admin-antika-ctrl/';return false;}
-      const role=session.user.user_metadata?.role;
-      if(role!=='admin'&&role!=='moderator'){window.location.href='/admin-antika-ctrl/';return false;}
-      document.body.style.opacity='1';document.body.style.transition='opacity 0.3s';
-      
-      loadPendingBadge();return session;
+    const STATUS_LABELS = { pending: 'انتظار', confirmed: 'مؤكد', processing: 'تجهيز', shipped: 'في الطريق', delivered: 'تم التوصيل', cancelled: 'ملغي' };
+    const STATUS_COLORS = { pending: 'badge-warning', confirmed: 'badge-info', processing: 'badge-info', shipped: 'badge-gold', delivered: 'badge-success', cancelled: 'badge-danger' };
+
+    let allOrders = [], currentFilter = '';
+
+    async function loadOrders() {
+      let q = db.from('orders').select('*,profiles(full_name,phone)').order('created_at', { ascending: false });
+      if (currentFilter) q = q.eq('status', currentFilter);
+      const { data } = await q;
+      allOrders = data || [];
+      renderOrders();
     }
 
-    const STATUS_LABELS={pending:'انتظار',confirmed:'مؤكد',processing:'تجهيز',shipped:'في الطريق',delivered:'تم التوصيل',cancelled:'ملغي'};
-    const STATUS_COLORS={pending:'badge-warning',confirmed:'badge-info',processing:'badge-info',shipped:'badge-gold',delivered:'badge-success',cancelled:'badge-danger'};
-    let allOrders=[],currentFilter='';
-
-    async function loadOrders(){
-      let q=db.from('orders').select('*,profiles(full_name,phone)').order('created_at',{ascending:false});
-      if(currentFilter)q=q.eq('status',currentFilter);
-      const{data}=await q;
-      allOrders=data||[];renderOrders();
+    function renderOrders() {
+      const tbody = document.getElementById('orders-tbody');
+      if (!allOrders.length) {
+        tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:2rem;color:var(--text-muted)">مفيش طلبات</td></tr>';
+        return;
+      }
+      tbody.innerHTML = allOrders.map(o => `
+        <tr style="cursor:pointer" onclick="showDetail('${o.id}')">
+          <td><span style="font-family:monospace;color:var(--gold);font-weight:700">#${o.id.slice(0, 8).toUpperCase()}</span></td>
+          <td>
+            <div style="font-weight:600;font-size:.875rem">${o.profiles?.full_name || '—'}</div>
+            <div style="font-size:.75rem;color:var(--text-muted)">${o.profiles?.phone || ''}</div>
+          </td>
+          <td style="font-weight:700;color:var(--gold)">${formatPrice(o.total)}</td>
+          <td>${o.payment_method === 'cash' ? '<span class="badge badge-gray">كاش</span>' : '<span class="badge badge-info">محفظة</span>'}</td>
+          <td><span class="badge ${STATUS_COLORS[o.status] || 'badge-gray'}">${STATUS_LABELS[o.status] || o.status}</span></td>
+          <td style="color:var(--text-muted);font-size:.8rem;white-space:nowrap">${formatDate(o.created_at)}</td>
+          <td>
+            <select class="status-select" onclick="event.stopPropagation()" onchange="updateStatus('${o.id}', this.value)">
+              ${Object.entries(STATUS_LABELS).map(([v, l]) => `<option value="${v}" ${o.status === v ? 'selected' : ''}>${l}</option>`).join('')}
+            </select>
+          </td>
+        </tr>`).join('');
     }
 
-    function renderOrders(){
-      const tbody=document.getElementById('orders-tbody');
-      if(!allOrders.length){tbody.innerHTML='<tr><td colspan="7" style="text-align:center;padding:2rem;color:var(--text-muted)">مفيش طلبات</td></tr>';return;}
-      tbody.innerHTML=allOrders.map(o=>`<tr style="cursor:pointer" onclick="showDetail('${o.id}')">
-        <td><span style="font-family:monospace;color:var(--gold);font-weight:700">#${o.id.slice(0,8).toUpperCase()}</span></td>
-        <td><div style="font-weight:600;font-size:.875rem">${o.profiles?.full_name||'—'}</div><div style="font-size:.75rem;color:var(--text-muted)">${o.profiles?.phone||''}</div></td>
-        <td style="font-weight:700;color:var(--gold)">${formatPrice(o.total)}</td>
-        <td>${o.payment_method==='cash'?'<span class="badge badge-gray">كاش</span>':'<span class="badge badge-info">محفظة</span>'}</td>
-        <td><span class="badge ${STATUS_COLORS[o.status]||'badge-gray'}">${STATUS_LABELS[o.status]||o.status}</span></td>
-        <td style="color:var(--text-muted);font-size:.8rem;white-space:nowrap">${formatDate(o.created_at)}</td>
-        <td><select class="status-select" onclick="event.stopPropagation()" onchange="updateStatus('${o.id}',this.value)">
-          ${Object.entries(STATUS_LABELS).map(([v,l])=>`<option value="${v}" ${o.status===v?'selected':''}>${l}</option>`).join('')}
-        </select></td>
-      </tr>`).join('');
-    }
-
-    async function updateStatus(id,status){
-      await db.from('orders').update({status}).eq('id',id);
+    async function updateStatus(id, status) {
+      const { error } = await db.from('orders').update({ status }).eq('id', id);
+      if (error) { showToast('حصل خطأ', 'error'); return; }
       showToast('تم تحديث الحالة');
-      const o=allOrders.find(x=>x.id===id);if(o)o.status=status;renderOrders();
+      const o = allOrders.find(x => x.id === id);
+      if (o) o.status = status;
+      renderOrders();
+      loadPendingBadge();
     }
 
-    async function showDetail(id){
-      const{data:o}=await db.from('orders').select('*,profiles(full_name,phone,address),order_items(*,products(name,name_ar,images))').eq('id',id).single();
-      if(!o)return;
-      const panel=document.getElementById('detail-panel');
-      document.getElementById('detail-content').innerHTML=`
+    async function showDetail(id) {
+      const { data: o } = await db.from('orders')
+        .select('*,profiles(full_name,phone,address),order_items(*,products(name,name_ar,images))')
+        .eq('id', id).single();
+      if (!o) return;
+
+      document.getElementById('detail-content').innerHTML = `
         <div style="margin-bottom:1.25rem;padding:1rem;background:var(--bg-secondary);border-radius:var(--radius)">
           <div style="font-size:.75rem;color:var(--text-muted);margin-bottom:.25rem">رقم الطلب</div>
-          <div style="font-family:monospace;color:var(--gold);font-weight:700">#${o.id.slice(0,8).toUpperCase()}</div>
+          <div style="font-family:monospace;color:var(--gold);font-weight:700">#${o.id.slice(0, 8).toUpperCase()}</div>
         </div>
         <div style="margin-bottom:1.25rem">
           <div style="font-weight:700;margin-bottom:.5rem">بيانات العميل</div>
-          <div style="font-size:.875rem;color:var(--text-secondary)">${o.profiles?.full_name||'—'}</div>
-          <div style="font-size:.875rem;color:var(--text-secondary)">${o.profiles?.phone||''}</div>
-          <div style="font-size:.875rem;color:var(--text-secondary)">${o.profiles?.address||''}</div>
+          <div style="font-size:.875rem;color:var(--text-secondary)">${o.profiles?.full_name || '—'}</div>
+          <div style="font-size:.875rem;color:var(--text-secondary)">${o.profiles?.phone || ''}</div>
+          <div style="font-size:.875rem;color:var(--text-secondary)">${o.profiles?.address || ''}</div>
         </div>
         <div style="margin-bottom:1.25rem">
           <div style="font-weight:700;margin-bottom:.75rem">المنتجات</div>
-          ${(o.order_items||[]).map(item=>`<div style="display:flex;gap:.75rem;align-items:center;margin-bottom:.5rem;padding:.5rem;background:var(--bg-secondary);border-radius:var(--radius-sm)">
-            <img src="${item.products?.images?.[0]||''}" style="width:48px;height:48px;border-radius:var(--radius-sm);object-fit:cover;background:var(--border)">
-            <div style="flex:1"><div style="font-size:.85rem;font-weight:600">${item.products?.name_ar||item.products?.name||'منتج محذوف'}</div><div style="font-size:.78rem;color:var(--text-muted)">×${item.quantity} — ${formatPrice(item.price_at_time)}</div></div>
-          </div>`).join('')}
+          ${(o.order_items || []).map(item => `
+            <div style="display:flex;gap:.75rem;align-items:center;margin-bottom:.5rem;padding:.5rem;background:var(--bg-secondary);border-radius:var(--radius-sm)">
+              <img src="${item.products?.images?.[0] || ''}" style="width:48px;height:48px;border-radius:var(--radius-sm);object-fit:cover;background:var(--border)"
+                onerror="this.style.display='none'">
+              <div style="flex:1">
+                <div style="font-size:.85rem;font-weight:600">${item.products?.name_ar || item.products?.name || 'منتج محذوف'}</div>
+                <div style="font-size:.78rem;color:var(--text-muted)">×${item.quantity} — ${formatPrice(item.price_at_time)}</div>
+              </div>
+            </div>`).join('')}
         </div>
-        ${o.payment_method==='wallet'&&o.payment_proof_url?`<div style="margin-bottom:1.25rem"><div style="font-weight:700;margin-bottom:.5rem">إيصال الدفع</div><a href="${o.payment_proof_url}" target="_blank"><img src="${o.payment_proof_url}" style="width:100%;border-radius:var(--radius);border:1px solid var(--border)"></a></div>`:''}
+        ${o.payment_method === 'wallet' && o.payment_proof_url ? `
+          <div style="margin-bottom:1.25rem">
+            <div style="font-weight:700;margin-bottom:.5rem">إيصال الدفع</div>
+            <a href="${o.payment_proof_url}" target="_blank" rel="noopener">
+              <img src="${o.payment_proof_url}" style="width:100%;border-radius:var(--radius);border:1px solid var(--border)">
+            </a>
+          </div>` : ''}
         <div style="padding:1rem;background:var(--bg-secondary);border-radius:var(--radius);display:flex;justify-content:space-between;font-weight:700">
-          <span>الإجمالي</span><span style="color:var(--gold)">${formatPrice(o.total)}</span>
+          <span>الإجمالي</span>
+          <span style="color:var(--gold)">${formatPrice(o.total)}</span>
         </div>
-        ${o.notes?`<div style="margin-top:1rem;padding:.75rem;background:rgba(201,168,76,.08);border-radius:var(--radius-sm);font-size:.85rem"><strong>ملاحظات:</strong> ${o.notes}</div>`:''}
+        ${o.notes ? `<div style="margin-top:1rem;padding:.75rem;background:rgba(201,168,76,.08);border-radius:var(--radius-sm);font-size:.85rem"><strong>ملاحظات:</strong> ${o.notes}</div>` : ''}
         <div style="margin-top:1.5rem">
           <label class="form-label">تغيير الحالة</label>
-          <select class="form-control" onchange="updateStatus('${o.id}',this.value);closeDetail()">
-            ${Object.entries(STATUS_LABELS).map(([v,l])=>`<option value="${v}" ${o.status===v?'selected':''}>${l}</option>`).join('')}
+          <select class="form-control" onchange="updateStatus('${o.id}', this.value); closeDetail()">
+            ${Object.entries(STATUS_LABELS).map(([v, l]) => `<option value="${v}" ${o.status === v ? 'selected' : ''}>${l}</option>`).join('')}
           </select>
         </div>`;
-      panel.classList.add('open');
+
+      document.getElementById('detail-panel').classList.add('open');
     }
 
-    function closeDetail(){document.getElementById('detail-panel').classList.remove('open');}
-    function filterOrders(status,btn){
-      currentFilter=status;
-      document.querySelectorAll('.filter-tab').forEach(t=>t.classList.remove('active'));
-      btn.classList.add('active');loadOrders();
+    function closeDetail() { document.getElementById('detail-panel').classList.remove('open'); }
+
+    function filterOrders(status, btn) {
+      currentFilter = status;
+      document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+      btn.classList.add('active');
+      loadOrders();
     }
 
-    async function init(){
-      const s=await adminCheck();if(!s)return;loadOrders();
+    async function init() {
+      const ok = await adminAuth();
+      if (!ok) return;
+      // فحص لو الـ URL فيه order id محدد
+      const params = new URLSearchParams(window.location.search);
+      if (params.get('id')) {
+        await loadOrders();
+        showDetail(params.get('id'));
+      } else {
+        loadOrders();
+      }
+      loadPendingBadge();
     }
+
     init();
   </script>
 </body>

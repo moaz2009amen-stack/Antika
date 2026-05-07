@@ -50,9 +50,7 @@
     <div class="navbar-actions">
       <button class="navbar-icon-btn" onclick="toggleTheme()" id="theme-toggle"><i class="fas fa-moon"></i></button>
       <button class="navbar-icon-btn" onclick="toggleLang()" style="font-size:0.75rem;font-weight:700" id="lang-toggle">EN</button>
-      <a href="/wishlist.html" class="navbar-icon-btn" title="المفضلة">
-        <i class="far fa-heart"></i>
-      </a>
+      <a href="/wishlist.html" class="navbar-icon-btn" title="المفضلة"><i class="far fa-heart"></i></a>
       <a href="/cart.html" class="navbar-icon-btn"><i class="fas fa-shopping-bag"></i><span class="cart-count" style="display:none">0</span></a>
       <button class="hamburger" onclick="document.getElementById('nav-menu').classList.toggle('open')"><span></span><span></span><span></span></button>
     </div>
@@ -68,27 +66,34 @@
             <div class="avatar-edit" onclick="document.getElementById('avatar-input').click()">
               <i class="fas fa-camera"></i>
             </div>
-            <input type="file" id="avatar-input" accept="image/*" style="display:none" onchange="updateAvatar(this)">
+            <input type="file" id="avatar-input" accept="image/jpeg,image/png,image/webp" style="display:none" onchange="updateAvatar(this)">
           </div>
           <div class="profile-name" id="profile-name">...</div>
           <div class="profile-email" id="profile-email">...</div>
         </div>
+
         <div class="profile-nav">
           <div class="profile-nav-item active" onclick="showPanel('orders')" id="nav-orders">
-            <i class="fas fa-box"></i> <span data-ar="طلباتي" data-en="My Orders">طلباتي</span>
+            <i class="fas fa-box"></i>
+            <span data-ar="طلباتي" data-en="My Orders">طلباتي</span>
           </div>
           <div class="profile-nav-item" onclick="showPanel('info')" id="nav-info">
-            <i class="fas fa-user"></i> <span data-ar="بياناتي" data-en="My Info">بياناتي</span>
+            <i class="fas fa-user"></i>
+            <span data-ar="بياناتي" data-en="My Info">بياناتي</span>
           </div>
           <div class="profile-nav-item" onclick="showPanel('notifications')" id="nav-notifications">
-            <i class="fas fa-bell"></i> <span data-ar="الإشعارات" data-en="Notifications">الإشعارات</span>
-            <span id="notif-badge" style="margin-right:auto;background:var(--gold);color:#fff;border-radius:20px;padding:2px 8px;font-size:0.75px;display:none"></span>
+            <i class="fas fa-bell"></i>
+            <span data-ar="الإشعارات" data-en="Notifications">الإشعارات</span>
+            <!-- FIX: font-size كانت 0.75px والمفروض 0.7rem -->
+            <span id="notif-badge" style="margin-right:auto;background:var(--gold);color:#fff;border-radius:20px;padding:2px 8px;font-size:0.7rem;display:none"></span>
           </div>
           <div class="profile-nav-item" onclick="showPanel('password')" id="nav-password">
-            <i class="fas fa-lock"></i> <span data-ar="تغيير الباسوورد" data-en="Change Password">تغيير الباسوورد</span>
+            <i class="fas fa-lock"></i>
+            <span data-ar="تغيير الباسوورد" data-en="Change Password">تغيير الباسوورد</span>
           </div>
           <div class="profile-nav-item" onclick="logout()" style="color:#dc2626">
-            <i class="fas fa-sign-out-alt"></i> <span data-ar="تسجيل الخروج" data-en="Sign Out">تسجيل الخروج</span>
+            <i class="fas fa-sign-out-alt"></i>
+            <span data-ar="تسجيل الخروج" data-en="Sign Out">تسجيل الخروج</span>
           </div>
         </div>
       </div>
@@ -108,16 +113,16 @@
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">
               <div class="form-group">
                 <label class="form-label" data-ar="الاسم الكامل" data-en="Full Name">الاسم الكامل</label>
-                <input type="text" class="form-control" id="info-name">
+                <input type="text" class="form-control" id="info-name" maxlength="100">
               </div>
               <div class="form-group">
                 <label class="form-label" data-ar="رقم التليفون" data-en="Phone">رقم التليفون</label>
-                <input type="tel" class="form-control" id="info-phone" dir="ltr">
+                <input type="tel" class="form-control" id="info-phone" dir="ltr" maxlength="20">
               </div>
             </div>
             <div class="form-group">
               <label class="form-label" data-ar="العنوان" data-en="Address">العنوان</label>
-              <input type="text" class="form-control" id="info-address">
+              <input type="text" class="form-control" id="info-address" maxlength="300">
             </div>
             <div class="form-group" style="margin-bottom:0">
               <label class="form-label" data-ar="البريد الإلكتروني" data-en="Email">البريد الإلكتروني</label>
@@ -145,14 +150,15 @@
           <div class="card" style="max-width:480px">
             <div class="form-group">
               <label class="form-label" data-ar="كلمة المرور الجديدة" data-en="New Password">كلمة المرور الجديدة</label>
-              <input type="password" class="form-control" id="new-password" dir="ltr">
+              <input type="password" class="form-control" id="new-password" dir="ltr" minlength="8" maxlength="128">
             </div>
             <div class="form-group">
               <label class="form-label" data-ar="تأكيد كلمة المرور" data-en="Confirm Password">تأكيد كلمة المرور</label>
-              <input type="password" class="form-control" id="confirm-password" dir="ltr">
+              <input type="password" class="form-control" id="confirm-password" dir="ltr" maxlength="128">
             </div>
-            <button class="btn btn-primary" onclick="changePassword()" data-ar="تغيير الباسوورد" data-en="Change Password">تغيير الباسوورد</button>
-            <span id="pass-msg" style="font-size:0.85rem;margin-right:1rem"></span>
+            <button class="btn btn-primary" onclick="changePassword()" id="change-pass-btn"
+              data-ar="تغيير الباسوورد" data-en="Change Password">تغيير الباسوورد</button>
+            <span id="pass-msg" style="font-size:0.85rem;margin-right:1rem;margin-top:0.5rem;display:inline-block"></span>
           </div>
         </div>
       </div>
@@ -173,11 +179,19 @@
     let currentUser = null;
 
     function applyLang() {
-      document.querySelectorAll('[data-ar]').forEach(el => { if (el.tagName !== 'INPUT') el.textContent = l === 'ar' ? el.dataset.ar : el.dataset.en; });
+      document.querySelectorAll('[data-ar]').forEach(el => {
+        if (el.tagName !== 'INPUT' && el.tagName !== 'TEXTAREA') {
+          el.textContent = l === 'ar' ? el.dataset.ar : el.dataset.en;
+        }
+      });
       document.getElementById('lang-toggle').textContent = l === 'ar' ? 'EN' : 'ع';
     }
     function toggleLang() { setLang(l === 'ar' ? 'en' : 'ar'); }
-    function toggleTheme() { const t = getTheme() === 'light' ? 'dark' : 'light'; setTheme(t); document.getElementById('theme-toggle').innerHTML = t === 'dark' ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>'; }
+    function toggleTheme() {
+      const t = getTheme() === 'light' ? 'dark' : 'light';
+      setTheme(t);
+      document.getElementById('theme-toggle').innerHTML = t === 'dark' ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
+    }
 
     function showPanel(name) {
       document.querySelectorAll('.profile-panel').forEach(p => p.classList.remove('active'));
@@ -187,64 +201,92 @@
     }
 
     const statusMap = {
-      pending: { ar: 'في الانتظار', en: 'Pending', class: 'badge-warning' },
-      confirmed: { ar: 'مؤكد', en: 'Confirmed', class: 'badge-info' },
-      processing: { ar: 'قيد التجهيز', en: 'Processing', class: 'badge-info' },
-      shipped: { ar: 'في الطريق', en: 'Shipped', class: 'badge-gold' },
-      delivered: { ar: 'تم التوصيل', en: 'Delivered', class: 'badge-success' },
-      cancelled: { ar: 'ملغي', en: 'Cancelled', class: 'badge-danger' }
+      pending:    { ar: 'في الانتظار',   en: 'Pending',    class: 'badge-warning' },
+      confirmed:  { ar: 'مؤكد',          en: 'Confirmed',  class: 'badge-info' },
+      processing: { ar: 'قيد التجهيز',   en: 'Processing', class: 'badge-info' },
+      shipped:    { ar: 'في الطريق',     en: 'Shipped',    class: 'badge-gold' },
+      delivered:  { ar: 'تم التوصيل',    en: 'Delivered',  class: 'badge-success' },
+      cancelled:  { ar: 'ملغي',          en: 'Cancelled',  class: 'badge-danger' }
     };
 
     async function loadOrders() {
-      const { data: orders } = await db.from('orders').select('*, order_items(*, products(name, name_ar, images))')
-        .eq('user_id', currentUser.id).order('created_at', { ascending: false });
+      const { data: orders } = await db.from('orders')
+        .select('*, order_items(*, products(name, name_ar, images))')
+        .eq('user_id', currentUser.id)
+        .order('created_at', { ascending: false });
 
       const el = document.getElementById('orders-list');
       if (!orders?.length) {
-        el.innerHTML = `<div style="text-align:center;padding:3rem;color:var(--text-muted)"><i class="fas fa-box-open" style="font-size:2.5rem;display:block;margin-bottom:1rem;color:var(--border)"></i><p>${l === 'ar' ? 'مفيش طلبات لحد دلوقتي' : 'No orders yet'}</p><a href="/shop.html" class="btn btn-primary" style="margin-top:1rem">${l === 'ar' ? 'ابدئي التسوق' : 'Start Shopping'}</a></div>`;
+        el.innerHTML = `
+          <div style="text-align:center;padding:3rem;color:var(--text-muted)">
+            <i class="fas fa-box-open" style="font-size:2.5rem;display:block;margin-bottom:1rem;color:var(--border)"></i>
+            <p>${l === 'ar' ? 'مفيش طلبات لحد دلوقتي' : 'No orders yet'}</p>
+            <a href="/shop.html" class="btn btn-primary" style="margin-top:1rem">
+              ${l === 'ar' ? 'ابدئي التسوق' : 'Start Shopping'}
+            </a>
+          </div>`;
         return;
       }
+
+      const placeholder = 'https://res.cloudinary.com/df3ffyrsg/image/upload/q_auto,f_auto,w_48/v1/antika/placeholder';
 
       el.innerHTML = orders.map(order => {
         const s = statusMap[order.status] || statusMap.pending;
         const imgs = order.order_items?.slice(0, 3).map(oi => {
           const img = oi.products?.images?.[0];
-          return img ? cardImage(img) : null;
+          return img && !isVideoUrl(img) ? cardImage(img) : null;
         }).filter(Boolean) || [];
+
         return `
           <div class="order-card">
             <div class="order-header">
               <div>
-                <div class="order-id">#${order.id.slice(0,8).toUpperCase()}</div>
+                <div class="order-id">#${order.id.slice(0, 8).toUpperCase()}</div>
                 <div style="font-size:0.8rem;color:var(--text-muted)">${formatDate(order.created_at)}</div>
               </div>
               <span class="badge ${s.class}">${l === 'ar' ? s.ar : s.en}</span>
             </div>
-            ${imgs.length ? `<div class="order-items-preview">${imgs.map(img => `<img src="${img}" class="order-item-thumb" alt="" onerror="this.style.display='none'">`).join('')}${order.order_items.length > 3 ? `<div class="order-item-thumb" style="display:flex;align-items:center;justify-content:center;font-size:0.8rem;font-weight:700;color:var(--text-muted)">+${order.order_items.length - 3}</div>` : ''}</div>` : ''}
+            ${imgs.length ? `
+              <div class="order-items-preview">
+                ${imgs.map(img => `<img src="${img}" class="order-item-thumb" alt="" onerror="this.src='${placeholder}'">`).join('')}
+                ${order.order_items.length > 3
+                  ? `<div class="order-item-thumb" style="display:flex;align-items:center;justify-content:center;font-size:0.8rem;font-weight:700;color:var(--text-muted)">
+                      +${order.order_items.length - 3}
+                    </div>` : ''}
+              </div>` : ''}
             <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:0.5rem">
               <span style="font-weight:700;color:var(--gold)">${formatPrice(order.total)}</span>
-              <span style="font-size:0.85rem;color:var(--text-muted)">${order.payment_method === 'cash' ? (l === 'ar' ? 'كاش' : 'Cash') : (l === 'ar' ? 'محفظة' : 'Wallet')}</span>
+              <span style="font-size:0.85rem;color:var(--text-muted)">
+                ${order.payment_method === 'cash' ? (l === 'ar' ? 'كاش' : 'Cash') : (l === 'ar' ? 'محفظة' : 'Wallet')}
+              </span>
             </div>
           </div>`;
       }).join('');
     }
 
     async function loadNotifications() {
-      const { data: notifs } = await db.from('notifications').select('*')
-        .eq('user_id', currentUser.id).order('created_at', { ascending: false });
+      const { data: notifs } = await db.from('notifications')
+        .select('*')
+        .eq('user_id', currentUser.id)
+        .order('created_at', { ascending: false })
+        .limit(50);
 
       const el = document.getElementById('notifications-list');
       const unreadCount = notifs?.filter(n => !n.is_read).length || 0;
 
+      // FIX: font-size كانت 0.75px — المفروض display وfont-size بس
       if (unreadCount > 0) {
         const badge = document.getElementById('notif-badge');
         badge.textContent = unreadCount;
         badge.style.display = 'inline-block';
-        badge.style.fontSize = '0.7rem';
       }
 
       if (!notifs?.length) {
-        el.innerHTML = `<div style="text-align:center;padding:3rem;color:var(--text-muted)"><i class="fas fa-bell-slash" style="font-size:2rem;display:block;margin-bottom:1rem;color:var(--border)"></i><p>${l === 'ar' ? 'مفيش إشعارات' : 'No notifications'}</p></div>`;
+        el.innerHTML = `
+          <div style="text-align:center;padding:3rem;color:var(--text-muted)">
+            <i class="fas fa-bell-slash" style="font-size:2rem;display:block;margin-bottom:1rem;color:var(--border)"></i>
+            <p>${l === 'ar' ? 'مفيش إشعارات' : 'No notifications'}</p>
+          </div>`;
         return;
       }
 
@@ -262,6 +304,11 @@
       await db.from('notifications').update({ is_read: true }).eq('id', id);
       el.classList.remove('unread');
       el.querySelector('.notif-dot')?.remove();
+      // تحديث الـ badge
+      const remaining = document.querySelectorAll('.notif-item.unread').length;
+      const badge = document.getElementById('notif-badge');
+      if (remaining === 0) badge.style.display = 'none';
+      else badge.textContent = remaining;
     }
 
     async function markAllRead() {
@@ -279,10 +326,22 @@
       const address = document.getElementById('info-address').value.trim();
       const msg = document.getElementById('info-msg');
 
-      await db.from('profiles').update({ full_name: name, phone, address }).eq('id', currentUser.id);
-      await db.auth.updateUser({ data: { full_name: name } });
+      if (!name) {
+        msg.style.color = '#dc2626';
+        msg.textContent = l === 'ar' ? 'الاسم مطلوب' : 'Name is required';
+        return;
+      }
 
+      const { error } = await db.from('profiles').update({ full_name: name, phone, address }).eq('id', currentUser.id);
+      if (error) {
+        msg.style.color = '#dc2626';
+        msg.textContent = l === 'ar' ? 'حصل خطأ' : 'Error occurred';
+        return;
+      }
+
+      await db.auth.updateUser({ data: { full_name: name } });
       document.getElementById('profile-name').textContent = name;
+      msg.style.color = '#16a34a';
       msg.textContent = l === 'ar' ? '✓ تم الحفظ' : '✓ Saved';
       setTimeout(() => msg.textContent = '', 2000);
     }
@@ -291,39 +350,68 @@
       const np = document.getElementById('new-password').value;
       const cp = document.getElementById('confirm-password').value;
       const msg = document.getElementById('pass-msg');
+      const btn = document.getElementById('change-pass-btn');
 
-      if (np !== cp) { msg.style.color = '#dc2626'; msg.textContent = l === 'ar' ? 'الباسوورد مش متطابق' : 'Passwords do not match'; return; }
-      if (np.length < 8) { msg.style.color = '#dc2626'; msg.textContent = l === 'ar' ? 'لازم 8 حروف على الأقل' : 'At least 8 characters'; return; }
+      if (np.length < 8) {
+        msg.style.color = '#dc2626';
+        msg.textContent = l === 'ar' ? 'لازم 8 حروف على الأقل' : 'At least 8 characters';
+        return;
+      }
+      if (np !== cp) {
+        msg.style.color = '#dc2626';
+        msg.textContent = l === 'ar' ? 'الباسوورد مش متطابق' : 'Passwords do not match';
+        return;
+      }
+
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
 
       const { error } = await db.auth.updateUser({ password: np });
+
+      btn.disabled = false;
+      btn.textContent = l === 'ar' ? 'تغيير الباسوورد' : 'Change Password';
+
       msg.style.color = error ? '#dc2626' : '#16a34a';
-      msg.textContent = error ? (l === 'ar' ? 'حصل خطأ' : 'Error') : (l === 'ar' ? '✓ تم التغيير' : '✓ Changed');
+      msg.textContent = error
+        ? (l === 'ar' ? 'حصل خطأ' : 'Error')
+        : (l === 'ar' ? '✓ تم التغيير' : '✓ Changed');
+
+      if (!error) {
+        document.getElementById('new-password').value = '';
+        document.getElementById('confirm-password').value = '';
+      }
     }
 
     async function updateAvatar(input) {
       const file = input.files[0];
       if (!file) return;
 
-      // تحقق إن الملف صورة
-      if (!file.type.startsWith('image/')) {
-        showToast(l === 'ar' ? 'يرجى اختيار صورة فقط' : 'Please select an image', 'error');
+      // FIX: تحقق صارم من نوع الملف
+      const allowedTypes = ['image/jpeg', 'image/png', 'image/webp'];
+      if (!allowedTypes.includes(file.type)) {
+        showToast(l === 'ar' ? 'يرجى اختيار صورة JPG أو PNG أو WebP فقط' : 'Please select JPG, PNG, or WebP only', 'error');
+        input.value = '';
+        return;
+      }
+
+      // FIX: تحقق من الحجم (3MB للأفاتار)
+      if (file.size > 3 * 1024 * 1024) {
+        showToast(l === 'ar' ? 'الصورة أكبر من 3MB' : 'Image exceeds 3MB', 'error');
+        input.value = '';
         return;
       }
 
       showToast(l === 'ar' ? 'جاري رفع الصورة...' : 'Uploading...', 'info');
 
       try {
-        // رفع على Cloudinary مش Supabase Storage
         const url = await uploadToCloudinary(file, 'avatars');
-
-        // تحديث الـ profile
         await db.from('profiles').update({ avatar_url: url }).eq('id', currentUser.id);
-
-        // تحديث الصورة في الصفحة فوراً
         document.getElementById('profile-avatar').src = url;
         showToast(l === 'ar' ? '✓ تم تحديث الصورة' : '✓ Avatar updated');
       } catch (err) {
         showToast(l === 'ar' ? 'فشل رفع الصورة' : 'Upload failed', 'error');
+      } finally {
+        input.value = '';
       }
     }
 
@@ -338,9 +426,19 @@
 
       const { data: profile } = await db.from('profiles').select('*').eq('id', currentUser.id).single();
 
-      document.getElementById('profile-name').textContent = profile?.full_name || '—';
+      // FIX: تحقق إن المستخدم مش محظور
+      if (profile?.is_banned) {
+        await db.auth.signOut();
+        window.location.href = '/auth.html';
+        return;
+      }
+
+      const displayName = profile?.full_name || '—';
+      document.getElementById('profile-name').textContent = displayName;
       document.getElementById('profile-email').textContent = currentUser.email;
-      document.getElementById('profile-avatar').src = profile?.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(profile?.full_name || 'U')}&background=C9A84C&color=fff`;
+      document.getElementById('profile-avatar').src = profile?.avatar_url ||
+        `https://ui-avatars.com/api/?name=${encodeURIComponent(displayName)}&background=C9A84C&color=fff`;
+
       document.getElementById('info-name').value = profile?.full_name || '';
       document.getElementById('info-phone').value = profile?.phone || '';
       document.getElementById('info-address').value = profile?.address || '';
@@ -350,7 +448,10 @@
       loadNotifications();
     }
 
-    checkMaintenance(); applyLang(); updateCartCount(); init();
+    checkMaintenance();
+    applyLang();
+    updateCartCount();
+    init();
     document.getElementById('theme-toggle').innerHTML = getTheme() === 'dark' ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
     window.addEventListener('scroll', () => document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 20));
   </script>

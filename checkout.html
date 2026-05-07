@@ -29,7 +29,7 @@
     .order-summary-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 1.75rem; position: sticky; top: 90px; height: fit-content; }
     .summary-row { display: flex; align-items: center; justify-content: space-between; padding: 0.6rem 0; font-size: 0.9rem; }
     .summary-total { font-size: 1.2rem; font-weight: 700; color: var(--gold); border-top: 1.5px solid var(--border); padding-top: 1rem; margin-top: 0.5rem; }
-    .success-overlay { position: fixed; inset: 0; background: var(--bg); z-index: 9000; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 2rem; display: none; }
+    .success-overlay { position: fixed; inset: 0; background: var(--bg); z-index: 9000; display: none; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 2rem; }
     .success-icon { width: 80px; height: 80px; border-radius: 50%; background: rgba(22,163,74,0.1); display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem; font-size: 2rem; color: #16a34a; }
     @media (max-width: 900px) { .checkout-layout { grid-template-columns: 1fr; } .order-summary-card { position: static; } }
   </style>
@@ -70,20 +70,20 @@
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">
             <div class="form-group">
               <label class="form-label" data-ar="الاسم الكامل" data-en="Full Name">الاسم الكامل</label>
-              <input type="text" class="form-control" id="delivery-name">
+              <input type="text" class="form-control" id="delivery-name" maxlength="100">
             </div>
             <div class="form-group">
               <label class="form-label" data-ar="رقم التليفون" data-en="Phone">رقم التليفون</label>
-              <input type="tel" class="form-control" id="delivery-phone" dir="ltr">
+              <input type="tel" class="form-control" id="delivery-phone" dir="ltr" maxlength="20">
             </div>
           </div>
           <div class="form-group">
             <label class="form-label" data-ar="العنوان الكامل" data-en="Full Address">العنوان الكامل</label>
-            <input type="text" class="form-control" id="delivery-address" placeholder="">
+            <input type="text" class="form-control" id="delivery-address" maxlength="300">
           </div>
           <div class="form-group">
             <label class="form-label" data-ar="ملاحظات للطلب (اختياري)" data-en="Order Notes (optional)">ملاحظات للطلب (اختياري)</label>
-            <textarea class="form-control" id="delivery-notes" style="min-height:70px"></textarea>
+            <textarea class="form-control" id="delivery-notes" style="min-height:70px" maxlength="500"></textarea>
           </div>
         </div>
 
@@ -149,7 +149,10 @@
         <!-- كوبون الخصم -->
         <div style="margin:0.75rem 0;padding:0.75rem;background:var(--bg-secondary);border-radius:var(--radius-sm);border:1px dashed var(--border)">
           <div style="display:flex;gap:0.5rem">
-            <input type="text" class="form-control" id="coupon-input" placeholder="كود الخصم" dir="ltr" style="flex:1;font-size:0.85rem;height:40px;padding:0.5rem 0.75rem">
+            <input type="text" class="form-control" id="coupon-input" placeholder="كود الخصم" dir="ltr"
+              style="flex:1;font-size:0.85rem;height:40px;padding:0.5rem 0.75rem"
+              maxlength="30"
+              oninput="this.value=this.value.toUpperCase().replace(/[^A-Z0-9]/g,'')">
             <button class="btn btn-ghost btn-sm" onclick="applyCoupon()" id="coupon-btn" style="height:40px;white-space:nowrap">
               <i class="fas fa-tag"></i> تطبيق
             </button>
@@ -175,7 +178,11 @@
           <span data-ar="تأكيد الطلب" data-en="Place Order">تأكيد الطلب</span>
         </button>
 
-        <p style="font-size:0.8rem;color:var(--text-muted);text-align:center;margin-top:1rem" data-ar="بتأكيد الطلب، بتوافقي على شروط وأحكام أنتيكا جاليري" data-en="By placing your order, you agree to Antika Gallery's terms">بتأكيد الطلب، بتوافقي على شروط وأحكام أنتيكا جاليري</p>
+        <p style="font-size:0.8rem;color:var(--text-muted);text-align:center;margin-top:1rem"
+           data-ar="بتأكيد الطلب، بتوافقي على شروط وأحكام أنتيكا جاليري"
+           data-en="By placing your order, you agree to Antika Gallery's terms">
+          بتأكيد الطلب، بتوافقي على شروط وأحكام أنتيكا جاليري
+        </p>
       </div>
     </div>
   </div>
@@ -196,9 +203,18 @@
     const l = getLang();
 
     function applyLang() {
-      document.querySelectorAll('[data-ar]').forEach(el => { if (el.tagName !== 'INPUT' && el.tagName !== 'TEXTAREA') el.textContent = l === 'ar' ? el.dataset.ar : el.dataset.en; });
+      document.querySelectorAll('[data-ar]').forEach(el => {
+        if (el.tagName !== 'INPUT' && el.tagName !== 'TEXTAREA') {
+          el.textContent = l === 'ar' ? el.dataset.ar : el.dataset.en;
+        }
+      });
     }
-    function toggleTheme() { const t = getTheme() === 'light' ? 'dark' : 'light'; setTheme(t); document.getElementById('theme-toggle').innerHTML = t === 'dark' ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>'; }
+
+    function toggleTheme() {
+      const t = getTheme() === 'light' ? 'dark' : 'light';
+      setTheme(t);
+      document.getElementById('theme-toggle').innerHTML = t === 'dark' ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
+    }
 
     function selectPayment(method) {
       selectedPayment = method;
@@ -210,6 +226,18 @@
     function previewProof(input) {
       const file = input.files[0];
       if (!file) return;
+      // FIX: تحقق من نوع الملف
+      if (!file.type.startsWith('image/')) {
+        showToast(l === 'ar' ? 'يرجى رفع صورة فقط' : 'Please upload an image only', 'error');
+        input.value = '';
+        return;
+      }
+      // FIX: تحقق من حجم الملف (5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        showToast(l === 'ar' ? 'الصورة أكبر من 5MB' : 'Image exceeds 5MB', 'error');
+        input.value = '';
+        return;
+      }
       proofFile = file;
       const reader = new FileReader();
       reader.onload = e => {
@@ -226,7 +254,7 @@
 
       const subtotal = cart.reduce((s, i) => s + i.price * i.quantity, 0);
       const discount = appliedCoupon?.discount || 0;
-      const total = subtotal - discount;
+      const total = Math.max(0, subtotal - discount);
 
       document.getElementById('order-subtotal').textContent = formatPrice(subtotal);
       document.getElementById('order-total').textContent = formatPrice(total);
@@ -234,17 +262,24 @@
       if (discount > 0) {
         document.getElementById('discount-row').style.display = 'flex';
         document.getElementById('discount-amount').textContent = `- ${formatPrice(discount)}`;
+      } else {
+        document.getElementById('discount-row').style.display = 'none';
       }
 
-      document.getElementById('order-items').innerHTML = cart.map(item => `
-        <div class="order-item-row">
-          <img src="${cardImage(item.image) || 'https://res.cloudinary.com/df3ffyrsg/image/upload/q_auto,f_auto,w_50/v1/antika/placeholder'}" class="order-item-img" alt="${item.name}" onerror="this.src='https://res.cloudinary.com/df3ffyrsg/image/upload/q_auto,f_auto,w_50/v1/antika/placeholder'">
-          <div style="flex:1">
-            <div style="font-weight:600;font-size:0.9rem">${item.name}</div>
-            <div style="font-size:0.8rem;color:var(--text-muted)">${l === 'ar' ? 'الكمية:' : 'Qty:'} ${item.quantity}</div>
-          </div>
-          <div style="font-weight:700;color:var(--gold);font-size:0.9rem">${formatPrice(item.price * item.quantity)}</div>
-        </div>`).join('');
+      const placeholder = 'https://res.cloudinary.com/df3ffyrsg/image/upload/q_auto,f_auto,w_50/v1/antika/placeholder';
+      document.getElementById('order-items').innerHTML = cart.map(item => {
+        const imgSrc = item.image ? (cardImage(item.image) || placeholder) : placeholder;
+        return `
+          <div class="order-item-row">
+            <img src="${imgSrc}" class="order-item-img" alt=""
+              onerror="this.src='${placeholder}'">
+            <div style="flex:1">
+              <div style="font-weight:600;font-size:0.9rem">${item.name}</div>
+              <div style="font-size:0.8rem;color:var(--text-muted)">${l === 'ar' ? 'الكمية:' : 'Qty:'} ${item.quantity}</div>
+            </div>
+            <div style="font-weight:700;color:var(--gold);font-size:0.9rem">${formatPrice(item.price * item.quantity)}</div>
+          </div>`;
+      }).join('');
     }
 
     async function prefillUserData() {
@@ -260,11 +295,16 @@
 
     async function loadWalletNumber() {
       const num = await getSetting('whatsapp_number');
-      document.getElementById('wallet-number-display').textContent = `${l === 'ar' ? 'رقم التحويل:' : 'Transfer to:'} ${num || '—'}`;
+      document.getElementById('wallet-number-display').textContent =
+        `${l === 'ar' ? 'رقم التحويل:' : 'Transfer to:'} ${num || '—'}`;
     }
 
     async function placeOrder() {
       const btn = document.getElementById('place-btn');
+
+      // FIX: تحقق من إن الزر مش disabled (منع double-submit)
+      if (btn.disabled) return;
+
       const name = document.getElementById('delivery-name').value.trim();
       const phone = document.getElementById('delivery-phone').value.trim();
       const address = document.getElementById('delivery-address').value.trim();
@@ -272,6 +312,12 @@
 
       if (!name || !phone || !address) {
         showToast(l === 'ar' ? 'من فضلك اكملي بيانات التوصيل' : 'Please complete delivery information', 'error');
+        return;
+      }
+
+      // FIX: تحقق من رقم التليفون
+      if (!/^[\d\s\+\-\(\)]{7,20}$/.test(phone)) {
+        showToast(l === 'ar' ? 'رقم التليفون غير صحيح' : 'Invalid phone number', 'error');
         return;
       }
 
@@ -288,22 +334,25 @@
 
       try {
         const user = await getCurrentUser();
+        if (!user) { window.location.href = '/auth.html?redirect=/checkout.html'; return; }
+
         const subtotal = cart.reduce((s, i) => s + i.price * i.quantity, 0);
         const discount = appliedCoupon?.discount || 0;
-        const total = subtotal - discount;
+        const total = Math.max(0, subtotal - discount);
 
+        // رفع الإيصال لو موجود
         let proofUrl = null;
         if (proofFile) {
           proofUrl = await uploadToCloudinary(proofFile, 'payment_proofs');
         }
 
-        // Create order
+        // FIX: عملية واحدة متكاملة — لو order_items فشلت، Order بتتحذف
         const { data: order, error: orderError } = await db.from('orders').insert({
-          user_id: user?.id || null,
+          user_id: user.id,
           total,
           payment_method: selectedPayment,
           payment_proof_url: proofUrl,
-          notes: `الاسم: ${name} | التليفون: ${phone} | العنوان: ${address}${notes ? ' | ملاحظات: ' + notes : ''}${appliedCoupon ? ' | كوبون: ' + document.getElementById('coupon-input').value.toUpperCase() : ''}`,
+          notes: `${name} | ${phone} | ${address}${notes ? ' | ' + notes : ''}${appliedCoupon ? ' | كوبون: ' + document.getElementById('coupon-input').value.toUpperCase() : ''}`,
           status: 'pending'
         }).select().single();
 
@@ -316,36 +365,44 @@
           quantity: item.quantity,
           price_at_time: item.price
         }));
-        await db.from('order_items').insert(items);
 
-        // Update coupon usage count
+        const { error: itemsError } = await db.from('order_items').insert(items);
+
+        if (itemsError) {
+          // FIX: لو items فشلت، بنحذف الـ order عشان مايبقاش ناقص
+          await db.from('orders').delete().eq('id', order.id);
+          throw itemsError;
+        }
+
+        // FIX: تحديث الكوبون عن طريق RPC function بدل db.raw
         if (appliedCoupon?.couponId) {
-          await db.from('coupons').update({ used_count: db.rpc('used_count + 1') }).eq('id', appliedCoupon.couponId);
+          await db.rpc('increment_coupon_usage', { coupon_id: appliedCoupon.couponId });
         }
 
-        // Update profile
-        if (user?.id) {
-          await db.from('profiles').update({ phone, address }).eq('id', user.id);
-        }
+        // تحديث بيانات العميل
+        await db.from('profiles').update({ phone, address }).eq('id', user.id);
 
-        // Send WhatsApp notification
+        // إرسال واتساب
         const waNum = await getSetting('whatsapp_number');
         if (waNum) {
           const couponInfo = appliedCoupon ? `\n🏷️ خصم: ${formatPrice(appliedCoupon.discount)}` : '';
-          const msg = encodeURIComponent(`🛍️ طلب جديد من أنتيكا!\n\n👤 ${name}\n📱 ${phone}\n📍 ${address}\n💰 ${formatPrice(total)}${couponInfo}\n💳 ${selectedPayment === 'cash' ? 'كاش' : 'محفظة'}\n🔖 رقم الطلب: ${order.id.slice(0,8)}`);
+          const msg = encodeURIComponent(
+            `🛍️ طلب جديد من أنتيكا!\n\n👤 ${name}\n📱 ${phone}\n📍 ${address}\n💰 ${formatPrice(total)}${couponInfo}\n💳 ${selectedPayment === 'cash' ? 'كاش' : 'محفظة'}\n🔖 رقم الطلب: ${order.id.slice(0, 8)}`
+          );
           window.open(`https://wa.me/2${waNum}?text=${msg}`, '_blank');
         }
 
-        // Clear cart
+        // FIX: بنمسح السلة بعد ما الطلب اتأكد بنجاح 100%
         saveCart([]);
         appliedCoupon = null;
 
-        // Show success
+        // إظهار صفحة النجاح
         document.getElementById('success-order-id').textContent = order.id.slice(0, 8).toUpperCase();
         document.getElementById('success-overlay').style.display = 'flex';
         applyLang();
 
       } catch (err) {
+        console.error('Order error:', err);
         showToast(l === 'ar' ? 'حصل خطأ، حاولي تاني' : 'Something went wrong, please try again', 'error');
         btn.disabled = false;
         btn.innerHTML = `<i class="fas fa-check-circle"></i> <span>${l === 'ar' ? 'تأكيد الطلب' : 'Place Order'}</span>`;
@@ -357,6 +414,9 @@
       const msgEl = document.getElementById('coupon-msg');
       const btn = document.getElementById('coupon-btn');
       if (!code) return;
+
+      // FIX: تحقق من طول الكود
+      if (code.length > 30) return;
 
       btn.disabled = true;
       btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
@@ -373,12 +433,13 @@
         document.getElementById('coupon-input').disabled = true;
         btn.innerHTML = '<i class="fas fa-times"></i>';
         btn.onclick = removeCoupon;
+        btn.disabled = false;
       } else {
         appliedCoupon = null;
         btn.innerHTML = '<i class="fas fa-tag"></i> تطبيق';
+        btn.disabled = false;
       }
 
-      btn.disabled = false;
       renderOrderItems();
     }
 

@@ -35,7 +35,6 @@
     .cat-tag{display:flex;align-items:center;gap:.375rem;padding:5px 12px;background:var(--bg-secondary);border:1px solid var(--border);border-radius:20px;font-size:.82rem;font-weight:600}
     .cat-tag button{color:var(--text-muted);cursor:pointer;font-size:.72rem;transition:color .2s;line-height:1}
     .cat-tag button:hover{color:#dc2626}
-    /* Revenue */
     .rev-tabs{display:flex;border-bottom:2px solid var(--border);margin-bottom:1.25rem;gap:.25rem}
     .rev-tab{padding:.6rem 1rem;font-size:.85rem;font-weight:600;color:var(--text-muted);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;transition:all .2s;background:none;border-top:none;border-left:none;border-right:none;font-family:inherit}
     .rev-tab.active{color:var(--gold);border-bottom-color:var(--gold)}
@@ -43,7 +42,6 @@
     .rev-card{background:var(--bg-secondary);border-radius:var(--radius-sm);padding:.875rem;text-align:center}
     .rev-val{font-size:1.1rem;font-weight:700;color:var(--gold);font-family:var(--font-display)}
     .rev-lbl{font-size:.72rem;color:var(--text-muted);margin-top:.2rem}
-    /* Danger */
     .danger-section{border-color:#dc2626}
     .danger-section .s-head{background:rgba(220,38,38,.05)}
     .danger-section .s-head i,.danger-section .s-head-title{color:#dc2626}
@@ -52,7 +50,6 @@
     .delete-info{flex:1;min-width:200px}
     .delete-title{font-weight:600;font-size:.9rem}
     .delete-desc{font-size:.78rem;color:var(--text-muted);margin-top:.2rem}
-    /* Confirm Modal */
     .confirm-overlay{position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:3000;display:none;align-items:center;justify-content:center;padding:1rem;backdrop-filter:blur(4px)}
     .confirm-overlay.open{display:flex}
     .confirm-box{background:var(--bg-card);border-radius:var(--radius-lg);width:100%;max-width:420px;border:1px solid var(--border);overflow:hidden}
@@ -101,7 +98,7 @@
 
     <div class="admin-content" style="max-width:960px">
 
-      <!-- ── إحصائيات الإيرادات ── -->
+      <!-- إحصائيات الإيرادات -->
       <div class="s-section">
         <div class="s-head"><i class="fas fa-chart-bar"></i><div class="s-head-title">إحصائيات الإيرادات والطلبات</div></div>
         <div class="s-body">
@@ -125,34 +122,34 @@
       </div>
 
       <div class="settings-grid">
-        <!-- ── إعدادات المتجر ── -->
         <div>
+          <!-- إعدادات المتجر -->
           <div class="s-section">
             <div class="s-head"><i class="fas fa-store"></i><div class="s-head-title">إعدادات المتجر</div></div>
             <div class="s-body">
               <div class="form-group">
                 <label class="form-label">اسم المتجر (عربي)</label>
-                <input type="text" class="form-control" id="site-ar" placeholder="أنتيكا جاليري">
+                <input type="text" class="form-control" id="site-ar" placeholder="أنتيكا جاليري" maxlength="100">
               </div>
               <div class="form-group">
                 <label class="form-label">اسم المتجر (إنجليزي)</label>
-                <input type="text" class="form-control" id="site-en" dir="ltr" placeholder="Antika Gallery">
+                <input type="text" class="form-control" id="site-en" dir="ltr" placeholder="Antika Gallery" maxlength="100">
               </div>
               <div class="form-group">
                 <label class="form-label">إعلان علوي <span style="color:var(--text-muted);font-weight:400">(اتركه فاضي لو مش محتاج)</span></label>
-                <input type="text" class="form-control" id="announcement" placeholder="مثال: شحن مجاني فوق ٥٠٠ جنيه 🎉">
+                <input type="text" class="form-control" id="announcement" placeholder="مثال: شحن مجاني فوق ٥٠٠ جنيه 🎉" maxlength="200">
               </div>
               <button class="btn btn-primary btn-sm" onclick="saveGeneral()"><i class="fas fa-save"></i> حفظ</button>
             </div>
           </div>
 
-          <!-- ── واتساب ── -->
+          <!-- واتساب -->
           <div class="s-section">
             <div class="s-head"><i class="fab fa-whatsapp" style="color:#25d366"></i><div class="s-head-title">الواتساب</div></div>
             <div class="s-body">
               <div class="form-group">
                 <label class="form-label">رقم الواتساب</label>
-                <input type="tel" class="form-control" id="wa-num" dir="ltr" placeholder="01000000000">
+                <input type="tel" class="form-control" id="wa-num" dir="ltr" placeholder="01000000000" maxlength="15">
                 <div class="form-hint">بدون كود الدولة — +20 بتتضاف تلقائي</div>
               </div>
               <div style="display:flex;gap:.75rem">
@@ -162,7 +159,7 @@
             </div>
           </div>
 
-          <!-- ── التشغيل ── -->
+          <!-- التشغيل -->
           <div class="s-section">
             <div class="s-head"><i class="fas fa-toggle-on"></i><div class="s-head-title">التشغيل</div></div>
             <div class="s-body" style="padding-top:.5rem;padding-bottom:.5rem">
@@ -185,7 +182,7 @@
         </div>
 
         <div>
-          <!-- ── التصنيفات ── -->
+          <!-- التصنيفات -->
           <div class="s-section">
             <div class="s-head"><i class="fas fa-tags"></i><div class="s-head-title">التصنيفات</div></div>
             <div class="s-body">
@@ -193,11 +190,11 @@
               <div style="display:grid;grid-template-columns:1fr 1fr auto;gap:.5rem;align-items:end">
                 <div class="form-group" style="margin:0">
                   <label class="form-label" style="font-size:.75rem">اسم عربي</label>
-                  <input type="text" class="form-control" id="cat-ar">
+                  <input type="text" class="form-control" id="cat-ar" maxlength="50">
                 </div>
                 <div class="form-group" style="margin:0">
                   <label class="form-label" style="font-size:.75rem">English name</label>
-                  <input type="text" class="form-control" id="cat-en" dir="ltr">
+                  <input type="text" class="form-control" id="cat-en" dir="ltr" maxlength="50">
                 </div>
                 <button class="btn btn-primary btn-sm" onclick="addCat()" style="height:42px"><i class="fas fa-plus"></i></button>
               </div>
@@ -206,71 +203,45 @@
         </div>
       </div>
 
-      <!-- ── تصدير البيانات ── -->
+      <!-- تصدير البيانات -->
       <div class="s-section">
         <div class="s-head"><i class="fas fa-download"></i><div class="s-head-title">تصدير البيانات</div></div>
         <div class="s-body" style="padding-top:.5rem;padding-bottom:.5rem">
           <div class="delete-btn-row">
-            <div class="delete-info">
-              <div class="delete-title">تصدير الطلبات</div>
-              <div class="delete-desc">تصدير كل الطلبات بصيغة CSV للمحاسبة</div>
-            </div>
+            <div class="delete-info"><div class="delete-title">تصدير الطلبات</div><div class="delete-desc">تصدير كل الطلبات بصيغة CSV للمحاسبة</div></div>
             <button class="btn btn-ghost btn-sm" onclick="exportOrders()"><i class="fas fa-file-csv"></i> تصدير</button>
           </div>
           <div class="delete-btn-row">
-            <div class="delete-info">
-              <div class="delete-title">تصدير المنتجات</div>
-              <div class="delete-desc">تصدير كل المنتجات مع أسعارها والمخزون</div>
-            </div>
+            <div class="delete-info"><div class="delete-title">تصدير المنتجات</div><div class="delete-desc">تصدير كل المنتجات مع أسعارها والمخزون</div></div>
             <button class="btn btn-ghost btn-sm" onclick="exportProducts()"><i class="fas fa-file-csv"></i> تصدير</button>
           </div>
           <div class="delete-btn-row">
-            <div class="delete-info">
-              <div class="delete-title">تصدير المستخدمين</div>
-              <div class="delete-desc">تصدير بيانات العملاء</div>
-            </div>
+            <div class="delete-info"><div class="delete-title">تصدير المستخدمين</div><div class="delete-desc">تصدير بيانات العملاء</div></div>
             <button class="btn btn-ghost btn-sm" onclick="exportUsers()"><i class="fas fa-file-csv"></i> تصدير</button>
           </div>
         </div>
       </div>
 
-      <!-- ── منطقة الخطر ── -->
+      <!-- منطقة الخطر -->
       <div class="s-section danger-section">
         <div class="s-head"><i class="fas fa-exclamation-triangle"></i><div class="s-head-title">منطقة الخطر — حذف البيانات</div></div>
         <div class="s-body" style="padding-top:.5rem;padding-bottom:.5rem">
-
           <div class="delete-btn-row">
-            <div class="delete-info">
-              <div class="delete-title">حذف طلبات آخر أسبوع</div>
-              <div class="delete-desc">حذف كل الطلبات المكتملة والملغية في آخر 7 أيام</div>
-            </div>
+            <div class="delete-info"><div class="delete-title">حذف طلبات آخر أسبوع</div><div class="delete-desc">حذف الطلبات المكتملة والملغية في آخر 7 أيام</div></div>
             <button class="btn btn-danger btn-sm" onclick="deleteOrders('week')"><i class="fas fa-trash"></i> حذف</button>
           </div>
-
           <div class="delete-btn-row">
-            <div class="delete-info">
-              <div class="delete-title">حذف طلبات آخر شهر</div>
-              <div class="delete-desc">حذف كل الطلبات المكتملة والملغية في آخر 30 يوم</div>
-            </div>
+            <div class="delete-info"><div class="delete-title">حذف طلبات آخر شهر</div><div class="delete-desc">حذف الطلبات المكتملة والملغية في آخر 30 يوم</div></div>
             <button class="btn btn-danger btn-sm" onclick="deleteOrders('month')"><i class="fas fa-trash"></i> حذف</button>
           </div>
-
           <div class="delete-btn-row">
-            <div class="delete-info">
-              <div class="delete-title">حذف طلبات آخر سنة</div>
-              <div class="delete-desc">حذف كل الطلبات المكتملة والملغية في آخر 365 يوم</div>
-            </div>
+            <div class="delete-info"><div class="delete-title">حذف طلبات آخر سنة</div><div class="delete-desc">حذف الطلبات المكتملة والملغية في آخر 365 يوم</div></div>
             <button class="btn btn-danger btn-sm" onclick="deleteOrders('year')"><i class="fas fa-trash"></i> حذف</button>
           </div>
-
           <div class="delete-btn-row">
-            <div class="delete-info">
-              <div class="delete-title" style="color:#dc2626">حذف كل الطلبات</div>
-              <div class="delete-desc">⚠️ هيحذف كل الطلبات المكتملة والملغية بدون استثناء</div>
-            </div>
+            <div class="delete-info"><div class="delete-title" style="color:#dc2626">حذف كل الطلبات</div><div class="delete-desc">⚠️ هيحذف كل الطلبات المكتملة والملغية بدون استثناء</div></div>
             <button class="btn btn-danger btn-sm" onclick="deleteOrders('all')"><i class="fas fa-trash"></i> حذف الكل</button>
           </div>
-
         </div>
       </div>
 
@@ -281,8 +252,12 @@
   <div class="confirm-overlay" id="confirm-modal">
     <div class="confirm-box">
       <div class="confirm-head">
-        <h3 style="color:#dc2626;font-size:1rem;display:flex;align-items:center;gap:.5rem"><i class="fas fa-exclamation-triangle"></i> تأكيد الحذف النهائي</h3>
-        <button onclick="closeConfirm()" style="width:30px;height:30px;border-radius:50%;border:1.5px solid var(--border);background:none;cursor:pointer;color:var(--text-muted);font-size:.8rem;display:flex;align-items:center;justify-content:center"><i class="fas fa-times"></i></button>
+        <h3 style="color:#dc2626;font-size:1rem;display:flex;align-items:center;gap:.5rem">
+          <i class="fas fa-exclamation-triangle"></i> تأكيد الحذف النهائي
+        </h3>
+        <button onclick="closeConfirm()" style="width:30px;height:30px;border-radius:50%;border:1.5px solid var(--border);background:none;cursor:pointer;color:var(--text-muted);font-size:.8rem;display:flex;align-items:center;justify-content:center">
+          <i class="fas fa-times"></i>
+        </button>
       </div>
       <div class="confirm-body">
         <div style="background:rgba(220,38,38,.08);border:1px solid rgba(220,38,38,.25);border-radius:var(--radius-sm);padding:1rem;margin-bottom:1.25rem">
@@ -290,11 +265,14 @@
           <p style="font-size:.875rem;color:var(--text-secondary)" id="confirm-msg"></p>
         </div>
         <p style="font-size:.82rem;color:var(--text-muted);margin-bottom:.75rem">اكتب <strong style="color:var(--text)">احذف</strong> في المربع للتأكيد:</p>
-        <input type="text" class="form-control" id="confirm-input" placeholder="اكتب: احذف" oninput="checkConfirmInput()" autocomplete="off">
+        <input type="text" class="form-control" id="confirm-input" placeholder="اكتب: احذف"
+          oninput="checkConfirmInput()" autocomplete="off" maxlength="10">
       </div>
       <div class="confirm-foot">
         <button class="btn btn-ghost" onclick="closeConfirm()">إلغاء</button>
-        <button class="btn btn-danger" id="confirm-btn" onclick="execDelete()" disabled><i class="fas fa-trash"></i> تأكيد الحذف</button>
+        <button class="btn btn-danger" id="confirm-btn" onclick="execDelete()" disabled>
+          <i class="fas fa-trash"></i> تأكيد الحذف
+        </button>
       </div>
     </div>
   </div>
@@ -304,174 +282,223 @@
   <script>
     let deleteTarget = null;
 
-    function openSidebar(){document.getElementById('admin-sidebar').classList.add('open');document.getElementById('sidebar-overlay').classList.add('active');}
-    function closeSidebar(){document.getElementById('admin-sidebar').classList.remove('open');document.getElementById('sidebar-overlay').classList.remove('active');}
-    function toggleTheme(){const t=getTheme()==='light'?'dark':'light';setTheme(t);document.getElementById('theme-toggle').innerHTML=t==='dark'?'<i class="fas fa-sun"></i>':'<i class="fas fa-moon"></i>';}
-    async function logout(){await db.auth.signOut();window.location.href='/admin-antika-ctrl/login.html';}
+    function openSidebar() { document.getElementById('admin-sidebar').classList.add('open'); document.getElementById('sidebar-overlay').classList.add('active'); }
+    function closeSidebar() { document.getElementById('admin-sidebar').classList.remove('open'); document.getElementById('sidebar-overlay').classList.remove('active'); }
+    function toggleTheme() {
+      const t = getTheme() === 'light' ? 'dark' : 'light';
+      setTheme(t);
+      document.getElementById('theme-toggle').innerHTML = t === 'dark' ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
+    }
+    async function logout() { await db.auth.signOut(); window.location.href = '/admin-antika-ctrl/login.html'; }
 
-    async function adminAuth(){
-      document.body.style.opacity='0';document.body.style.transition='opacity .25s';
-      let{data:{session}}=await db.auth.getSession();
-      if(!session){await new Promise(r=>setTimeout(r,900));const r=await db.auth.getSession();session=r.data.session;}
-      if(!session){window.location.href='/admin-antika-ctrl/login.html';return false;}
-      const role=session.user.user_metadata?.role;
-      if(role!=='admin'){window.location.href='/admin-antika-ctrl/';return false;} // الإعدادات للأدمن بس
-      document.body.style.opacity='1';initTheme();
-      document.getElementById('theme-toggle').innerHTML=getTheme()==='dark'?'<i class="fas fa-sun"></i>':'<i class="fas fa-moon"></i>';
+    // FIX: الإعدادات للأدمن فقط — redirect لـ login مش للـ dashboard
+    async function adminAuth() {
+      document.body.style.opacity = '0';
+      document.body.style.transition = 'opacity .25s';
+      let { data: { session } } = await db.auth.getSession();
+      if (!session) {
+        await new Promise(r => setTimeout(r, 900));
+        const r = await db.auth.getSession();
+        session = r.data.session;
+      }
+      if (!session) { window.location.href = '/admin-antika-ctrl/login.html'; return false; }
+      const role = session.user.user_metadata?.role;
+      // FIX: moderator بيروح لـ login مش dashboard عشان مفيش redirect loop
+      if (role !== 'admin') {
+        await db.auth.signOut();
+        window.location.href = '/admin-antika-ctrl/login.html';
+        return false;
+      }
+      document.body.style.opacity = '1';
+      initTheme();
+      document.getElementById('theme-toggle').innerHTML = getTheme() === 'dark' ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
       return true;
     }
 
-    async function loadBadge(){
-      const{count}=await db.from('orders').select('*',{count:'exact',head:true}).eq('status','pending');
-      const b=document.getElementById('pending-badge');if(b&&count>0){b.textContent=count;b.style.display='inline';}
+    async function loadBadge() {
+      const { count } = await db.from('orders').select('*', { count: 'exact', head: true }).eq('status', 'pending');
+      const b = document.getElementById('pending-badge');
+      if (b && count > 0) { b.textContent = count; b.style.display = 'inline'; }
     }
 
-    // ── Settings Load ─────────────────────────────────────────────
-    async function loadSettings(){
-      const{data}=await db.from('settings').select('*');
-      const s={};(data||[]).forEach(r=>s[r.key]=r.value);
-      document.getElementById('site-ar').value=s['site_name_ar']||'';
-      document.getElementById('site-en').value=s['site_name_en']||'';
-      document.getElementById('announcement').value=s['announcement']||'';
-      document.getElementById('wa-num').value=s['whatsapp_number']||'';
-      if(s['maintenance_mode']==='true')document.getElementById('t-maintenance').classList.add('on');
-      if(s['orders_enabled']==='false')document.getElementById('t-orders').classList.remove('on');
+    // ── Settings ──────────────────────────────────────────────────
+    async function loadSettings() {
+      const { data } = await db.from('settings').select('*');
+      const s = {};
+      (data || []).forEach(r => s[r.key] = r.value);
+      document.getElementById('site-ar').value = s['site_name_ar'] || '';
+      document.getElementById('site-en').value = s['site_name_en'] || '';
+      document.getElementById('announcement').value = s['announcement'] || '';
+      document.getElementById('wa-num').value = s['whatsapp_number'] || '';
+      if (s['maintenance_mode'] === 'true') document.getElementById('t-maintenance').classList.add('on');
+      if (s['orders_enabled'] === 'false') document.getElementById('t-orders').classList.remove('on');
     }
 
-    async function toggleSetting(key,el){
-      const on=el.classList.toggle('on');
-      await db.from('settings').upsert({key,value:on.toString()},{onConflict:'key'});
-      showToast(on?'تم التفعيل':'تم الإيقاف');
+    async function toggleSetting(key, el) {
+      const on = el.classList.toggle('on');
+      await db.from('settings').upsert({ key, value: on.toString() }, { onConflict: 'key' });
+      showToast(on ? 'تم التفعيل' : 'تم الإيقاف');
+      // مسح الكاش عشان checkMaintenance يتحدث
+      clearSettingsCache();
     }
 
-    async function saveGeneral(){
+    async function saveGeneral() {
+      const ar = document.getElementById('site-ar').value.trim();
+      const en = document.getElementById('site-en').value.trim();
+      const ann = document.getElementById('announcement').value.trim();
       await Promise.all([
-        db.from('settings').upsert({key:'site_name_ar',value:document.getElementById('site-ar').value},{onConflict:'key'}),
-        db.from('settings').upsert({key:'site_name_en',value:document.getElementById('site-en').value},{onConflict:'key'}),
-        db.from('settings').upsert({key:'announcement',value:document.getElementById('announcement').value},{onConflict:'key'}),
+        db.from('settings').upsert({ key: 'site_name_ar', value: ar }, { onConflict: 'key' }),
+        db.from('settings').upsert({ key: 'site_name_en', value: en }, { onConflict: 'key' }),
+        db.from('settings').upsert({ key: 'announcement', value: ann }, { onConflict: 'key' }),
       ]);
+      clearSettingsCache();
       showToast('✓ تم حفظ إعدادات المتجر');
     }
 
-    async function saveWA(){
-      await db.from('settings').upsert({key:'whatsapp_number',value:document.getElementById('wa-num').value},{onConflict:'key'});
+    async function saveWA() {
+      const num = document.getElementById('wa-num').value.trim();
+      // FIX: تحقق من إن الرقم أرقام بس
+      if (num && !/^\d{8,15}$/.test(num)) {
+        showToast('رقم الواتساب غير صحيح', 'error');
+        return;
+      }
+      await db.from('settings').upsert({ key: 'whatsapp_number', value: num }, { onConflict: 'key' });
+      clearSettingsCache();
       showToast('✓ تم حفظ رقم الواتساب');
     }
 
-    function testWA(){
-      const n=document.getElementById('wa-num').value;
-      if(!n){showToast('اكتب الرقم الأول','error');return;}
-      window.open(`https://wa.me/2${n}`,'_blank');
+    function testWA() {
+      const n = document.getElementById('wa-num').value.trim();
+      if (!n) { showToast('اكتب الرقم الأول', 'error'); return; }
+      window.open(`https://wa.me/2${n}`, '_blank');
     }
 
     // ── Revenue ───────────────────────────────────────────────────
-    async function loadRevenue(period, btn){
-      document.querySelectorAll('.rev-tab').forEach(t=>t.classList.remove('active'));
-      if(btn)btn.classList.add('active');
+    async function loadRevenue(period, btn) {
+      document.querySelectorAll('.rev-tab').forEach(t => t.classList.remove('active'));
+      if (btn) btn.classList.add('active');
 
-      let query=db.from('orders').select('total,status,created_at');
-      const now=new Date();
-      if(period==='week'){const d=new Date(now-7*864e5);query=query.gte('created_at',d.toISOString());}
-      else if(period==='month'){const d=new Date(now-30*864e5);query=query.gte('created_at',d.toISOString());}
-      else if(period==='year'){const d=new Date(now-365*864e5);query=query.gte('created_at',d.toISOString());}
+      let query = db.from('orders').select('total,status,created_at');
+      const now = new Date();
+      if (period === 'week') query = query.gte('created_at', new Date(now - 7 * 864e5).toISOString());
+      else if (period === 'month') query = query.gte('created_at', new Date(now - 30 * 864e5).toISOString());
+      else if (period === 'year') query = query.gte('created_at', new Date(now - 365 * 864e5).toISOString());
 
-      const{data:orders}=await query;
-      if(!orders){return;}
+      const { data: orders } = await query;
+      if (!orders) return;
 
-      const delivered=orders.filter(o=>o.status==='delivered');
-      const pending=orders.filter(o=>o.status==='pending');
-      const cancelled=orders.filter(o=>o.status==='cancelled');
-      const shipping=orders.filter(o=>['confirmed','processing','shipped'].includes(o.status));
+      const delivered = orders.filter(o => o.status === 'delivered');
+      const pending = orders.filter(o => o.status === 'pending');
+      const cancelled = orders.filter(o => o.status === 'cancelled');
+      const shipping = orders.filter(o => ['confirmed', 'processing', 'shipped'].includes(o.status));
 
-      const rev=delivered.reduce((s,o)=>s+(o.total||0),0);
-      const avg=delivered.length?rev/delivered.length:0;
+      const rev = delivered.reduce((s, o) => s + (o.total || 0), 0);
+      const avg = delivered.length ? rev / delivered.length : 0;
 
-      document.getElementById('rev-total').textContent=formatPrice(rev);
-      document.getElementById('rev-orders').textContent=delivered.length;
-      document.getElementById('rev-avg').textContent=formatPrice(avg);
-      document.getElementById('rev-pending').textContent=pending.length;
-      document.getElementById('rev-cancelled').textContent=cancelled.length;
-      document.getElementById('rev-delivery').textContent=shipping.length;
+      document.getElementById('rev-total').textContent = formatPrice(rev);
+      document.getElementById('rev-orders').textContent = delivered.length;
+      document.getElementById('rev-avg').textContent = formatPrice(avg);
+      document.getElementById('rev-pending').textContent = pending.length;
+      document.getElementById('rev-cancelled').textContent = cancelled.length;
+      document.getElementById('rev-delivery').textContent = shipping.length;
     }
 
     // ── Categories ────────────────────────────────────────────────
-    let cats=[];
-    async function loadCats(){
-      const{data}=await db.from('categories').select('*').order('name');
-      cats=data||[];
-      const list=document.getElementById('cat-list');
-      if(!cats.length){list.innerHTML='<p style="font-size:.82rem;color:var(--text-muted)">مفيش تصنيفات</p>';return;}
-      list.innerHTML=cats.map(c=>`<div class="cat-tag"><span>${c.name_ar||c.name}</span>${c.name_ar&&c.name!==c.name_ar?`<span style="color:var(--text-muted);font-size:.72rem">/${c.name}</span>`:''}<button onclick="delCat('${c.id}')">✕</button></div>`).join('');
+    let cats = [];
+    async function loadCats() {
+      const { data } = await db.from('categories').select('*').order('name');
+      cats = data || [];
+      const list = document.getElementById('cat-list');
+      if (!cats.length) { list.innerHTML = '<p style="font-size:.82rem;color:var(--text-muted)">مفيش تصنيفات</p>'; return; }
+      list.innerHTML = cats.map(c => `
+        <div class="cat-tag">
+          <span>${c.name_ar || c.name}</span>
+          ${c.name_ar && c.name !== c.name_ar ? `<span style="color:var(--text-muted);font-size:.72rem">/${c.name}</span>` : ''}
+          <button onclick="delCat('${c.id}')">✕</button>
+        </div>`).join('');
     }
 
-    async function addCat(){
-      const ar=document.getElementById('cat-ar').value.trim();
-      const en=document.getElementById('cat-en').value.trim();
-      if(!ar&&!en){showToast('اكتب اسم التصنيف','error');return;}
-      const name=en||ar;
-      const slug=name.toLowerCase().replace(/\s+/g,'-').replace(/[^a-z0-9-]/g,'')||Date.now().toString();
-      const{error}=await db.from('categories').insert({name,name_ar:ar||null,slug});
-      if(error){showToast('التصنيف موجود بالفعل','error');}
-      else{document.getElementById('cat-ar').value='';document.getElementById('cat-en').value='';showToast('✓ تم إضافة التصنيف');loadCats();}
+    async function addCat() {
+      const ar = document.getElementById('cat-ar').value.trim();
+      const en = document.getElementById('cat-en').value.trim();
+      if (!ar && !en) { showToast('اكتب اسم التصنيف', 'error'); return; }
+      const name = en || ar;
+      const slug = name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '') || Date.now().toString();
+      const { error } = await db.from('categories').insert({ name, name_ar: ar || null, slug });
+      if (error) { showToast('التصنيف موجود بالفعل', 'error'); }
+      else {
+        document.getElementById('cat-ar').value = '';
+        document.getElementById('cat-en').value = '';
+        showToast('✓ تم إضافة التصنيف');
+        loadCats();
+      }
     }
 
-    async function delCat(id){
-      if(!confirm('هتحذف التصنيف؟ المنتجات المرتبطة به مش هتتحذف.'))return;
-      await db.from('categories').delete().eq('id',id);
-      showToast('تم الحذف');loadCats();
+    async function delCat(id) {
+      if (!confirm('هتحذف التصنيف؟ المنتجات المرتبطة به مش هتتحذف.')) return;
+      await db.from('categories').delete().eq('id', id);
+      showToast('تم الحذف');
+      loadCats();
     }
 
     // ── Delete Orders ─────────────────────────────────────────────
-    const deleteLabels={
-      week:'طلبات آخر 7 أيام المكتملة والملغية',
-      month:'طلبات آخر 30 يوم المكتملة والملغية',
-      year:'طلبات آخر 365 يوم المكتملة والملغية',
-      all:'كل الطلبات المكتملة والملغية بدون استثناء'
+    const deleteLabels = {
+      week: 'طلبات آخر 7 أيام المكتملة والملغية',
+      month: 'طلبات آخر 30 يوم المكتملة والملغية',
+      year: 'طلبات آخر 365 يوم المكتملة والملغية',
+      all: 'كل الطلبات المكتملة والملغية بدون استثناء'
     };
 
-    function deleteOrders(period){
-      deleteTarget=period;
-      document.getElementById('confirm-msg').textContent=`ستقوم بحذف ${deleteLabels[period]}. هذا الإجراء لا يمكن التراجع عنه نهائياً.`;
-      document.getElementById('confirm-input').value='';
-      document.getElementById('confirm-btn').disabled=true;
+    function deleteOrders(period) {
+      deleteTarget = period;
+      document.getElementById('confirm-msg').textContent =
+        `ستقوم بحذف ${deleteLabels[period]}. هذا الإجراء لا يمكن التراجع عنه نهائياً.`;
+      document.getElementById('confirm-input').value = '';
+      document.getElementById('confirm-btn').disabled = true;
       document.getElementById('confirm-modal').classList.add('open');
     }
 
-    function checkConfirmInput(){
-      const val=document.getElementById('confirm-input').value.trim();
-      document.getElementById('confirm-btn').disabled=(val!=='احذف');
+    function checkConfirmInput() {
+      const val = document.getElementById('confirm-input').value.trim();
+      document.getElementById('confirm-btn').disabled = (val !== 'احذف');
     }
 
-    function closeConfirm(){
+    function closeConfirm() {
       document.getElementById('confirm-modal').classList.remove('open');
-      deleteTarget=null;
+      deleteTarget = null;
     }
 
-    async function execDelete(){
-      if(!deleteTarget)return;
-      const btn=document.getElementById('confirm-btn');
-      btn.disabled=true;btn.innerHTML='<i class="fas fa-spinner fa-spin"></i> جاري الحذف...';
+    async function execDelete() {
+      if (!deleteTarget) return;
+      const btn = document.getElementById('confirm-btn');
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري الحذف...';
 
-      let query=db.from('orders').delete().in('status',['delivered','cancelled']);
+      // FIX: بنبني الـ query بشكل صحيح
+      const now = new Date();
+      let cutoff = null;
+      if (deleteTarget === 'week') cutoff = new Date(now - 7 * 864e5).toISOString();
+      else if (deleteTarget === 'month') cutoff = new Date(now - 30 * 864e5).toISOString();
+      else if (deleteTarget === 'year') cutoff = new Date(now - 365 * 864e5).toISOString();
 
-      const now=new Date();
-      if(deleteTarget==='week'){query=query.gte('created_at',new Date(now-7*864e5).toISOString());}
-      else if(deleteTarget==='month'){query=query.gte('created_at',new Date(now-30*864e5).toISOString());}
-      else if(deleteTarget==='year'){query=query.gte('created_at',new Date(now-365*864e5).toISOString());}
-      // all = بدون فلتر تاريخ
+      let query = db.from('orders').delete().in('status', ['delivered', 'cancelled']);
+      // FIX: لو فيه cutoff، بنحذف الطلبات القديمة من الـ cutoff لـ الحاضر
+      if (cutoff) query = query.lte('created_at', now.toISOString()).gte('created_at', cutoff);
 
-      const{error}=await query;
-      btn.innerHTML='<i class="fas fa-trash"></i> تأكيد الحذف';
+      const { error } = await query;
+      btn.innerHTML = '<i class="fas fa-trash"></i> تأكيد الحذف';
 
-      if(error){showToast('حصل خطأ: '+error.message,'error');}
-      else{showToast('✓ تم الحذف بنجاح');closeConfirm();loadRevenue('all',null);}
+      if (error) { showToast('حصل خطأ: ' + error.message, 'error'); btn.disabled = false; }
+      else { showToast('✓ تم الحذف بنجاح'); closeConfirm(); loadRevenue('all', null); }
     }
 
     // ── CSV Export ────────────────────────────────────────────────
     function downloadCSV(data, filename) {
       if (!data?.length) { showToast('مفيش بيانات للتصدير', 'error'); return; }
       const headers = Object.keys(data[0]);
-      const rows = data.map(row => headers.map(h => `"${(row[h] ?? '').toString().replace(/"/g, '""')}"`).join(','));
+      const rows = data.map(row =>
+        headers.map(h => `"${(row[h] ?? '').toString().replace(/"/g, '""')}"`).join(',')
+      );
       const csv = [headers.join(','), ...rows].join('\n');
       const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8' });
       const url = URL.createObjectURL(blob);
@@ -483,10 +510,10 @@
 
     async function exportOrders() {
       const { data } = await db.from('orders')
-        .select('id, created_at, total, status, payment_method, notes')
+        .select('id,created_at,total,status,payment_method,notes')
         .order('created_at', { ascending: false });
       downloadCSV(data?.map(o => ({
-        'رقم الطلب': o.id.slice(0,8).toUpperCase(),
+        'رقم الطلب': o.id.slice(0, 8).toUpperCase(),
         'التاريخ': new Date(o.created_at).toLocaleDateString('ar-EG'),
         'الإجمالي': o.total,
         'الحالة': o.status,
@@ -497,7 +524,7 @@
 
     async function exportProducts() {
       const { data } = await db.from('products')
-        .select('id, name, name_ar, price, stock, is_published, created_at, categories(name)')
+        .select('id,name,name_ar,price,stock,is_published,created_at,categories(name)')
         .order('created_at', { ascending: false });
       downloadCSV(data?.map(p => ({
         'الاسم': p.name_ar || p.name,
@@ -512,7 +539,7 @@
 
     async function exportUsers() {
       const { data } = await db.from('profiles')
-        .select('full_name, phone, address, created_at, is_banned')
+        .select('full_name,phone,address,created_at,is_banned')
         .order('created_at', { ascending: false });
       downloadCSV(data?.map(u => ({
         'الاسم': u.full_name || '',
@@ -523,10 +550,10 @@
       })), `antika-users-${new Date().toISOString().split('T')[0]}.csv`);
     }
 
-    // ── Init ──────────────────────────────────────────────────────
-    async function init(){
-      const ok=await adminAuth();if(!ok)return;
-      await Promise.all([loadSettings(),loadCats(),loadRevenue('week',null)]);
+    async function init() {
+      const ok = await adminAuth();
+      if (!ok) return;
+      await Promise.all([loadSettings(), loadCats(), loadRevenue('week', null)]);
       loadBadge();
     }
     init();

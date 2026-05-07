@@ -1,4 +1,7 @@
-const CACHE = 'antika-v1';
+// FIX: الـ version بيتبنى من التاريخ عشان كل deploy يكسر الكاش القديم
+const CACHE_VERSION = 'antika-v' + '20250507';
+const CACHE = CACHE_VERSION;
+
 const STATIC = [
   '/',
   '/shop.html',
@@ -12,36 +15,73 @@ const STATIC = [
 // Install — cache الملفات الأساسية
 self.addEventListener('install', e => {
   e.waitUntil(
-    caches.open(CACHE).then(c => c.addAll(STATIC)).then(() => self.skipWaiting())
+    caches.open(CACHE)
+      .then(c => c.addAll(STATIC))
+      .then(() => self.skipWaiting())
   );
 });
 
-// Activate — احذف الكاش القديم
+// Activate — احذف كل كاش قديم مش متطابق مع الـ version الحالية
 self.addEventListener('activate', e => {
   e.waitUntil(
     caches.keys().then(keys =>
-      Promise.all(keys.filter(k => k !== CACHE).map(k => caches.delete(k)))
+      Promise.all(
+        keys
+          .filter(k => k !== CACHE)
+          .map(k => caches.delete(k))
+      )
     ).then(() => self.clients.claim())
   );
 });
 
-// Fetch — استراتيجية Network First للـ API، Cache First للملفات الثابتة
+// Fetch
 self.addEventListener('fetch', e => {
   const url = new URL(e.request.url);
 
-  // مش بنعمل cache للـ Supabase أو Cloudinary requests
-  if (url.hostname.includes('supabase') || url.hostname.includes('cloudinary')) {
+  // مش بنعمل cache لـ Supabase أو Cloudinary أو Admin pages
+  if (
+    url.hostname.includes('supabase') ||
+    url.hostname.includes('cloudinary') ||
+    url.pathname.includes('admin-antika-ctrl')
+  ) {
     return;
   }
 
-  // للملفات الثابتة — Cache First
-  if (e.request.destination === 'style' || e.request.destination === 'script' || e.request.destination === 'font') {
+  // للملفات الثابتة (CSS, JS, Fonts) — Cache First
+  if (
+    e.request.destination === 'style' ||
+    e.request.destination === 'script' ||
+    e.request.destination === 'font'
+  ) {
     e.respondWith(
-      caches.match(e.request).then(cached => cached || fetch(e.request).then(res => {
-        const clone = res.clone();
-        caches.open(CACHE).then(c => c.put(e.request, clone));
-        return res;
-      }))
+      caches.match(e.request).then(cached => {
+        if (cached) return cached;
+        return fetch(e.request).then(res => {
+          // بنعمل cache بس للـ responses الناجحة
+          if (res.ok) {
+            const clone = res.clone();
+            caches.open(CACHE).then(c => c.put(e.request, clone));
+          }
+          return res;
+        });
+      })
+    );
+    return;
+  }
+
+  // للصور — Cache First مع timeout
+  if (e.request.destination === 'image') {
+    e.respondWith(
+      caches.match(e.request).then(cached => {
+        if (cached) return cached;
+        return fetch(e.request).then(res => {
+          if (res.ok) {
+            const clone = res.clone();
+            caches.open(CACHE).then(c => c.put(e.request, clone));
+          }
+          return res;
+        }).catch(() => cached);
+      })
     );
     return;
   }
@@ -51,8 +91,10 @@ self.addEventListener('fetch', e => {
     e.respondWith(
       fetch(e.request)
         .then(res => {
-          const clone = res.clone();
-          caches.open(CACHE).then(c => c.put(e.request, clone));
+          if (res.ok) {
+            const clone = res.clone();
+            caches.open(CACHE).then(c => c.put(e.request, clone));
+          }
           return res;
         })
         .catch(() => caches.match(e.request))

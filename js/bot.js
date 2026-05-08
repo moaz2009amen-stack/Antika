@@ -8,8 +8,9 @@
   'use strict';
 
   // ══ CONFIG ════════════════════════════════════════════════════
-  // PROXY_URL بيشير للـ Edge Function الجديدة ai-proxy
   const PROXY_URL   = 'https://tutcepymwnjvbbmdmsjm.supabase.co/functions/v1/ai-proxy';
+  // الـ anon key ده public — مش سر — بيسمح للـ Function تشتغل
+  const ANON_KEY    = 'sb_publishable_qoykvqJM4JpWh1N1-QpkLA_eDwjZQm6';
   const MAX_HISTORY = 20;
 
   // ══ STATE ═════════════════════════════════════════════════════
@@ -278,8 +279,11 @@
     try {
       const res = await fetch(PROXY_URL, {
         method:  'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body:    JSON.stringify({ messages: history })
+        headers: {
+          'Content-Type':  'application/json',
+          'Authorization': `Bearer ${ANON_KEY}`
+        },
+        body: JSON.stringify({ messages: history })
       });
 
       _abotRemoveTyping(tid);

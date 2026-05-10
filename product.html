@@ -487,18 +487,75 @@
     }
 
     async function uploadReviewImages(input){
-      const files=input.files;if(!files?.length)return;
-      showToast(getLang()==='ar'?'جاري رفع الصور...':'Uploading...','info');
-      for(const file of files){
-        try{const url=await uploadToCloudinary(file,'reviews');reviewImages.push(url);}catch(e){}
-      }
-      document.getElementById('review-images-preview').innerHTML=reviewImages.map((url,i)=>`
-        <div style="position:relative;display:inline-block">
-          <img src="${cardImage(url)}" style="width:60px;height:60px;object-fit:cover;border-radius:6px;border:1px solid var(--border)">
-          <button onclick="reviewImages.splice(${i},1);document.getElementById('review-images-preview').innerHTML='';uploadReviewImages({files:[]})" style="position:absolute;top:-6px;right:-6px;width:18px;height:18px;border-radius:50%;background:#dc2626;color:#fff;border:none;cursor:pointer;font-size:.6rem;display:flex;align-items:center;justify-content:center">✕</button>
-        </div>`).join('');
-      showToast(getLang()==='ar'?'✓ تم الرفع':'✓ Uploaded');
+    /**
+ * هذا الـ patch للدالة uploadReviewImages في product.html
+ * استبدل الدالة الموجودة بهذه النسخة المُصلحة
+ * ابحث عن: async function uploadReviewImages
+ * واستبدلها بالكود التالي:
+ */
+
+async function uploadReviewImages(input){
+  const files = input.files;
+  if (!files?.length) return;
+
+  // FIX: تحقق من نوع وحجم كل ملف قبل الرفع
+  const allowed = ['image/jpeg', 'image/png', 'image/webp'];
+  const maxSize = 5 * 1024 * 1024; // 5MB
+
+  for (const file of files) {
+    if (!allowed.includes(file.type)) {
+      showToast(getLang() === 'ar' ? 'يرجى اختيار صور JPG أو PNG أو WebP فقط' : 'Only JPG, PNG, WebP allowed', 'error');
+      input.value = '';
+      return;
     }
+    if (file.size > maxSize) {
+      showToast(getLang() === 'ar' ? `الصورة ${file.name} أكبر من 5MB` : `Image ${file.name} exceeds 5MB`, 'error');
+      input.value = '';
+      return;
+    }
+  }
+
+  showToast(getLang() === 'ar' ? 'جاري رفع الصور...' : 'Uploading...', 'info');
+
+  for (const file of files) {
+    try {
+      const url = await uploadToCloudinary(file, 'reviews');
+      // FIX: تحقق إن الـ URL من Cloudinary بتاعنا بس
+      if (isCloudinaryUrl(url)) {
+        reviewImages.push(url);
+      } else {
+        console.warn('Unexpected URL from upload:', url);
+        showToast(getLang() === 'ar' ? 'خطأ في رفع الصورة' : 'Upload error', 'error');
+      }
+    } catch(e) {
+      showToast(getLang() === 'ar' ? 'فشل رفع صورة' : 'Failed to upload', 'error');
+    }
+  }
+
+  // FIX: بنعيد رسم الـ preview بدل ما نكلّم uploadReviewImages مرة تانية
+  const preview = document.getElementById('review-images-preview');
+  preview.innerHTML = reviewImages.map((url, i) => `
+    <div style="position:relative;display:inline-block">
+      <img src="${url}" style="width:60px;height:60px;object-fit:cover;border-radius:6px;border:1px solid var(--border)" alt="">
+      <button
+        data-idx="${i}"
+        style="position:absolute;top:-6px;right:-6px;width:18px;height:18px;border-radius:50%;background:#dc2626;color:#fff;border:none;cursor:pointer;font-size:.6rem;display:flex;align-items:center;justify-content:center"
+        class="review-img-del">✕</button>
+    </div>`).join('');
+
+  // Event delegation للحذف
+  preview.querySelectorAll('.review-img-del').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const idx = parseInt(btn.dataset.idx);
+      reviewImages.splice(idx, 1);
+      // إعادة رسم
+      btn.closest('div').remove();
+    });
+  });
+
+  showToast(getLang() === 'ar' ? '✓ تم الرفع' : '✓ Uploaded');
+  input.value = '';
+}
 
     // ── User Area ─────────────────────────────────────────────────
     async function initUserArea(){

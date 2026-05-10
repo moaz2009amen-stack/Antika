@@ -55,6 +55,23 @@ function isVideoUrl(url) {
   return url.includes('/video/upload/') || /\.(mp4|mov|webm|avi)(\?|$)/i.test(url);
 }
 
+// ── FIX: تحقق إن الـ URL من Cloudinary بتاعنا بس ─────────────
+function isCloudinaryUrl(url) {
+  if (!url) return false;
+  return url.startsWith('https://res.cloudinary.com/df3ffyrsg/');
+}
+
+// ── FIX: escapeHTML — helper عام للـ DOM ─────────────────────
+function escapeHtml(str) {
+  if (!str) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+
 // ── Cloudinary Upload ──────────────────────────────────────────
 async function uploadToCloudinary(file, folder = 'products') {
   const isVideo = file.type.startsWith('video/');

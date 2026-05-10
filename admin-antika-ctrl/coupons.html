@@ -24,6 +24,13 @@
     .m-head h3 { font-family:var(--font-display); font-size:1.15rem; }
     .m-body { padding:1.5rem; }
     .m-foot { padding:1rem 1.5rem; border-top:1px solid var(--border); display:flex; gap:.75rem; justify-content:flex-end; }
+    /* FIX: Delete confirm modal */
+    .del-overlay { position:fixed; inset:0; background:rgba(0,0,0,.65); z-index:3000; display:none; align-items:center; justify-content:center; padding:1rem; backdrop-filter:blur(4px); }
+    .del-overlay.open { display:flex; }
+    .del-box { background:var(--bg-card); border-radius:var(--radius-lg); width:100%; max-width:400px; border:1px solid #dc2626; overflow:hidden; }
+    .del-head { padding:1.25rem 1.5rem; border-bottom:1px solid var(--border); background:rgba(220,38,38,.05); display:flex; align-items:center; gap:.5rem; }
+    .del-body { padding:1.5rem; }
+    .del-foot { padding:1rem 1.5rem; border-top:1px solid var(--border); display:flex; gap:.75rem; justify-content:flex-end; }
   </style>
 </head>
 <body>
@@ -60,22 +67,18 @@
         <span class="admin-page-title">/ الكوبونات</span>
       </div>
       <div class="admin-topbar-left">
-        <button class="btn btn-primary btn-sm" onclick="openModal()">
-          <i class="fas fa-plus"></i> كوبون جديد
-        </button>
+        <button class="btn btn-primary btn-sm" onclick="openModal()"><i class="fas fa-plus"></i> كوبون جديد</button>
         <button class="navbar-icon-btn" onclick="toggleTheme()" id="theme-toggle"><i class="fas fa-moon"></i></button>
       </div>
     </div>
 
     <div class="admin-content">
-      <!-- Stats -->
       <div class="stat-cards" style="margin-bottom:1.5rem">
         <div class="stat-card"><div class="stat-icon"><i class="fas fa-tag"></i></div><div class="stat-value" id="s-total">—</div><div class="stat-label">إجمالي الكوبونات</div></div>
         <div class="stat-card"><div class="stat-icon" style="background:rgba(22,163,74,0.1)"><i class="fas fa-check-circle" style="color:#16a34a"></i></div><div class="stat-value" id="s-active" style="color:#16a34a">—</div><div class="stat-label">كوبونات نشطة</div></div>
         <div class="stat-card"><div class="stat-icon"><i class="fas fa-fire"></i></div><div class="stat-value" id="s-used">—</div><div class="stat-label">مرات الاستخدام</div></div>
       </div>
 
-      <!-- Filter -->
       <div style="display:flex;gap:.75rem;margin-bottom:1.25rem;flex-wrap:wrap">
         <select class="form-control" id="f-status" onchange="filterCoupons()" style="width:auto;min-width:130px">
           <option value="">الكل</option>
@@ -105,10 +108,11 @@
       <div class="m-body">
         <div class="form-group">
           <label class="form-label">كود الكوبون *</label>
-          <input type="text" class="form-control" id="f-code" dir="ltr" placeholder="SAVE20" style="text-transform:uppercase;font-family:monospace;font-size:1.1rem;letter-spacing:0.1em">
+          <input type="text" class="form-control" id="f-code" dir="ltr" placeholder="SAVE20"
+            style="text-transform:uppercase;font-family:monospace;font-size:1.1rem;letter-spacing:0.1em"
+            maxlength="30">
           <div class="form-hint">حروف وأرقام فقط — هيتحول لكبير تلقائي</div>
         </div>
-
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">
           <div class="form-group">
             <label class="form-label">نوع الخصم *</label>
@@ -119,29 +123,26 @@
           </div>
           <div class="form-group">
             <label class="form-label" id="value-label">قيمة الخصم (%) *</label>
-            <input type="number" class="form-control" id="f-value" dir="ltr" min="1" placeholder="20">
+            <input type="number" class="form-control" id="f-value" dir="ltr" min="1" max="999999" placeholder="20">
           </div>
         </div>
-
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">
           <div class="form-group">
             <label class="form-label">الحد الأدنى للطلب (جنيه)</label>
-            <input type="number" class="form-control" id="f-min" dir="ltr" min="0" placeholder="0">
+            <input type="number" class="form-control" id="f-min" dir="ltr" min="0" max="999999" placeholder="0">
             <div class="form-hint">0 = بدون حد أدنى</div>
           </div>
           <div class="form-group">
             <label class="form-label">أقصى عدد استخدام</label>
-            <input type="number" class="form-control" id="f-max-uses" dir="ltr" min="1" placeholder="∞">
+            <input type="number" class="form-control" id="f-max-uses" dir="ltr" min="1" max="999999" placeholder="∞">
             <div class="form-hint">فاضي = بدون حد</div>
           </div>
         </div>
-
         <div class="form-group">
           <label class="form-label">تاريخ الانتهاء</label>
           <input type="datetime-local" class="form-control" id="f-expires" dir="ltr">
           <div class="form-hint">فاضي = لا ينتهي</div>
         </div>
-
         <div style="display:flex;align-items:center;justify-content:space-between;padding:0.875rem;background:var(--bg-secondary);border-radius:var(--radius-sm)">
           <div>
             <div style="font-weight:600;font-size:0.9rem">الكوبون نشط</div>
@@ -149,13 +150,35 @@
           </div>
           <div class="toggle-switch on" id="f-active" onclick="this.classList.toggle('on')"></div>
         </div>
-
         <div class="form-error" id="modal-error" style="margin-top:1rem;display:none"></div>
       </div>
       <div class="m-foot">
         <button class="btn btn-ghost" onclick="closeModal()">إلغاء</button>
-        <button class="btn btn-primary" onclick="saveCoupon()" id="save-btn">
-          <i class="fas fa-save"></i> حفظ
+        <button class="btn btn-primary" onclick="saveCoupon()" id="save-btn"><i class="fas fa-save"></i> حفظ</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- FIX: Delete Confirm Modal — بدل confirm() البسيط -->
+  <div class="del-overlay" id="del-modal">
+    <div class="del-box">
+      <div class="del-head">
+        <i class="fas fa-exclamation-triangle" style="color:#dc2626"></i>
+        <h3 style="color:#dc2626;font-size:1rem">تأكيد حذف الكوبون</h3>
+      </div>
+      <div class="del-body">
+        <div style="background:rgba(220,38,38,.08);border:1px solid rgba(220,38,38,.2);border-radius:var(--radius-sm);padding:1rem;margin-bottom:1.25rem">
+          <p style="font-weight:700;color:#dc2626;margin-bottom:.4rem">⚠️ الكوبون هيتحذف نهائياً!</p>
+          <p style="font-size:.875rem;color:var(--text-secondary)" id="del-coupon-name"></p>
+        </div>
+        <p style="font-size:.82rem;color:var(--text-muted);margin-bottom:.75rem">اكتب <strong style="color:var(--text)">احذف</strong> للتأكيد:</p>
+        <input type="text" class="form-control" id="del-confirm-input"
+          placeholder="اكتب: احذف" oninput="checkDelInput()" autocomplete="off" maxlength="10">
+      </div>
+      <div class="del-foot">
+        <button class="btn btn-ghost" onclick="closeDelModal()">إلغاء</button>
+        <button class="btn btn-danger" id="del-confirm-btn" onclick="execDelete()" disabled>
+          <i class="fas fa-trash"></i> حذف
         </button>
       </div>
     </div>
@@ -164,7 +187,7 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
   <script src="/js/config.js"></script>
   <script>
-    let allCoupons = [], editId = null;
+    let allCoupons = [], editId = null, deleteId = null;
 
     function openSidebar(){document.getElementById('admin-sidebar').classList.add('open');document.getElementById('sidebar-overlay').classList.add('active');}
     function closeSidebar(){document.getElementById('admin-sidebar').classList.remove('open');document.getElementById('sidebar-overlay').classList.remove('active');}
@@ -191,12 +214,9 @@
     async function loadCoupons(){
       const{data}=await db.from('coupons').select('*').order('created_at',{ascending:false});
       allCoupons=data||[];
-
-      // Stats
       document.getElementById('s-total').textContent=allCoupons.length;
       document.getElementById('s-active').textContent=allCoupons.filter(c=>c.is_active).length;
       document.getElementById('s-used').textContent=allCoupons.reduce((s,c)=>s+(c.used_count||0),0);
-
       filterCoupons();
     }
 
@@ -212,6 +232,11 @@
       render(list);
     }
 
+    function escHtml(s){
+      if(!s)return'';
+      return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    }
+
     function render(list){
       const container=document.getElementById('coupons-container');
       if(!list.length){
@@ -225,23 +250,23 @@
         return `
           <div class="coupon-card ${!c.is_active||isExpired?'inactive':''}">
             <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:0.5rem;margin-bottom:0.75rem">
-              <div class="coupon-code">${c.code}</div>
+              <div class="coupon-code">${escHtml(c.code)}</div>
               ${statusBadge}
             </div>
             <div class="coupon-value" style="color:${c.is_active&&!isExpired?'var(--gold)':'var(--text-muted)'}">
-              ${c.type==='percentage'?c.value+'%':formatPrice(c.value)} ${c.type==='percentage'?'خصم':'خصم'}
+              ${c.type==='percentage'?escHtml(String(c.value))+'%':formatPrice(c.value)} خصم
             </div>
             <div class="coupon-meta">
               ${c.min_order>0?`<div><i class="fas fa-receipt"></i> حد أدنى: ${formatPrice(c.min_order)}</div>`:''}
-              <div><i class="fas fa-fire"></i> استُخدم ${c.used_count||0} ${c.max_uses?'/ '+c.max_uses:''} مرة</div>
+              <div><i class="fas fa-fire"></i> استُخدم ${c.used_count||0}${c.max_uses?' / '+c.max_uses:''} مرة</div>
               ${c.expires_at?`<div><i class="fas fa-clock"></i> ينتهي: ${formatDate(c.expires_at)}</div>`:'<div><i class="fas fa-infinity"></i> لا ينتهي</div>'}
             </div>
             <div style="display:flex;gap:0.5rem;margin-top:1rem">
-              <button class="btn btn-ghost btn-sm" style="flex:1" onclick="openEdit('${c.id}')"><i class="fas fa-edit"></i> تعديل</button>
-              <button class="btn btn-sm" style="background:${c.is_active?'rgba(220,38,38,.1)':'rgba(22,163,74,.1)'};color:${c.is_active?'#dc2626':'#16a34a'};border:none;flex:1" onclick="toggleActive('${c.id}',${c.is_active})">
+              <button class="btn btn-ghost btn-sm" style="flex:1" onclick="openEdit('${escHtml(c.id)}')"><i class="fas fa-edit"></i> تعديل</button>
+              <button class="btn btn-sm" style="background:${c.is_active?'rgba(220,38,38,.1)':'rgba(22,163,74,.1)'};color:${c.is_active?'#dc2626':'#16a34a'};border:none;flex:1" onclick="toggleActive('${escHtml(c.id)}',${c.is_active})">
                 <i class="fas ${c.is_active?'fa-pause':'fa-play'}"></i> ${c.is_active?'إيقاف':'تفعيل'}
               </button>
-              <button class="btn btn-danger btn-sm" onclick="deleteCoupon('${c.id}')"><i class="fas fa-trash"></i></button>
+              <button class="btn btn-danger btn-sm" onclick="openDelModal('${escHtml(c.id)}','${escHtml(c.code)}')"><i class="fas fa-trash"></i></button>
             </div>
           </div>`}).join('')}</div>`;
     }
@@ -254,11 +279,7 @@
     function openModal(){
       editId=null;
       document.getElementById('modal-title').textContent='كوبون جديد';
-      document.getElementById('f-code').value='';
-      document.getElementById('f-value').value='';
-      document.getElementById('f-min').value='';
-      document.getElementById('f-max-uses').value='';
-      document.getElementById('f-expires').value='';
+      ['f-code','f-value','f-min','f-max-uses','f-expires'].forEach(id=>document.getElementById(id).value='');
       document.getElementById('f-type-input').value='percentage';
       document.getElementById('f-active').classList.add('on');
       document.getElementById('modal-error').style.display='none';
@@ -290,7 +311,7 @@
       const type=document.getElementById('f-type-input').value;
       const errEl=document.getElementById('modal-error');
 
-      if(!code){errEl.textContent='اكتب كود الكوبون';errEl.style.display='block';return;}
+      if(!code||code.length<3){errEl.textContent='اكتب كود الكوبون (3 حروف على الأقل)';errEl.style.display='block';return;}
       if(!value||value<=0){errEl.textContent='اكتب قيمة صحيحة';errEl.style.display='block';return;}
       if(type==='percentage'&&value>100){errEl.textContent='النسبة مش ممكن تزيد عن 100%';errEl.style.display='block';return;}
       errEl.style.display='none';
@@ -298,11 +319,15 @@
       const btn=document.getElementById('save-btn');
       btn.disabled=true;btn.innerHTML='<i class="fas fa-spinner fa-spin"></i>';
 
+      const minOrder=parseFloat(document.getElementById('f-min').value)||0;
+      const maxUsesVal=document.getElementById('f-max-uses').value;
+      const expiresVal=document.getElementById('f-expires').value;
+
       const payload={
         code,type,value,
-        min_order:parseFloat(document.getElementById('f-min').value)||0,
-        max_uses:document.getElementById('f-max-uses').value?parseInt(document.getElementById('f-max-uses').value):null,
-        expires_at:document.getElementById('f-expires').value?new Date(document.getElementById('f-expires').value).toISOString():null,
+        min_order:minOrder>=0?minOrder:0,
+        max_uses:maxUsesVal?Math.max(1,parseInt(maxUsesVal)):null,
+        expires_at:expiresVal?new Date(expiresVal).toISOString():null,
         is_active:document.getElementById('f-active').classList.contains('on')
       };
 
@@ -323,10 +348,36 @@
       loadCoupons();
     }
 
-    async function deleteCoupon(id){
-      if(!confirm('هتحذف الكوبون ده؟'))return;
-      await db.from('coupons').delete().eq('id',id);
-      showToast('تم الحذف');loadCoupons();
+    // FIX: Delete مع تأكيد نصي
+    function openDelModal(id, code){
+      deleteId=id;
+      document.getElementById('del-coupon-name').textContent=`ستحذف الكوبون: ${code}`;
+      document.getElementById('del-confirm-input').value='';
+      document.getElementById('del-confirm-btn').disabled=true;
+      document.getElementById('del-modal').classList.add('open');
+    }
+
+    function closeDelModal(){
+      document.getElementById('del-modal').classList.remove('open');
+      deleteId=null;
+    }
+
+    function checkDelInput(){
+      const val=document.getElementById('del-confirm-input').value.trim();
+      document.getElementById('del-confirm-btn').disabled=(val!=='احذف');
+    }
+
+    async function execDelete(){
+      if(!deleteId)return;
+      const btn=document.getElementById('del-confirm-btn');
+      btn.disabled=true;
+      btn.innerHTML='<i class="fas fa-spinner fa-spin"></i>';
+      const{error}=await db.from('coupons').delete().eq('id',deleteId);
+      btn.innerHTML='<i class="fas fa-trash"></i> حذف';
+      if(error){showToast('حصل خطأ','error');btn.disabled=false;return;}
+      showToast('تم الحذف');
+      closeDelModal();
+      loadCoupons();
     }
 
     document.getElementById('f-code').addEventListener('input',e=>{

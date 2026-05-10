@@ -53,6 +53,12 @@
     <div style="display:flex;gap:1rem;flex-wrap:wrap;justify-content:center">
       <a href="/track.html" class="btn btn-primary btn-lg" data-ar="تتبع طلبك" data-en="Track Order">تتبع طلبك</a>
       <a href="/shop.html" class="btn btn-outline btn-lg" data-ar="متابعة التسوق" data-en="Continue Shopping">متابعة التسوق</a>
+      <!-- FIX: واتساب opt-in -->
+      <a id="wa-success-btn" href="#" target="_blank" rel="noopener"
+        class="btn btn-ghost btn-lg" style="display:none;align-items:center;gap:6px">
+        <i class="fab fa-whatsapp" style="color:#25d366"></i>
+        <span>إرسال على واتساب</span>
+      </a>
     </div>
   </div>
 
@@ -382,15 +388,18 @@
         // تحديث بيانات العميل
         await db.from('profiles').update({ phone, address }).eq('id', user.id);
 
-        // إرسال واتساب
+        // FIX: واتساب opt-in — بدل auto-open اللي ممكن يتمنع من المتصفح
         const waNum = await getSetting('whatsapp_number');
+        let waLink = null;
         if (waNum) {
           const couponInfo = appliedCoupon ? `\n🏷️ خصم: ${formatPrice(appliedCoupon.discount)}` : '';
           const msg = encodeURIComponent(
             `🛍️ طلب جديد من أنتيكا!\n\n👤 ${name}\n📱 ${phone}\n📍 ${address}\n💰 ${formatPrice(total)}${couponInfo}\n💳 ${selectedPayment === 'cash' ? 'كاش' : 'محفظة'}\n🔖 رقم الطلب: ${order.id.slice(0, 8)}`
           );
-          window.open(`https://wa.me/2${waNum}?text=${msg}`, '_blank');
+          waLink = `https://wa.me/2${waNum}?text=${msg}`;
         }
+        // حفظ الـ link للـ success overlay
+        window._successWaLink = waLink;
 
         // FIX: بنمسح السلة بعد ما الطلب اتأكد بنجاح 100%
         saveCart([]);
@@ -399,6 +408,12 @@
         // إظهار صفحة النجاح
         document.getElementById('success-order-id').textContent = order.id.slice(0, 8).toUpperCase();
         document.getElementById('success-overlay').style.display = 'flex';
+        // FIX: إظهار زر الواتساب اختياري
+        if (waLink) {
+          const waBtn = document.getElementById('wa-success-btn');
+          waBtn.href = waLink;
+          waBtn.style.display = 'inline-flex';
+        }
         applyLang();
 
       } catch (err) {
@@ -464,6 +479,5 @@
     document.getElementById('theme-toggle').innerHTML = getTheme() === 'dark' ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
     window.addEventListener('scroll', () => document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 20));
   </script>
-  <script src="/js/bot.js"></script>
 </body>
 </html>

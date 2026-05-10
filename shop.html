@@ -239,6 +239,20 @@
       document.getElementById('active-filters').innerHTML = tags.join('');
     }
 
+    // ── FIX: productMap — بدل string interpolation الخطر في onclick ──
+    const productMap = new Map();
+
+    function _addToCartById(id) {
+      const p = productMap.get(id);
+      if (!p) return;
+      const l     = getLang();
+      const name  = l === 'ar' && p.name_ar ? p.name_ar : p.name;
+      const first = p.images?.[0];
+      const isVid = first && isVideoUrl(first);
+      const image = (!isVid && first) ? cardImage(first) : null;
+      addToCart({ id: p.id, name, price: p.price, image });
+    }
+
     // ── FIX: Server-side pagination — مش بنجيب كل المنتجات دفعة واحدة
     async function loadProducts() {
       const l = getLang();
@@ -306,7 +320,10 @@
 
       const placeholder = 'https://res.cloudinary.com/df3ffyrsg/image/upload/v1/antika/placeholder';
 
-      // FIX: HTML مكتوب صح بدون </div> زيادة
+      // FIX: نحفظ المنتجات في Map أولاً
+      products.forEach(p => productMap.set(p.id, p));
+
+      // FIX: HTML مكتوب صح — بنبعت ID بس في onclick بدل string interpolation
       grid.innerHTML = products.map(p => {
         const name = l === 'ar' && p.name_ar ? p.name_ar : p.name;
         const firstMedia = p.images?.[0];
@@ -314,22 +331,21 @@
         const mediaSrc = firstMedia ? (isVid ? firstMedia : cardImage(firstMedia)) : placeholder;
         const isNew = new Date(p.created_at) > new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
         const catName = getCatName(p.categories, l);
-        const safeName = name.replace(/'/g, "\\'").replace(/"/g, '&quot;');
-        const safeMediaSrc = isVid ? '' : mediaSrc; // مش بنحط فيديو في السلة
+        // FIX: بنستخدم data-id attribute بدل string interpolation في onclick
+        const safeId = encodeURIComponent(p.id);
 
         const mediaEl = isVid
           ? `<video src="${mediaSrc}" muted loop playsinline style="width:100%;height:100%;object-fit:cover"></video>
              <span style="position:absolute;top:8px;left:8px;background:rgba(0,0,0,.6);color:#fff;border-radius:4px;padding:2px 8px;font-size:.7rem"><i class="fas fa-play"></i></span>`
-          : `<img src="${mediaSrc}" alt="${name}" loading="lazy">`;
+          : `<img src="${mediaSrc}" alt="" loading="lazy">`;
 
         return `
-          <a href="/product.html?id=${p.id}" class="product-card">
+          <a href="/product.html?id=${safeId}" class="product-card">
             <div class="product-card-image" style="position:relative">
               ${mediaEl}
               ${isNew ? `<span class="product-card-badge">${l === 'ar' ? 'جديد' : 'New'}</span>` : ''}
-              <button onclick="event.preventDefault();event.stopPropagation();openQuickView('${p.id}')"
-                style="position:absolute;bottom:8px;right:8px;background:rgba(255,255,255,0.92);border:none;border-radius:20px;padding:5px 12px;font-size:0.75rem;font-weight:700;cursor:pointer;color:#1a1510;opacity:0;transition:opacity 0.2s;display:flex;align-items:center;gap:4px"
-                class="qv-btn">
+              <button class="qv-btn" data-pid="${safeId}"
+                style="position:absolute;bottom:8px;right:8px;background:rgba(255,255,255,0.92);border:none;border-radius:20px;padding:5px 12px;font-size:0.75rem;font-weight:700;cursor:pointer;color:#1a1510;opacity:0;transition:opacity 0.2s;display:flex;align-items:center;gap:4px">
                 <i class="fas fa-eye"></i> ${l === 'ar' ? 'عرض سريع' : 'Quick View'}
               </button>
             </div>
@@ -338,14 +354,28 @@
               ${catName ? `<div style="font-size:0.8rem;color:var(--text-muted);margin-bottom:0.5rem">${catName}</div>` : ''}
               <div class="product-card-price">${formatPrice(p.price)}</div>
               <div class="product-card-actions">
-                <button class="btn btn-primary btn-sm" style="flex:1"
-                  onclick="event.preventDefault();addToCart({id:'${p.id}',name:'${safeName}',price:${p.price},image:'${safeMediaSrc}'})">
+                <button class="btn btn-primary btn-sm add-cart-btn" data-pid="${safeId}" style="flex:1">
                   <i class="fas fa-shopping-bag"></i> ${l === 'ar' ? 'أضيفي للسلة' : 'Add to Cart'}
                 </button>
               </div>
             </div>
           </a>`;
       }).join('');
+
+      // FIX: event delegation — بدل onclick في كل card
+      grid.addEventListener('click', function handler(e) {
+        const cartBtn = e.target.closest('.add-cart-btn');
+        const qvBtn   = e.target.closest('.qv-btn');
+        if (cartBtn) {
+          e.preventDefault();
+          _addToCartById(decodeURIComponent(cartBtn.dataset.pid));
+        }
+        if (qvBtn) {
+          e.preventDefault();
+          e.stopPropagation();
+          openQuickView(decodeURIComponent(qvBtn.dataset.pid));
+        }
+      }, { once: false });
     }
 
     function renderPagination(totalPages) {
@@ -467,7 +497,21 @@
       initUserArea();
       document.getElementById('theme-toggle').innerHTML = getTheme() === 'dark' ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
 
-      const { data: categories } = await db.from('categories').select('*').order('name');
+      // FIX: categories caching في sessionStorage — بدل DB call في كل visit
+      let categories;
+      try {
+        const cached = sessionStorage.getItem('antika_cats');
+        if (cached) {
+          categories = JSON.parse(cached);
+        } else {
+          const { data } = await db.from('categories').select('*').order('name');
+          categories = data || [];
+          sessionStorage.setItem('antika_cats', JSON.stringify(categories));
+        }
+      } catch {
+        const { data } = await db.from('categories').select('*').order('name');
+        categories = data || [];
+      }
       allCategories = categories || [];
       renderSidebars();
       renderActiveFilters();
@@ -477,6 +521,5 @@
     window.addEventListener('scroll', () => document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 20));
     init();
   </script>
-  <script src="/js/bot.js"></script>
 </body>
 </html>

@@ -360,7 +360,7 @@ async function validateCoupon(code, orderTotal) {
   };
 }
 
-// FIX: useCoupon — بيستخدم RPC function بدل db.raw اللي مش موجودة
+// FIX: useCoupon — بيستخدم RPC function بدل الطريقة القديمة الخاطئة
 async function useCoupon(couponId) {
   await db.rpc('increment_coupon_usage', { coupon_id: couponId });
 }

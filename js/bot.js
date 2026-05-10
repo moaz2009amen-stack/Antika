@@ -590,18 +590,73 @@
     _abAppend('bot', html);
   }
 
+  // ── FIX: sanitize HTML — بيسمح بالـ tags الآمنة بس ──────────
+  const ALLOWED_TAGS = new Set(['b','br','ul','li','div','span','a','svg','path','strong']);
+  const ALLOWED_ATTRS = new Set(['class','href','target','rel','width','height','viewBox','fill','d']);
+
+  function sanitizeHTML(html) {
+    const tpl = document.createElement('template');
+    tpl.innerHTML = html;
+    (function clean(node) {
+      [...node.childNodes].forEach(child => {
+        if (child.nodeType === 1) {
+          const tag = child.tagName.toLowerCase();
+          if (!ALLOWED_TAGS.has(tag)) {
+            child.replaceWith(document.createTextNode(child.textContent));
+            return;
+          }
+          // ازل الـ attributes الخطرة
+          [...child.attributes].forEach(attr => {
+            const name = attr.name.toLowerCase();
+            const val  = attr.value.toLowerCase().trim();
+            if (!ALLOWED_ATTRS.has(name)) { child.removeAttribute(attr.name); return; }
+            // منع javascript: في href
+            if (name === 'href' && (val.startsWith('javascript:') || val.startsWith('data:'))) {
+              child.removeAttribute('href');
+            }
+          });
+          // تأكد إن الروابط الخارجية عندها rel=noopener
+          if (tag === 'a' && child.getAttribute('target') === '_blank') {
+            child.setAttribute('rel', 'noopener noreferrer');
+          }
+          clean(child);
+        }
+      });
+    })(tpl.content);
+    return tpl.innerHTML;
+  }
+
   function _abAppend(role, text) {
     const msgs   = document.getElementById('_ab-msgs');
     const now    = new Date().toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' });
     const isUser = role === 'user';
     const row    = document.createElement('div');
     row.className = `_ab-row${isUser ? ' u' : ''}`;
-    row.innerHTML = `
-      <div class="_ab-mav ${isUser ? 'u' : 'b'}">${isUser ? '👤' : '✦'}</div>
-      <div>
-        <div class="_ab-bbl">${text}</div>
-        <div class="_ab-time">${now}</div>
-      </div>`;
+
+    // الـ avatar
+    const av  = document.createElement('div');
+    av.className = `_ab-mav ${isUser ? 'u' : 'b'}`;
+    av.textContent = isUser ? '👤' : '✦';
+
+    const wrap = document.createElement('div');
+
+    // Bubble — user input بيتعامل كـ plain text، bot replies بتتعقم
+    const bbl = document.createElement('div');
+    bbl.className = '_ab-bbl';
+    if (isUser) {
+      bbl.textContent = text; // plain text — مفيش HTML خالص
+    } else {
+      bbl.innerHTML = sanitizeHTML(text); // bot HTML بعد التعقيم
+    }
+
+    const time = document.createElement('div');
+    time.className = '_ab-time';
+    time.textContent = now;
+
+    wrap.appendChild(bbl);
+    wrap.appendChild(time);
+    row.appendChild(av);
+    row.appendChild(wrap);
     msgs.appendChild(row);
     msgs.scrollTop = msgs.scrollHeight;
   }
@@ -611,12 +666,23 @@
     const msgs = document.getElementById('_ab-msgs');
     const id   = `_abt${++_tid}`;
     const row  = document.createElement('div');
-    row.className = '_ab-row'; row.id = id;
-    row.innerHTML = `
-      <div class="_ab-mav b">✦</div>
-      <div class="_ab-typing">
-        <div class="_ab-tdot"></div><div class="_ab-tdot"></div><div class="_ab-tdot"></div>
-      </div>`;
+    row.className = '_ab-row';
+    row.id = id;
+
+    const av = document.createElement('div');
+    av.className = '_ab-mav b';
+    av.textContent = '✦';
+
+    const typing = document.createElement('div');
+    typing.className = '_ab-typing';
+    for (let i = 0; i < 3; i++) {
+      const dot = document.createElement('div');
+      dot.className = '_ab-tdot';
+      typing.appendChild(dot);
+    }
+
+    row.appendChild(av);
+    row.appendChild(typing);
     msgs.appendChild(row);
     msgs.scrollTop = msgs.scrollHeight;
     return id;

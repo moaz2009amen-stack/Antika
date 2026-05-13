@@ -62,7 +62,6 @@
     </div>
 
     <div class="admin-content">
-      <!-- Stats -->
       <div class="stat-strip">
         <div class="strip-card"><div class="strip-val" id="s-total">—</div><div class="strip-lbl">إجمالي المستخدمين</div></div>
         <div class="strip-card"><div class="strip-val" id="s-active" style="color:#16a34a">—</div><div class="strip-lbl">نشطين (لهم طلبات)</div></div>
@@ -70,7 +69,6 @@
         <div class="strip-card"><div class="strip-val" id="s-new">—</div><div class="strip-lbl">جدد (آخر 7 أيام)</div></div>
       </div>
 
-      <!-- Search & Filter -->
       <div style="display:flex;gap:.75rem;flex-wrap:wrap;margin-bottom:1.25rem;align-items:center">
         <div style="position:relative;flex:1;min-width:180px">
           <input type="text" class="form-control" id="q" placeholder="ابحث بالاسم أو الإيميل..." oninput="filterUsers()" style="padding-right:2.5rem">
@@ -98,129 +96,127 @@
   <script>
     let allUsers = [];
 
-    function openSidebar(){document.getElementById('admin-sidebar').classList.add('open');document.getElementById('sidebar-overlay').classList.add('active');}
-    function closeSidebar(){document.getElementById('admin-sidebar').classList.remove('open');document.getElementById('sidebar-overlay').classList.remove('active');}
-    function toggleTheme(){const t=getTheme()==='light'?'dark':'light';setTheme(t);document.getElementById('theme-toggle').innerHTML=t==='dark'?'<i class="fas fa-sun"></i>':'<i class="fas fa-moon"></i>';}
-    async function logout(){await db.auth.signOut();window.location.href='/admin-antika-ctrl/login.html';}
+    function openSidebar()  { document.getElementById('admin-sidebar').classList.add('open'); document.getElementById('sidebar-overlay').classList.add('active'); }
+    function closeSidebar() { document.getElementById('admin-sidebar').classList.remove('open'); document.getElementById('sidebar-overlay').classList.remove('active'); }
+    function toggleTheme()  { const t = getTheme() === 'light' ? 'dark' : 'light'; setTheme(t); document.getElementById('theme-toggle').innerHTML = t === 'dark' ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>'; }
+    async function logout() { await db.auth.signOut(); window.location.href = '/admin-antika-ctrl/login.html'; }
 
-    async function adminAuth(){
-      document.body.style.opacity='0';document.body.style.transition='opacity .25s';
-      let{data:{session}}=await db.auth.getSession();
-      if(!session){await new Promise(r=>setTimeout(r,900));const r=await db.auth.getSession();session=r.data.session;}
-      if(!session){window.location.href='/admin-antika-ctrl/login.html';return false;}
-      const role=session.user.user_metadata?.role;
-      if(role!=='admin'&&role!=='moderator'){window.location.href='/admin-antika-ctrl/login.html';return false;}
-      document.body.style.opacity='1';initTheme();
-      document.getElementById('theme-toggle').innerHTML=getTheme()==='dark'?'<i class="fas fa-sun"></i>':'<i class="fas fa-moon"></i>';
+    // FIX: app_metadata بدل user_metadata
+    async function adminAuth() {
+      document.body.style.opacity = '0'; document.body.style.transition = 'opacity .25s';
+      let { data: { session } } = await db.auth.getSession();
+      if (!session) { await new Promise(r => setTimeout(r, 900)); const r = await db.auth.getSession(); session = r.data.session; }
+      if (!session) { window.location.href = '/admin-antika-ctrl/login.html'; return false; }
+      // FIX: app_metadata
+      const role = session.user.app_metadata?.role;
+      if (role !== 'admin' && role !== 'moderator') { window.location.href = '/admin-antika-ctrl/login.html'; return false; }
+      document.body.style.opacity = '1'; initTheme();
+      document.getElementById('theme-toggle').innerHTML = getTheme() === 'dark' ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
       return true;
     }
 
-    async function loadBadge(){
-      const{count}=await db.from('orders').select('*',{count:'exact',head:true}).eq('status','pending');
-      const b=document.getElementById('pending-badge');if(b&&count>0){b.textContent=count;b.style.display='inline';}
+    async function loadBadge() {
+      const { count } = await db.from('orders').select('*', { count: 'exact', head: true }).eq('status', 'pending');
+      const b = document.getElementById('pending-badge'); if (b && count > 0) { b.textContent = count; b.style.display = 'inline'; }
     }
 
-    async function loadUsers(){
-      // نستخدم RPC function عشان نتجاوز RLS ونشوف كل اليوزرز
-      const{data,error}=await db.rpc('get_all_users');
-
-      if(error||!data){
-        // fallback: نحاول نجيبهم من profiles مباشرة
-        const{data:profiles}=await db.from('profiles').select('*').order('created_at',{ascending:false});
-        allUsers=profiles||[];
-      }else{
-        allUsers=data;
+    async function loadUsers() {
+      const { data, error } = await db.rpc('get_all_users');
+      if (error || !data) {
+        const { data: profiles } = await db.from('profiles').select('*').order('created_at', { ascending: false });
+        allUsers = profiles || [];
+      } else {
+        allUsers = data;
       }
 
-      // إحصائيات
-      const total=allUsers.length;
-      const banned=allUsers.filter(u=>u.is_banned).length;
-      const week=new Date(Date.now()-7*24*60*60*1000).toISOString();
-      const newUsers=allUsers.filter(u=>u.created_at>week).length;
+      const total   = allUsers.length;
+      const banned  = allUsers.filter(u => u.is_banned).length;
+      const week    = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
+      const newUsers = allUsers.filter(u => u.created_at > week).length;
 
-      // عدد الطلبات لكل يوزر
-      const{data:orders}=await db.from('orders').select('user_id');
-      const orderMap={};
-      orders?.forEach(o=>{orderMap[o.user_id]=(orderMap[o.user_id]||0)+1;});
-      allUsers=allUsers.map(u=>({...u,order_count:orderMap[u.id]||0}));
+      const { data: orders } = await db.from('orders').select('user_id');
+      const orderMap = {};
+      orders?.forEach(o => { orderMap[o.user_id] = (orderMap[o.user_id] || 0) + 1; });
+      allUsers = allUsers.map(u => ({ ...u, order_count: orderMap[u.id] || 0 }));
 
-      const active=allUsers.filter(u=>u.order_count>0).length;
-
-      document.getElementById('s-total').textContent=total;
-      document.getElementById('s-active').textContent=active;
-      document.getElementById('s-banned').textContent=banned;
-      document.getElementById('s-new').textContent=newUsers;
-
+      const active = allUsers.filter(u => u.order_count > 0).length;
+      document.getElementById('s-total').textContent  = total;
+      document.getElementById('s-active').textContent = active;
+      document.getElementById('s-banned').textContent = banned;
+      document.getElementById('s-new').textContent    = newUsers;
       filterUsers();
     }
 
-    function filterUsers(){
-      const q=document.getElementById('q').value.toLowerCase();
-      const st=document.getElementById('f-status').value;
-      const sort=document.getElementById('f-sort').value;
+    function filterUsers() {
+      const q    = document.getElementById('q').value.toLowerCase();
+      const st   = document.getElementById('f-status').value;
+      const sort = document.getElementById('f-sort').value;
 
-      let list=[...allUsers].filter(u=>{
-        const n=((u.full_name||'')+' '+(u.email||'')).toLowerCase();
-        if(q&&!n.includes(q))return false;
-        if(st==='banned'&&!u.is_banned)return false;
-        if(st==='active'&&u.is_banned)return false;
+      let list = [...allUsers].filter(u => {
+        const n = ((u.full_name || '') + ' ' + (u.email || '')).toLowerCase();
+        if (q && !n.includes(q)) return false;
+        if (st === 'banned' && !u.is_banned)  return false;
+        if (st === 'active' &&  u.is_banned)  return false;
         return true;
       });
 
-      list.sort((a,b)=>{
-        if(sort==='orders')return(b.order_count||0)-(a.order_count||0);
-        if(sort==='name')return(a.full_name||'').localeCompare(b.full_name||'');
-        return new Date(b.created_at)-new Date(a.created_at);
+      list.sort((a, b) => {
+        if (sort === 'orders') return (b.order_count || 0) - (a.order_count || 0);
+        if (sort === 'name')   return (a.full_name || '').localeCompare(b.full_name || '');
+        return new Date(b.created_at) - new Date(a.created_at);
       });
 
-      document.getElementById('ucount').textContent=`${list.length} مستخدم`;
+      document.getElementById('ucount').textContent = `${list.length} مستخدم`;
       render(list);
     }
 
-    function render(list){
-      const c=document.getElementById('users-container');
-      if(!list.length){
-        c.innerHTML=`<div style="text-align:center;padding:4rem;color:var(--text-muted)"><i class="fas fa-users" style="font-size:3rem;margin-bottom:1rem;display:block;opacity:.4"></i><p style="font-size:1rem;font-weight:600">مفيش مستخدمين</p></div>`;
+    function render(list) {
+      const c = document.getElementById('users-container');
+      if (!list.length) {
+        c.innerHTML = `<div style="text-align:center;padding:4rem;color:var(--text-muted)"><i class="fas fa-users" style="font-size:3rem;margin-bottom:1rem;display:block;opacity:.4"></i><p style="font-size:1rem;font-weight:600">مفيش مستخدمين</p></div>`;
         return;
       }
-      c.innerHTML=`<div class="users-grid">${list.map(u=>`
-        <div class="user-card" style="${u.is_banned?'opacity:.7;border-color:#dc262630':''}">
+      c.innerHTML = `<div class="users-grid">${list.map(u => `
+        <div class="user-card" style="${u.is_banned ? 'opacity:.7;border-color:#dc262630' : ''}">
           ${u.avatar_url
-            ?`<img src="${u.avatar_url}" class="user-avatar" onerror="this.style.display='none'">`
-            :`<div class="user-avatar-placeholder">${(u.full_name||u.email||'?')[0].toUpperCase()}</div>`}
+            ? `<img src="${escapeHtml(u.avatar_url)}" class="user-avatar" onerror="this.style.display='none'">`
+            : `<div class="user-avatar-placeholder">${escapeHtml((u.full_name || u.email || '?')[0].toUpperCase())}</div>`}
           <div class="user-info">
-            <div class="user-name">${u.full_name||'بدون اسم'} ${u.is_banned?'<span class="badge badge-danger" style="font-size:.65rem">محظور</span>':''}</div>
-            <div class="user-email">${u.email||'—'}</div>
+            <div class="user-name">${escapeHtml(u.full_name || 'بدون اسم')} ${u.is_banned ? '<span class="badge badge-danger" style="font-size:.65rem">محظور</span>' : ''}</div>
+            <div class="user-email">${escapeHtml(u.email || '—')}</div>
             <div class="user-meta">
-              ${u.phone?`<span><i class="fas fa-phone" style="font-size:.65rem"></i> ${u.phone}</span> · `:''}
+              ${u.phone ? `<span><i class="fas fa-phone" style="font-size:.65rem"></i> ${escapeHtml(u.phone)}</span> · ` : ''}
               <span>${u.order_count} طلب</span> ·
               <span>${formatDate(u.created_at)}</span>
             </div>
           </div>
           <div style="display:flex;flex-direction:column;gap:.375rem;flex-shrink:0">
             ${!u.is_banned
-              ?`<button class="btn btn-danger btn-sm" onclick="banUser('${u.id}',true)" title="حظر"><i class="fas fa-ban"></i></button>`
-              :`<button class="btn btn-sm" style="background:rgba(22,163,74,.1);color:#16a34a;border:none" onclick="banUser('${u.id}',false)" title="رفع الحظر"><i class="fas fa-check"></i></button>`}
-            <button class="btn btn-ghost btn-sm" onclick="viewOrders('${u.id}')" title="الطلبات"><i class="fas fa-shopping-cart"></i></button>
+              ? `<button class="btn btn-danger btn-sm" onclick="banUser('${encodeURIComponent(u.id)}',true)" title="حظر"><i class="fas fa-ban"></i></button>`
+              : `<button class="btn btn-sm" style="background:rgba(22,163,74,.1);color:#16a34a;border:none" onclick="banUser('${encodeURIComponent(u.id)}',false)" title="رفع الحظر"><i class="fas fa-check"></i></button>`}
+            <button class="btn btn-ghost btn-sm" onclick="viewOrders('${encodeURIComponent(u.id)}')" title="الطلبات"><i class="fas fa-shopping-cart"></i></button>
           </div>
         </div>`).join('')}</div>`;
     }
 
-    async function banUser(id,ban){
-      const msg=ban?'هتحظر المستخدم ده؟':'هترفع الحظر عن المستخدم ده؟';
-      if(!confirm(msg))return;
-      await db.from('profiles').update({is_banned:ban}).eq('id',id);
-      showToast(ban?'تم الحظر':'تم رفع الحظر');
+    async function banUser(encodedId, ban) {
+      const id  = decodeURIComponent(encodedId);
+      const msg = ban ? 'هتحظر المستخدم ده؟' : 'هترفع الحظر عن المستخدم ده؟';
+      if (!confirm(msg)) return;
+      await db.from('profiles').update({ is_banned: ban }).eq('id', id);
+      showToast(ban ? 'تم الحظر' : 'تم رفع الحظر');
       await loadUsers();
     }
 
-    function viewOrders(userId){
-      window.location.href=`/admin-antika-ctrl/orders.html?user=${userId}`;
+    // FIX: viewOrders بيروح لـ orders.html مع user param اللي بيتعمل handle دلوقتي
+    function viewOrders(encodedId) {
+      const id = decodeURIComponent(encodedId);
+      window.location.href = `/admin-antika-ctrl/orders.html?user=${encodeURIComponent(id)}`;
     }
 
-    async function init(){
-      const ok=await adminAuth();if(!ok)return;
-      await loadUsers();loadBadge();
+    async function init() {
+      const ok = await adminAuth(); if (!ok) return;
+      await loadUsers(); loadBadge();
     }
     init();
   </script>

@@ -17,7 +17,6 @@
     .prod-name{font-weight:700;font-size:.875rem;margin-bottom:.25rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
     .prod-price{color:var(--gold);font-weight:700;font-size:.95rem;margin-bottom:.75rem}
     .prod-actions{display:flex;gap:.375rem}
-    /* Modal */
     .m-overlay{position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:2000;display:flex;align-items:center;justify-content:center;padding:1rem;opacity:0;visibility:hidden;transition:all .25s;backdrop-filter:blur(4px)}
     .m-overlay.open{opacity:1;visibility:visible}
     .m-box{background:var(--bg-card);border-radius:var(--radius-lg);width:100%;max-width:640px;max-height:92vh;overflow-y:auto;border:1px solid var(--border);transform:translateY(24px);transition:transform .25s}
@@ -27,7 +26,6 @@
     .m-body{padding:1.5rem}
     .m-footer{padding:1rem 1.5rem;border-top:1px solid var(--border);display:flex;gap:.75rem;justify-content:flex-end;position:sticky;bottom:0;background:var(--bg-card)}
     .form-row{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
-    /* Media upload */
     .media-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:.5rem;margin-bottom:.75rem}
     .media-thumb{aspect-ratio:1;border-radius:var(--radius-sm);overflow:hidden;position:relative;background:var(--bg-secondary);border:1px solid var(--border)}
     .media-thumb img,.media-thumb video{width:100%;height:100%;object-fit:cover}
@@ -37,10 +35,16 @@
     .drop-zone:hover,.drop-zone.drag{border-color:var(--gold);color:var(--gold);background:rgba(201,168,76,.05)}
     .prog-bar{height:4px;background:var(--border);border-radius:2px;margin-top:.75rem;overflow:hidden;display:none}
     .prog-fill{height:100%;background:var(--gold);border-radius:2px;transition:width .3s}
-    /* Table view */
     .view-toggle{display:flex;border:1.5px solid var(--border);border-radius:var(--radius-sm);overflow:hidden}
     .view-btn{padding:.45rem .75rem;background:none;border:none;cursor:pointer;color:var(--text-muted);transition:all .2s;font-size:.875rem}
     .view-btn.active{background:var(--gold);color:#fff}
+    /* FIX: Delete confirm modal */
+    .del-overlay{position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:3000;display:none;align-items:center;justify-content:center;padding:1rem;backdrop-filter:blur(4px)}
+    .del-overlay.open{display:flex}
+    .del-box{background:var(--bg-card);border-radius:var(--radius-lg);width:100%;max-width:400px;border:1px solid #dc2626;overflow:hidden}
+    .del-head{padding:1.25rem 1.5rem;border-bottom:1px solid var(--border);background:rgba(220,38,38,.05);display:flex;align-items:center;gap:.5rem}
+    .del-body{padding:1.5rem}
+    .del-foot{padding:1rem 1.5rem;border-top:1px solid var(--border);display:flex;gap:.75rem;justify-content:flex-end}
   </style>
 </head>
 <body>
@@ -85,7 +89,6 @@
     </div>
 
     <div class="admin-content">
-      <!-- Toolbar -->
       <div style="display:flex;gap:.75rem;flex-wrap:wrap;margin-bottom:1.25rem;align-items:center">
         <div style="position:relative;flex:1;min-width:180px">
           <input type="text" class="form-control" id="q" placeholder="ابحث عن منتج..." oninput="filter()" style="padding-right:2.5rem">
@@ -109,7 +112,7 @@
     </div>
   </main>
 
-  <!-- Modal -->
+  <!-- Product Modal -->
   <div class="m-overlay" id="modal">
     <div class="m-box">
       <div class="m-head">
@@ -117,7 +120,6 @@
         <button onclick="closeModal()" style="width:32px;height:32px;border-radius:50%;border:1.5px solid var(--border);background:none;cursor:pointer;color:var(--text-muted);font-size:.85rem;display:flex;align-items:center;justify-content:center"><i class="fas fa-times"></i></button>
       </div>
       <div class="m-body">
-        <!-- Media -->
         <div class="form-group">
           <label class="form-label">الصور والفيديوهات <span style="color:var(--text-muted);font-weight:400">(يمكن رفع أكثر من ملف)</span></label>
           <div class="media-grid" id="media-grid"></div>
@@ -130,8 +132,6 @@
           <div class="prog-bar" id="prog-bar"><div class="prog-fill" id="prog-fill"></div></div>
           <div style="font-size:.78rem;color:var(--text-muted);margin-top:.35rem" id="prog-text"></div>
         </div>
-
-        <!-- Names -->
         <div class="form-row">
           <div class="form-group">
             <label class="form-label">الاسم (عربي) *</label>
@@ -142,8 +142,6 @@
             <input type="text" class="form-control" id="p-en" dir="ltr">
           </div>
         </div>
-
-        <!-- Price, Stock, Category -->
         <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:1rem">
           <div class="form-group">
             <label class="form-label">السعر (جنيه) *</label>
@@ -160,8 +158,6 @@
             </select>
           </div>
         </div>
-
-        <!-- Description -->
         <div class="form-group">
           <label class="form-label">الوصف (عربي)</label>
           <textarea class="form-control" id="p-desc-ar" rows="3"></textarea>
@@ -170,8 +166,6 @@
           <label class="form-label">الوصف (إنجليزي)</label>
           <textarea class="form-control" id="p-desc-en" rows="2" dir="ltr"></textarea>
         </div>
-
-        <!-- Publish toggle -->
         <div style="display:flex;align-items:center;justify-content:space-between;padding:1rem;background:var(--bg-secondary);border-radius:var(--radius-sm)">
           <div>
             <div style="font-weight:600;font-size:.9rem">نشر المنتج</div>
@@ -179,7 +173,6 @@
           </div>
           <div class="toggle-switch on" id="p-pub" onclick="this.classList.toggle('on')"></div>
         </div>
-
         <div class="form-error" id="m-err" style="margin-top:1rem;display:none"></div>
       </div>
       <div class="m-footer">
@@ -191,36 +184,61 @@
     </div>
   </div>
 
+  <!-- FIX: Delete Confirm Modal — بدل confirm() البسيط -->
+  <div class="del-overlay" id="del-modal">
+    <div class="del-box">
+      <div class="del-head">
+        <i class="fas fa-exclamation-triangle" style="color:#dc2626"></i>
+        <h3 style="color:#dc2626;font-size:1rem">تأكيد حذف المنتج</h3>
+      </div>
+      <div class="del-body">
+        <div style="background:rgba(220,38,38,.08);border:1px solid rgba(220,38,38,.2);border-radius:var(--radius-sm);padding:1rem;margin-bottom:1.25rem">
+          <p style="font-weight:700;color:#dc2626;margin-bottom:.4rem">⚠️ المنتج هيتحذف نهائياً ومش هيرجع!</p>
+          <p style="font-size:.875rem;color:var(--text-secondary)" id="del-prod-name"></p>
+        </div>
+        <p style="font-size:.82rem;color:var(--text-muted);margin-bottom:.75rem">اكتب <strong style="color:var(--text)">احذف</strong> للتأكيد:</p>
+        <input type="text" class="form-control" id="del-prod-input"
+          placeholder="اكتب: احذف" oninput="checkDelProdInput()" autocomplete="off" maxlength="10">
+      </div>
+      <div class="del-foot">
+        <button class="btn btn-ghost" onclick="closeDelProdModal()">إلغاء</button>
+        <button class="btn btn-danger" id="del-prod-btn" onclick="execDelProd()" disabled>
+          <i class="fas fa-trash"></i> حذف
+        </button>
+      </div>
+    </div>
+  </div>
+
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
   <script src="/js/config.js"></script>
   <script>
-    let allProds = [], cats = [], editId = null, mediaUrls = [], curView = 'grid';
+    let allProds=[], cats=[], editId=null, mediaUrls=[], curView='grid';
+    let deleteProdId=null;
 
-    function openSidebar(){document.getElementById('admin-sidebar').classList.add('open');document.getElementById('sidebar-overlay').classList.add('active');}
-    function closeSidebar(){document.getElementById('admin-sidebar').classList.remove('open');document.getElementById('sidebar-overlay').classList.remove('active');}
-    function toggleTheme(){const t=getTheme()==='light'?'dark':'light';setTheme(t);document.getElementById('theme-toggle').innerHTML=t==='dark'?'<i class="fas fa-sun"></i>':'<i class="fas fa-moon"></i>';}
-    async function logout(){await db.auth.signOut();window.location.href='/admin-antika-ctrl/login.html';}
+    function openSidebar()  { document.getElementById('admin-sidebar').classList.add('open');    document.getElementById('sidebar-overlay').classList.add('active'); }
+    function closeSidebar() { document.getElementById('admin-sidebar').classList.remove('open'); document.getElementById('sidebar-overlay').classList.remove('active'); }
+    function toggleTheme()  { const t=getTheme()==='light'?'dark':'light'; setTheme(t); document.getElementById('theme-toggle').innerHTML=t==='dark'?'<i class="fas fa-sun"></i>':'<i class="fas fa-moon"></i>'; }
+    async function logout() { await db.auth.signOut(); window.location.href='/admin-antika-ctrl/login.html'; }
 
-    // ── Auth ──────────────────────────────────────────────────────
+    // FIX: app_metadata بدل user_metadata
     async function adminAuth(){
-      document.body.style.opacity='0';document.body.style.transition='opacity .25s';
+      document.body.style.opacity='0'; document.body.style.transition='opacity .25s';
       let{data:{session}}=await db.auth.getSession();
       if(!session){await new Promise(r=>setTimeout(r,900));const r=await db.auth.getSession();session=r.data.session;}
       if(!session){window.location.href='/admin-antika-ctrl/login.html';return false;}
-      const role=session.user.user_metadata?.role;
+      // FIX: app_metadata
+      const role=session.user.app_metadata?.role;
       if(role!=='admin'&&role!=='moderator'){window.location.href='/admin-antika-ctrl/login.html';return false;}
-      document.body.style.opacity='1';initTheme();
+      document.body.style.opacity='1'; initTheme();
       document.getElementById('theme-toggle').innerHTML=getTheme()==='dark'?'<i class="fas fa-sun"></i>':'<i class="fas fa-moon"></i>';
       return true;
     }
 
-    // ── Pending badge ────────────────────────────────────────────
     async function loadBadge(){
       const{count}=await db.from('orders').select('*',{count:'exact',head:true}).eq('status','pending');
       const b=document.getElementById('pending-badge');if(b&&count>0){b.textContent=count;b.style.display='inline';}
     }
 
-    // ── View ─────────────────────────────────────────────────────
     function setView(v){
       curView=v;
       document.getElementById('vg').classList.toggle('active',v==='grid');
@@ -228,24 +246,22 @@
       filter();
     }
 
-    // ── Load ─────────────────────────────────────────────────────
     async function loadCats(){
       const{data}=await db.from('categories').select('*').order('name');
       cats=data||[];
       const sel=document.getElementById('f-cat');
       const pcat=document.getElementById('p-cat');
       cats.forEach(c=>{
-        sel.insertAdjacentHTML('beforeend',`<option value="${c.id}">${c.name_ar||c.name}</option>`);
-        pcat.insertAdjacentHTML('beforeend',`<option value="${c.id}">${c.name_ar||c.name}</option>`);
+        sel.insertAdjacentHTML('beforeend',`<option value="${encodeURIComponent(c.id)}">${escapeHtml(c.name_ar||c.name)}</option>`);
+        pcat.insertAdjacentHTML('beforeend',`<option value="${encodeURIComponent(c.id)}">${escapeHtml(c.name_ar||c.name)}</option>`);
       });
     }
 
     async function loadProds(){
       const{data}=await db.from('products').select('*,categories(name,name_ar)').order('created_at',{ascending:false});
-      allProds=data||[];filter();
+      allProds=data||[]; filter();
     }
 
-    // ── Filter ───────────────────────────────────────────────────
     function filter(){
       const q=document.getElementById('q').value.toLowerCase();
       const cat=document.getElementById('f-cat').value;
@@ -253,7 +269,7 @@
       const list=allProds.filter(p=>{
         const n=((p.name_ar||'')+' '+(p.name||'')).toLowerCase();
         if(q&&!n.includes(q))return false;
-        if(cat&&p.category_id!==cat)return false;
+        if(cat&&p.category_id!==decodeURIComponent(cat))return false;
         if(pub==='1'&&!p.is_published)return false;
         if(pub==='0'&&p.is_published)return false;
         return true;
@@ -262,12 +278,13 @@
       render(list);
     }
 
-    // ── Render ───────────────────────────────────────────────────
     function isVideo(url){return url&&(url.includes('/video/')||url.endsWith('.mp4')||url.endsWith('.mov')||url.endsWith('.webm'));}
 
-    function mediaEl(url,cls=''){
-      if(!url)return `<div style="display:flex;align-items:center;justify-content:center;height:100%;color:var(--text-muted)"><i class="fas fa-image" style="font-size:2rem"></i></div>`;
-      return isVideo(url)?`<video src="${url}" muted loop playsinline class="${cls}" style="width:100%;height:100%;object-fit:cover"></video>`:`<img src="${url}" alt="" loading="lazy" class="${cls}" style="width:100%;height:100%;object-fit:cover">`;
+    function mediaEl(url){
+      if(!url)return`<div style="display:flex;align-items:center;justify-content:center;height:100%;color:var(--text-muted)"><i class="fas fa-image" style="font-size:2rem"></i></div>`;
+      return isVideo(url)
+        ?`<video src="${escapeHtml(url)}" muted loop playsinline style="width:100%;height:100%;object-fit:cover"></video>`
+        :`<img src="${escapeHtml(url)}" alt="" loading="lazy" style="width:100%;height:100%;object-fit:cover">`;
     }
 
     function render(list){
@@ -286,31 +303,33 @@
               ${p.images?.some(u=>isVideo(u))?`<span style="position:absolute;top:6px;left:6px;background:rgba(201,168,76,.9);color:#fff;border-radius:4px;padding:2px 7px;font-size:.68rem"><i class="fas fa-video"></i></span>`:''}
             </div>
             <div class="prod-body">
-              <div class="prod-name">${p.name_ar||p.name}</div>
+              <div class="prod-name">${escapeHtml(p.name_ar||p.name)}</div>
               <div class="prod-price">${formatPrice(p.price)}</div>
               <div style="font-size:.75rem;color:var(--text-muted);margin-bottom:.75rem">مخزون: ${p.stock}</div>
               <div class="prod-actions">
-                <button class="btn btn-ghost btn-sm" style="flex:1" onclick="openEdit('${p.id}')" title="تعديل"><i class="fas fa-edit"></i></button>
-                <button class="btn btn-sm" style="flex:1;background:${p.is_published?'rgba(220,38,38,.1)':'rgba(22,163,74,.1)'};color:${p.is_published?'#dc2626':'#16a34a'};border:none" onclick="togglePub('${p.id}',${p.is_published})" title="${p.is_published?'إخفاء':'نشر'}"><i class="fas ${p.is_published?'fa-eye-slash':'fa-eye'}"></i></button>
-                <button class="btn btn-danger btn-sm" onclick="delProd('${p.id}')" title="حذف"><i class="fas fa-trash"></i></button>
+                <button class="btn btn-ghost btn-sm" style="flex:1" onclick="openEdit('${encodeURIComponent(p.id)}')"><i class="fas fa-edit"></i></button>
+                <button class="btn btn-sm" style="flex:1;background:${p.is_published?'rgba(220,38,38,.1)':'rgba(22,163,74,.1)'};color:${p.is_published?'#dc2626':'#16a34a'};border:none" onclick="togglePub('${encodeURIComponent(p.id)}',${p.is_published})"><i class="fas ${p.is_published?'fa-eye-slash':'fa-eye'}"></i></button>
+                <button class="btn btn-danger btn-sm" onclick="openDelProdModal('${encodeURIComponent(p.id)}','${escapeHtml(p.name_ar||p.name)}')"><i class="fas fa-trash"></i></button>
               </div>
             </div>
           </div>`).join('')}</div>`;
-      }else{
+      } else {
         c.innerHTML=`<div class="admin-card"><div style="overflow-x:auto"><table class="admin-table"><thead><tr><th>المنتج</th><th>السعر</th><th>المخزون</th><th>التصنيف</th><th>الميديا</th><th>الحالة</th><th>إجراءات</th></tr></thead><tbody>${list.map(p=>`
           <tr>
-            <td><div style="display:flex;align-items:center;gap:.75rem"><div style="width:44px;height:44px;border-radius:6px;overflow:hidden;background:var(--bg-secondary);flex-shrink:0">${mediaEl(p.images?.[0])}</div><div><div style="font-weight:600;font-size:.875rem">${p.name_ar||p.name}</div>${p.name_ar&&p.name?`<div style="font-size:.75rem;color:var(--text-muted)">${p.name}</div>`:''}</div></div></td>
+            <td><div style="display:flex;align-items:center;gap:.75rem"><div style="width:44px;height:44px;border-radius:6px;overflow:hidden;background:var(--bg-secondary);flex-shrink:0">${mediaEl(p.images?.[0])}</div><div><div style="font-weight:600;font-size:.875rem">${escapeHtml(p.name_ar||p.name)}</div></div></div></td>
             <td style="font-weight:700;color:var(--gold)">${formatPrice(p.price)}</td>
             <td>${p.stock}</td>
-            <td><span class="badge badge-gray">${p.categories?.name_ar||p.categories?.name||'—'}</span></td>
+            <td><span class="badge badge-gray">${escapeHtml(p.categories?.name_ar||p.categories?.name||'—')}</span></td>
             <td style="font-size:.78rem;color:var(--text-muted)">${p.images?.length||0} صورة${p.images?.some(u=>isVideo(u))?' + فيديو':''}</td>
             <td>${p.is_published?'<span class="badge badge-success">منشور</span>':'<span class="badge badge-danger">مخفي</span>'}</td>
-            <td><div style="display:flex;gap:.375rem"><button class="btn btn-ghost btn-sm" onclick="openEdit('${p.id}')"><i class="fas fa-edit"></i></button><button class="btn btn-danger btn-sm" onclick="delProd('${p.id}')"><i class="fas fa-trash"></i></button></div></td>
+            <td><div style="display:flex;gap:.375rem">
+              <button class="btn btn-ghost btn-sm" onclick="openEdit('${encodeURIComponent(p.id)}')"><i class="fas fa-edit"></i></button>
+              <button class="btn btn-danger btn-sm" onclick="openDelProdModal('${encodeURIComponent(p.id)}','${escapeHtml(p.name_ar||p.name)}')"><i class="fas fa-trash"></i></button>
+            </div></td>
           </tr>`).join('')}</tbody></table></div></div>`;
       }
     }
 
-    // ── Modal ────────────────────────────────────────────────────
     function openModal(id=null){
       editId=id; mediaUrls=[];
       document.getElementById('m-title').textContent=id?'تعديل المنتج':'منتج جديد';
@@ -324,14 +343,14 @@
       document.getElementById('modal').classList.add('open');
     }
 
-    function openEdit(id){openModal(id);}
+    function openEdit(encodedId){ openModal(decodeURIComponent(encodedId)); }
 
     function fillModal(p){
       document.getElementById('p-ar').value=p.name_ar||'';
       document.getElementById('p-en').value=p.name||'';
       document.getElementById('p-price').value=p.price||'';
       document.getElementById('p-stock').value=p.stock||0;
-      document.getElementById('p-cat').value=p.category_id||'';
+      document.getElementById('p-cat').value=p.category_id?encodeURIComponent(p.category_id):'';
       document.getElementById('p-desc-ar').value=p.description_ar||'';
       document.getElementById('p-desc-en').value=p.description||'';
       document.getElementById('p-pub').classList.toggle('on',p.is_published);
@@ -339,17 +358,17 @@
       renderMedia();
     }
 
-    function closeModal(){document.getElementById('modal').classList.remove('open');}
+    function closeModal(){ document.getElementById('modal').classList.remove('open'); }
 
     function renderMedia(){
       document.getElementById('media-grid').innerHTML=mediaUrls.map((url,i)=>`
         <div class="media-thumb">
-          ${isVideo(url)?`<video src="${url}" muted></video><span class="vid-badge">VID</span>`:`<img src="${url}">`}
+          ${isVideo(url)?`<video src="${escapeHtml(url)}" muted></video><span class="vid-badge">VID</span>`:`<img src="${escapeHtml(url)}">`}
           <button class="del-btn" onclick="rmMedia(${i})"><i class="fas fa-times"></i></button>
         </div>`).join('');
     }
 
-    function rmMedia(i){mediaUrls.splice(i,1);renderMedia();}
+    function rmMedia(i){ mediaUrls.splice(i,1); renderMedia(); }
 
     function handleDrop(e){
       e.preventDefault();
@@ -388,25 +407,28 @@
       if(!price||price<=0){err.textContent='اكتب سعر صحيح';err.style.display='block';return;}
       err.style.display='none';
       const btn=document.getElementById('save-btn');
-      btn.disabled=true;btn.innerHTML='<i class="fas fa-spinner fa-spin"></i> جاري الحفظ...';
+      btn.disabled=true; btn.innerHTML='<i class="fas fa-spinner fa-spin"></i> جاري الحفظ...';
+
+      const catVal=document.getElementById('p-cat').value;
       const payload={
         name:en||ar, name_ar:ar||null,
         description:document.getElementById('p-desc-en').value.trim()||null,
         description_ar:document.getElementById('p-desc-ar').value.trim()||null,
         price, stock:parseInt(document.getElementById('p-stock').value)||0,
-        category_id:document.getElementById('p-cat').value||null,
+        category_id:catVal?decodeURIComponent(catVal):null,
         images:mediaUrls,
         is_published:document.getElementById('p-pub').classList.contains('on')
       };
+
       const{error}=editId
         ?await db.from('products').update(payload).eq('id',editId)
         :await db.from('products').insert(payload);
-      btn.disabled=false;btn.innerHTML='<i class="fas fa-save"></i> حفظ المنتج';
+
+      btn.disabled=false; btn.innerHTML='<i class="fas fa-save"></i> حفظ المنتج';
       if(error){err.textContent='حصل خطأ: '+error.message;err.style.display='block';return;}
       showToast(editId?'تم تعديل المنتج ✓':'تم إضافة المنتج ✓');
-      closeModal();await loadProds();
+      closeModal(); await loadProds();
 
-      // إشعار للمستخدمين لو منتج جديد
       if(!editId){
         const{data:users}=await db.from('profiles').select('id');
         if(users?.length){
@@ -415,20 +437,45 @@
       }
     }
 
-    async function togglePub(id,cur){
+    async function togglePub(encodedId,cur){
+      const id=decodeURIComponent(encodedId);
       await db.from('products').update({is_published:!cur}).eq('id',id);
-      showToast(!cur?'تم النشر':'تم الإخفاء');await loadProds();
+      showToast(!cur?'تم النشر':'تم الإخفاء'); await loadProds();
     }
 
-    async function delProd(id){
-      if(!confirm('هتحذف المنتج ده؟ مش هيرجع!'))return;
-      await db.from('products').delete().eq('id',id);
-      showToast('تم الحذف');await loadProds();
+    // FIX: delete confirmation modal بدل confirm() البسيط
+    function openDelProdModal(encodedId, name){
+      deleteProdId=decodeURIComponent(encodedId);
+      document.getElementById('del-prod-name').textContent=`ستحذف المنتج: ${name}`;
+      document.getElementById('del-prod-input').value='';
+      document.getElementById('del-prod-btn').disabled=true;
+      document.getElementById('del-modal').classList.add('open');
+    }
+
+    function closeDelProdModal(){
+      document.getElementById('del-modal').classList.remove('open');
+      deleteProdId=null;
+    }
+
+    function checkDelProdInput(){
+      const val=document.getElementById('del-prod-input').value.trim();
+      document.getElementById('del-prod-btn').disabled=(val!=='احذف');
+    }
+
+    async function execDelProd(){
+      if(!deleteProdId)return;
+      const btn=document.getElementById('del-prod-btn');
+      btn.disabled=true; btn.innerHTML='<i class="fas fa-spinner fa-spin"></i>';
+      const{error}=await db.from('products').delete().eq('id',deleteProdId);
+      btn.innerHTML='<i class="fas fa-trash"></i> حذف';
+      if(error){showToast('حصل خطأ','error');btn.disabled=false;return;}
+      showToast('تم الحذف');
+      closeDelProdModal(); await loadProds();
     }
 
     async function init(){
       const ok=await adminAuth();if(!ok)return;
-      await loadCats();await loadProds();loadBadge();
+      await loadCats(); await loadProds(); loadBadge();
     }
     init();
   </script>

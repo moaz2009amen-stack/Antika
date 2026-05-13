@@ -24,7 +24,6 @@
     .m-head h3 { font-family:var(--font-display); font-size:1.15rem; }
     .m-body { padding:1.5rem; }
     .m-foot { padding:1rem 1.5rem; border-top:1px solid var(--border); display:flex; gap:.75rem; justify-content:flex-end; }
-    /* FIX: Delete confirm modal */
     .del-overlay { position:fixed; inset:0; background:rgba(0,0,0,.65); z-index:3000; display:none; align-items:center; justify-content:center; padding:1rem; backdrop-filter:blur(4px); }
     .del-overlay.open { display:flex; }
     .del-box { background:var(--bg-card); border-radius:var(--radius-lg); width:100%; max-width:400px; border:1px solid #dc2626; overflow:hidden; }
@@ -109,8 +108,7 @@
         <div class="form-group">
           <label class="form-label">كود الكوبون *</label>
           <input type="text" class="form-control" id="f-code" dir="ltr" placeholder="SAVE20"
-            style="text-transform:uppercase;font-family:monospace;font-size:1.1rem;letter-spacing:0.1em"
-            maxlength="30">
+            style="text-transform:uppercase;font-family:monospace;font-size:1.1rem;letter-spacing:0.1em" maxlength="30">
           <div class="form-hint">حروف وأرقام فقط — هيتحول لكبير تلقائي</div>
         </div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">
@@ -159,7 +157,7 @@
     </div>
   </div>
 
-  <!-- FIX: Delete Confirm Modal — بدل confirm() البسيط -->
+  <!-- Delete Confirm Modal -->
   <div class="del-overlay" id="del-modal">
     <div class="del-box">
       <div class="del-head">
@@ -189,17 +187,19 @@
   <script>
     let allCoupons = [], editId = null, deleteId = null;
 
-    function openSidebar(){document.getElementById('admin-sidebar').classList.add('open');document.getElementById('sidebar-overlay').classList.add('active');}
-    function closeSidebar(){document.getElementById('admin-sidebar').classList.remove('open');document.getElementById('sidebar-overlay').classList.remove('active');}
-    function toggleTheme(){const t=getTheme()==='light'?'dark':'light';setTheme(t);document.getElementById('theme-toggle').innerHTML=t==='dark'?'<i class="fas fa-sun"></i>':'<i class="fas fa-moon"></i>';}
-    async function logout(){await db.auth.signOut();window.location.href='/admin-antika-ctrl/login.html';}
+    function openSidebar()  { document.getElementById('admin-sidebar').classList.add('open');    document.getElementById('sidebar-overlay').classList.add('active'); }
+    function closeSidebar() { document.getElementById('admin-sidebar').classList.remove('open'); document.getElementById('sidebar-overlay').classList.remove('active'); }
+    function toggleTheme()  { const t=getTheme()==='light'?'dark':'light'; setTheme(t); document.getElementById('theme-toggle').innerHTML=t==='dark'?'<i class="fas fa-sun"></i>':'<i class="fas fa-moon"></i>'; }
+    async function logout() { await db.auth.signOut(); window.location.href='/admin-antika-ctrl/login.html'; }
 
+    // FIX: app_metadata بدل user_metadata
     async function adminAuth(){
-      document.body.style.opacity='0';document.body.style.transition='opacity .25s';
+      document.body.style.opacity='0'; document.body.style.transition='opacity .25s';
       let{data:{session}}=await db.auth.getSession();
       if(!session){await new Promise(r=>setTimeout(r,900));const r=await db.auth.getSession();session=r.data.session;}
       if(!session){window.location.href='/admin-antika-ctrl/login.html';return false;}
-      const role=session.user.user_metadata?.role;
+      // FIX: app_metadata
+      const role=session.user.app_metadata?.role;
       if(role!=='admin'){window.location.href='/admin-antika-ctrl/login.html';return false;}
       document.body.style.opacity='1';initTheme();
       document.getElementById('theme-toggle').innerHTML=getTheme()==='dark'?'<i class="fas fa-sun"></i>':'<i class="fas fa-moon"></i>';
@@ -232,11 +232,6 @@
       render(list);
     }
 
-    function escHtml(s){
-      if(!s)return'';
-      return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-    }
-
     function render(list){
       const container=document.getElementById('coupons-container');
       if(!list.length){
@@ -250,11 +245,11 @@
         return `
           <div class="coupon-card ${!c.is_active||isExpired?'inactive':''}">
             <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:0.5rem;margin-bottom:0.75rem">
-              <div class="coupon-code">${escHtml(c.code)}</div>
+              <div class="coupon-code">${escapeHtml(c.code)}</div>
               ${statusBadge}
             </div>
             <div class="coupon-value" style="color:${c.is_active&&!isExpired?'var(--gold)':'var(--text-muted)'}">
-              ${c.type==='percentage'?escHtml(String(c.value))+'%':formatPrice(c.value)} خصم
+              ${c.type==='percentage'?escapeHtml(String(c.value))+'%':formatPrice(c.value)} خصم
             </div>
             <div class="coupon-meta">
               ${c.min_order>0?`<div><i class="fas fa-receipt"></i> حد أدنى: ${formatPrice(c.min_order)}</div>`:''}
@@ -262,11 +257,11 @@
               ${c.expires_at?`<div><i class="fas fa-clock"></i> ينتهي: ${formatDate(c.expires_at)}</div>`:'<div><i class="fas fa-infinity"></i> لا ينتهي</div>'}
             </div>
             <div style="display:flex;gap:0.5rem;margin-top:1rem">
-              <button class="btn btn-ghost btn-sm" style="flex:1" onclick="openEdit('${escHtml(c.id)}')"><i class="fas fa-edit"></i> تعديل</button>
-              <button class="btn btn-sm" style="background:${c.is_active?'rgba(220,38,38,.1)':'rgba(22,163,74,.1)'};color:${c.is_active?'#dc2626':'#16a34a'};border:none;flex:1" onclick="toggleActive('${escHtml(c.id)}',${c.is_active})">
+              <button class="btn btn-ghost btn-sm" style="flex:1" onclick="openEdit('${encodeURIComponent(c.id)}')"><i class="fas fa-edit"></i> تعديل</button>
+              <button class="btn btn-sm" style="background:${c.is_active?'rgba(220,38,38,.1)':'rgba(22,163,74,.1)'};color:${c.is_active?'#dc2626':'#16a34a'};border:none;flex:1" onclick="toggleActive('${encodeURIComponent(c.id)}',${c.is_active})">
                 <i class="fas ${c.is_active?'fa-pause':'fa-play'}"></i> ${c.is_active?'إيقاف':'تفعيل'}
               </button>
-              <button class="btn btn-danger btn-sm" onclick="openDelModal('${escHtml(c.id)}','${escHtml(c.code)}')"><i class="fas fa-trash"></i></button>
+              <button class="btn btn-danger btn-sm" onclick="openDelModal('${encodeURIComponent(c.id)}','${escapeHtml(c.code)}')"><i class="fas fa-trash"></i></button>
             </div>
           </div>`}).join('')}</div>`;
     }
@@ -287,7 +282,8 @@
       document.getElementById('modal').classList.add('open');
     }
 
-    function openEdit(id){
+    function openEdit(encodedId){
+      const id=decodeURIComponent(encodedId);
       const c=allCoupons.find(x=>x.id===id);if(!c)return;
       editId=id;
       document.getElementById('modal-title').textContent='تعديل الكوبون';
@@ -303,7 +299,7 @@
       document.getElementById('modal').classList.add('open');
     }
 
-    function closeModal(){document.getElementById('modal').classList.remove('open');}
+    function closeModal(){ document.getElementById('modal').classList.remove('open'); }
 
     async function saveCoupon(){
       const code=document.getElementById('f-code').value.trim().toUpperCase().replace(/[^A-Z0-9]/g,'');
@@ -317,7 +313,7 @@
       errEl.style.display='none';
 
       const btn=document.getElementById('save-btn');
-      btn.disabled=true;btn.innerHTML='<i class="fas fa-spinner fa-spin"></i>';
+      btn.disabled=true; btn.innerHTML='<i class="fas fa-spinner fa-spin"></i>';
 
       const minOrder=parseFloat(document.getElementById('f-min').value)||0;
       const maxUsesVal=document.getElementById('f-max-uses').value;
@@ -335,32 +331,29 @@
         ?await db.from('coupons').update(payload).eq('id',editId)
         :await db.from('coupons').insert(payload);
 
-      btn.disabled=false;btn.innerHTML='<i class="fas fa-save"></i> حفظ';
+      btn.disabled=false; btn.innerHTML='<i class="fas fa-save"></i> حفظ';
 
       if(error){errEl.textContent=error.code==='23505'?'الكود ده موجود بالفعل':error.message;errEl.style.display='block';return;}
       showToast(editId?'✓ تم التعديل':'✓ تم إضافة الكوبون');
-      closeModal();loadCoupons();
+      closeModal(); loadCoupons();
     }
 
-    async function toggleActive(id,cur){
+    async function toggleActive(encodedId, cur){
+      const id=decodeURIComponent(encodedId);
       await db.from('coupons').update({is_active:!cur}).eq('id',id);
       showToast(!cur?'تم التفعيل':'تم الإيقاف');
       loadCoupons();
     }
 
-    // FIX: Delete مع تأكيد نصي
-    function openDelModal(id, code){
-      deleteId=id;
+    function openDelModal(encodedId, code){
+      deleteId=decodeURIComponent(encodedId);
       document.getElementById('del-coupon-name').textContent=`ستحذف الكوبون: ${code}`;
       document.getElementById('del-confirm-input').value='';
       document.getElementById('del-confirm-btn').disabled=true;
       document.getElementById('del-modal').classList.add('open');
     }
 
-    function closeDelModal(){
-      document.getElementById('del-modal').classList.remove('open');
-      deleteId=null;
-    }
+    function closeDelModal(){ document.getElementById('del-modal').classList.remove('open'); deleteId=null; }
 
     function checkDelInput(){
       const val=document.getElementById('del-confirm-input').value.trim();
@@ -370,14 +363,12 @@
     async function execDelete(){
       if(!deleteId)return;
       const btn=document.getElementById('del-confirm-btn');
-      btn.disabled=true;
-      btn.innerHTML='<i class="fas fa-spinner fa-spin"></i>';
+      btn.disabled=true; btn.innerHTML='<i class="fas fa-spinner fa-spin"></i>';
       const{error}=await db.from('coupons').delete().eq('id',deleteId);
       btn.innerHTML='<i class="fas fa-trash"></i> حذف';
       if(error){showToast('حصل خطأ','error');btn.disabled=false;return;}
       showToast('تم الحذف');
-      closeDelModal();
-      loadCoupons();
+      closeDelModal(); loadCoupons();
     }
 
     document.getElementById('f-code').addEventListener('input',e=>{
@@ -386,7 +377,7 @@
 
     async function init(){
       const ok=await adminAuth();if(!ok)return;
-      loadCoupons();loadBadge();
+      loadCoupons(); loadBadge();
     }
     init();
   </script>

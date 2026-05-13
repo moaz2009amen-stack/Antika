@@ -1,14 +1,16 @@
 // FIX: الـ version بيتبنى من التاريخ عشان كل deploy يكسر الكاش القديم
-const CACHE_VERSION = 'antika-v' + '20250507';
+const CACHE_VERSION = 'antika-v' + '20250511';
 const CACHE = CACHE_VERSION;
 
+// FIX: حذفنا /js/config.js من هنا
+// كان فيه تعارض مع vercel.json اللي بيقول no-cache على config.js
+// config.js لازم دايماً يتجيب fresh من الـ network
 const STATIC = [
   '/',
   '/shop.html',
   '/cart.html',
   '/auth.html',
   '/css/main.css',
-  '/js/config.js',
   'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css',
 ];
 
@@ -39,10 +41,13 @@ self.addEventListener('fetch', e => {
   const url = new URL(e.request.url);
 
   // مش بنعمل cache لـ Supabase أو Cloudinary أو Admin pages
+  // FIX: أضفنا config.js و bot.js هنا كمان
   if (
     url.hostname.includes('supabase') ||
     url.hostname.includes('cloudinary') ||
-    url.pathname.includes('admin-antika-ctrl')
+    url.pathname.includes('admin-antika-ctrl') ||
+    url.pathname === '/js/config.js' ||
+    url.pathname === '/js/bot.js'
   ) {
     return;
   }
@@ -57,7 +62,6 @@ self.addEventListener('fetch', e => {
       caches.match(e.request).then(cached => {
         if (cached) return cached;
         return fetch(e.request).then(res => {
-          // بنعمل cache بس للـ responses الناجحة
           if (res.ok) {
             const clone = res.clone();
             caches.open(CACHE).then(c => c.put(e.request, clone));

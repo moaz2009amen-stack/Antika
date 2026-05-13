@@ -16,6 +16,7 @@
     .filter-tabs{display:flex;gap:.35rem;flex-wrap:wrap;margin-bottom:1.25rem}
     .filter-tab{padding:.45rem 1rem;border:1.5px solid var(--border);border-radius:20px;font-size:.8rem;font-weight:600;color:var(--text-muted);cursor:pointer;transition:all .2s;background:none;font-family:inherit}
     .filter-tab.active{border-color:var(--gold);color:var(--gold);background:rgba(201,168,76,.1)}
+    .user-filter-notice{background:rgba(201,168,76,.08);border:1px solid var(--gold-light);border-radius:var(--radius-sm);padding:.6rem 1rem;font-size:.82rem;color:var(--gold-dark);margin-bottom:1rem;display:flex;align-items:center;justify-content:space-between;gap:.5rem}
   </style>
 </head>
 <body>
@@ -49,7 +50,7 @@
       <div class="admin-topbar-right">
         <button class="admin-hamburger" onclick="openSidebar()"><i class="fas fa-bars"></i></button>
         <span class="admin-brand">Antika</span>
-        <span class="admin-page-title">/ الطلبات</span>
+        <span class="admin-page-title" id="page-title">/ الطلبات</span>
       </div>
       <div class="admin-topbar-left">
         <button class="navbar-icon-btn" onclick="toggleTheme()" id="theme-toggle"><i class="fas fa-moon"></i></button>
@@ -57,6 +58,12 @@
     </div>
 
     <div class="admin-content">
+      <!-- FIX: user filter notice -->
+      <div id="user-filter-notice" style="display:none" class="user-filter-notice">
+        <span><i class="fas fa-user"></i> عرض طلبات مستخدم محدد</span>
+        <button class="btn btn-ghost btn-sm" onclick="clearUserFilter()"><i class="fas fa-times"></i> عرض الكل</button>
+      </div>
+
       <div class="filter-tabs">
         <button class="filter-tab active" onclick="filterOrders('',this)">الكل</button>
         <button class="filter-tab" onclick="filterOrders('pending',this)">انتظار</button>
@@ -71,15 +78,7 @@
         <div style="overflow-x:auto">
           <table class="admin-table">
             <thead>
-              <tr>
-                <th>رقم الطلب</th>
-                <th>العميل</th>
-                <th>المبلغ</th>
-                <th>الدفع</th>
-                <th>الحالة</th>
-                <th>التاريخ</th>
-                <th>إجراءات</th>
-              </tr>
+              <tr><th>رقم الطلب</th><th>العميل</th><th>المبلغ</th><th>الدفع</th><th>الحالة</th><th>التاريخ</th><th>إجراءات</th></tr>
             </thead>
             <tbody id="orders-tbody">
               <tr><td colspan="7" style="text-align:center;padding:2rem"><div class="spinner" style="margin:0 auto"></div></td></tr>
@@ -104,28 +103,20 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
   <script src="/js/config.js"></script>
   <script>
-    // ── Sidebar & Theme ───────────────────────────────────────────
-    function openSidebar() { document.getElementById('admin-sidebar').classList.add('open'); document.getElementById('sidebar-overlay').classList.add('active'); }
+    function openSidebar()  { document.getElementById('admin-sidebar').classList.add('open'); document.getElementById('sidebar-overlay').classList.add('active'); }
     function closeSidebar() { document.getElementById('admin-sidebar').classList.remove('open'); document.getElementById('sidebar-overlay').classList.remove('active'); }
-    function toggleTheme() {
-      const t = getTheme() === 'light' ? 'dark' : 'light';
-      setTheme(t);
-      document.getElementById('theme-toggle').innerHTML = t === 'dark' ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
-    }
+    function toggleTheme()  { const t = getTheme() === 'light' ? 'dark' : 'light'; setTheme(t); document.getElementById('theme-toggle').innerHTML = t === 'dark' ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>'; }
     async function logout() { await db.auth.signOut(); window.location.href = '/admin-antika-ctrl/login.html'; }
 
-    // ── FIX: دالة auth واحدة بس ──────────────────────────────────
+    // FIX: app_metadata بدل user_metadata
     async function adminAuth() {
       document.body.style.opacity = '0';
       document.body.style.transition = 'opacity 0.25s';
       let { data: { session } } = await db.auth.getSession();
-      if (!session) {
-        await new Promise(r => setTimeout(r, 900));
-        const r = await db.auth.getSession();
-        session = r.data.session;
-      }
+      if (!session) { await new Promise(r => setTimeout(r, 900)); const r = await db.auth.getSession(); session = r.data.session; }
       if (!session) { window.location.href = '/admin-antika-ctrl/login.html'; return false; }
-      const role = session.user.user_metadata?.role;
+      // FIX: app_metadata
+      const role = session.user.app_metadata?.role;
       if (role !== 'admin' && role !== 'moderator') { window.location.href = '/admin-antika-ctrl/login.html'; return false; }
       document.body.style.opacity = '1';
       initTheme();
@@ -133,7 +124,6 @@
       return true;
     }
 
-    // ── FIX: دالة loadPendingBadge واحدة بس ──────────────────────
     async function loadPendingBadge() {
       const { count } = await db.from('orders').select('*', { count: 'exact', head: true }).eq('status', 'pending');
       const b = document.getElementById('pending-badge');
@@ -143,14 +133,33 @@
     const STATUS_LABELS = { pending: 'انتظار', confirmed: 'مؤكد', processing: 'تجهيز', shipped: 'في الطريق', delivered: 'تم التوصيل', cancelled: 'ملغي' };
     const STATUS_COLORS = { pending: 'badge-warning', confirmed: 'badge-info', processing: 'badge-info', shipped: 'badge-gold', delivered: 'badge-success', cancelled: 'badge-danger' };
 
-    let allOrders = [], currentFilter = '';
+    let allOrders     = [];
+    let currentFilter = '';
+    let currentUserId = '';  // FIX: للـ user filter
 
     async function loadOrders() {
       let q = db.from('orders').select('*,profiles(full_name,phone)').order('created_at', { ascending: false });
       if (currentFilter) q = q.eq('status', currentFilter);
+      // FIX: لو فيه user filter نطبقه
+      if (currentUserId) q = q.eq('user_id', currentUserId);
       const { data } = await q;
       allOrders = data || [];
       renderOrders();
+    }
+
+    // FIX: دالة جديدة لجلب طلبات مستخدم محدد
+    async function loadOrdersByUser(userId) {
+      currentUserId = userId;
+      document.getElementById('user-filter-notice').style.display = 'flex';
+      document.getElementById('page-title').textContent = '/ الطلبات (مستخدم محدد)';
+      await loadOrders();
+    }
+
+    function clearUserFilter() {
+      currentUserId = '';
+      document.getElementById('user-filter-notice').style.display = 'none';
+      document.getElementById('page-title').textContent = '/ الطلبات';
+      loadOrders();
     }
 
     function renderOrders() {
@@ -160,25 +169,26 @@
         return;
       }
       tbody.innerHTML = allOrders.map(o => `
-        <tr style="cursor:pointer" onclick="showDetail('${o.id}')">
+        <tr style="cursor:pointer" onclick="showDetail('${encodeURIComponent(o.id)}')">
           <td><span style="font-family:monospace;color:var(--gold);font-weight:700">#${o.id.slice(0, 8).toUpperCase()}</span></td>
           <td>
-            <div style="font-weight:600;font-size:.875rem">${o.profiles?.full_name || '—'}</div>
-            <div style="font-size:.75rem;color:var(--text-muted)">${o.profiles?.phone || ''}</div>
+            <div style="font-weight:600;font-size:.875rem">${escapeHtml(o.profiles?.full_name || '—')}</div>
+            <div style="font-size:.75rem;color:var(--text-muted)">${escapeHtml(o.profiles?.phone || '')}</div>
           </td>
           <td style="font-weight:700;color:var(--gold)">${formatPrice(o.total)}</td>
           <td>${o.payment_method === 'cash' ? '<span class="badge badge-gray">كاش</span>' : '<span class="badge badge-info">محفظة</span>'}</td>
           <td><span class="badge ${STATUS_COLORS[o.status] || 'badge-gray'}">${STATUS_LABELS[o.status] || o.status}</span></td>
           <td style="color:var(--text-muted);font-size:.8rem;white-space:nowrap">${formatDate(o.created_at)}</td>
           <td>
-            <select class="status-select" onclick="event.stopPropagation()" onchange="updateStatus('${o.id}', this.value)">
+            <select class="status-select" onclick="event.stopPropagation()" onchange="updateStatus('${encodeURIComponent(o.id)}', this.value)">
               ${Object.entries(STATUS_LABELS).map(([v, l]) => `<option value="${v}" ${o.status === v ? 'selected' : ''}>${l}</option>`).join('')}
             </select>
           </td>
         </tr>`).join('');
     }
 
-    async function updateStatus(id, status) {
+    async function updateStatus(encodedId, status) {
+      const id = decodeURIComponent(encodedId);
       const { error } = await db.from('orders').update({ status }).eq('id', id);
       if (error) { showToast('حصل خطأ', 'error'); return; }
       showToast('تم تحديث الحالة');
@@ -188,7 +198,8 @@
       loadPendingBadge();
     }
 
-    async function showDetail(id) {
+    async function showDetail(encodedId) {
+      const id = decodeURIComponent(encodedId);
       const { data: o } = await db.from('orders')
         .select('*,profiles(full_name,phone,address),order_items(*,products(name,name_ar,images))')
         .eq('id', id).single();
@@ -201,18 +212,17 @@
         </div>
         <div style="margin-bottom:1.25rem">
           <div style="font-weight:700;margin-bottom:.5rem">بيانات العميل</div>
-          <div style="font-size:.875rem;color:var(--text-secondary)">${o.profiles?.full_name || '—'}</div>
-          <div style="font-size:.875rem;color:var(--text-secondary)">${o.profiles?.phone || ''}</div>
-          <div style="font-size:.875rem;color:var(--text-secondary)">${o.profiles?.address || ''}</div>
+          <div style="font-size:.875rem;color:var(--text-secondary)">${escapeHtml(o.profiles?.full_name || '—')}</div>
+          <div style="font-size:.875rem;color:var(--text-secondary)">${escapeHtml(o.profiles?.phone || '')}</div>
+          <div style="font-size:.875rem;color:var(--text-secondary)">${escapeHtml(o.profiles?.address || '')}</div>
         </div>
         <div style="margin-bottom:1.25rem">
           <div style="font-weight:700;margin-bottom:.75rem">المنتجات</div>
           ${(o.order_items || []).map(item => `
             <div style="display:flex;gap:.75rem;align-items:center;margin-bottom:.5rem;padding:.5rem;background:var(--bg-secondary);border-radius:var(--radius-sm)">
-              <img src="${item.products?.images?.[0] || ''}" style="width:48px;height:48px;border-radius:var(--radius-sm);object-fit:cover;background:var(--border)"
-                onerror="this.style.display='none'">
+              <img src="${escapeHtml(item.products?.images?.[0] || '')}" style="width:48px;height:48px;border-radius:var(--radius-sm);object-fit:cover;background:var(--border)" onerror="this.style.display='none'">
               <div style="flex:1">
-                <div style="font-size:.85rem;font-weight:600">${item.products?.name_ar || item.products?.name || 'منتج محذوف'}</div>
+                <div style="font-size:.85rem;font-weight:600">${escapeHtml(item.products?.name_ar || item.products?.name || 'منتج محذوف')}</div>
                 <div style="font-size:.78rem;color:var(--text-muted)">×${item.quantity} — ${formatPrice(item.price_at_time)}</div>
               </div>
             </div>`).join('')}
@@ -220,18 +230,18 @@
         ${o.payment_method === 'wallet' && o.payment_proof_url ? `
           <div style="margin-bottom:1.25rem">
             <div style="font-weight:700;margin-bottom:.5rem">إيصال الدفع</div>
-            <a href="${o.payment_proof_url}" target="_blank" rel="noopener">
-              <img src="${o.payment_proof_url}" style="width:100%;border-radius:var(--radius);border:1px solid var(--border)">
+            <a href="${escapeHtml(o.payment_proof_url)}" target="_blank" rel="noopener">
+              <img src="${escapeHtml(o.payment_proof_url)}" style="width:100%;border-radius:var(--radius);border:1px solid var(--border)">
             </a>
           </div>` : ''}
         <div style="padding:1rem;background:var(--bg-secondary);border-radius:var(--radius);display:flex;justify-content:space-between;font-weight:700">
           <span>الإجمالي</span>
           <span style="color:var(--gold)">${formatPrice(o.total)}</span>
         </div>
-        ${o.notes ? `<div style="margin-top:1rem;padding:.75rem;background:rgba(201,168,76,.08);border-radius:var(--radius-sm);font-size:.85rem"><strong>ملاحظات:</strong> ${o.notes}</div>` : ''}
+        ${o.notes ? `<div style="margin-top:1rem;padding:.75rem;background:rgba(201,168,76,.08);border-radius:var(--radius-sm);font-size:.85rem"><strong>ملاحظات:</strong> ${escapeHtml(o.notes)}</div>` : ''}
         <div style="margin-top:1.5rem">
           <label class="form-label">تغيير الحالة</label>
-          <select class="form-control" onchange="updateStatus('${o.id}', this.value); closeDetail()">
+          <select class="form-control" onchange="updateStatus('${encodeURIComponent(o.id)}', this.value); closeDetail()">
             ${Object.entries(STATUS_LABELS).map(([v, l]) => `<option value="${v}" ${o.status === v ? 'selected' : ''}>${l}</option>`).join('')}
           </select>
         </div>`;
@@ -251,11 +261,18 @@
     async function init() {
       const ok = await adminAuth();
       if (!ok) return;
-      // فحص لو الـ URL فيه order id محدد
-      const params = new URLSearchParams(window.location.search);
-      if (params.get('id')) {
+
+      const params  = new URLSearchParams(window.location.search);
+      const orderId = params.get('id');
+      const userId  = params.get('user');  // FIX: الجديد
+
+      if (userId) {
+        // FIX: فلتر بالـ user_id
+        await loadOrdersByUser(userId);
+        if (orderId) showDetail(orderId);
+      } else if (orderId) {
         await loadOrders();
-        showDetail(params.get('id'));
+        showDetail(orderId);
       } else {
         loadOrders();
       }

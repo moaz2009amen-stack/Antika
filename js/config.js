@@ -30,7 +30,7 @@ function optimizeImage(url, options = {}) {
   } = options;
 
   let transforms = `q_${quality},f_${format}`;
-  if (width) transforms += `,w_${width}`;
+  if (width)  transforms += `,w_${width}`;
   if (height) transforms += `,h_${height}`;
   if (width || height) transforms += `,c_${crop}`;
 
@@ -99,10 +99,12 @@ async function getCurrentUser() {
   return user;
 }
 
+// FIX: بيقرأ الـ role من app_metadata بدل user_metadata
+// app_metadata = server-only، مش قابل للتعديل من الـ client
 async function getUserRole() {
-  const user = await getCurrentUser();
-  if (!user) return null;
-  return user.user_metadata?.role || 'customer';
+  const { data: { session } } = await db.auth.getSession();
+  if (!session) return null;
+  return session.user.app_metadata?.role || 'customer';
 }
 
 async function requireAuth(redirectTo = '/auth.html') {
@@ -111,8 +113,11 @@ async function requireAuth(redirectTo = '/auth.html') {
   return user;
 }
 
+// FIX: بيقرأ الـ role من app_metadata
 async function requireAdmin() {
-  const role = await getUserRole();
+  const { data: { session } } = await db.auth.getSession();
+  if (!session) { window.location.href = '/'; return false; }
+  const role = session.user.app_metadata?.role;
   if (role !== 'admin' && role !== 'moderator') {
     window.location.href = '/';
     return false;
@@ -121,18 +126,32 @@ async function requireAdmin() {
 }
 
 // ── Site Settings ──────────────────────────────────────────────
-// FIX: بنكاش الـ settings في sessionStorage عشان منعملش call كل مرة
-const _settingsCache = {};
+// FIX: أضفنا TTL للـ cache عشان التغييرات تتعكس خلال 30 ثانية
+const _settingsCache  = {};
+const _settingsTTL    = {};
+const SETTINGS_TTL_MS = 30 * 1000; // 30 ثانية
 
 async function getSetting(key) {
-  if (_settingsCache[key] !== undefined) return _settingsCache[key];
+  const now    = Date.now();
+  const cached = _settingsCache[key];
+  const ttl    = _settingsTTL[key] || 0;
+
+  // استخدم الـ cache لو لسه طازج
+  if (cached !== undefined && (now - ttl) < SETTINGS_TTL_MS) {
+    return cached;
+  }
+
   const { data } = await db.from('settings').select('value').eq('key', key).single();
   _settingsCache[key] = data?.value ?? null;
+  _settingsTTL[key]   = now;
   return _settingsCache[key];
 }
 
 function clearSettingsCache() {
-  Object.keys(_settingsCache).forEach(k => delete _settingsCache[k]);
+  Object.keys(_settingsCache).forEach(k => {
+    delete _settingsCache[k];
+    delete _settingsTTL[k];
+  });
 }
 
 async function checkMaintenance() {
@@ -225,16 +244,16 @@ function saveCart(cart) {
 }
 
 function updateCartCount() {
-  const cart = getCart();
+  const cart  = getCart();
   const count = cart.reduce((sum, item) => sum + item.quantity, 0);
   document.querySelectorAll('.cart-count').forEach(el => {
-    el.textContent = count;
-    el.style.display = count > 0 ? 'flex' : 'none';
+    el.textContent    = count;
+    el.style.display  = count > 0 ? 'flex' : 'none';
   });
 }
 
 function addToCart(product, quantity = 1) {
-  const cart = getCart();
+  const cart     = getCart();
   const existing = cart.find(i => i.id === product.id);
 
   // FIX: لو الصورة فيديو، مش بنحفظها كصورة في السلة
@@ -274,7 +293,7 @@ async function getWishlist() {
 
 async function toggleWishlist(productId, btn) {
   const user = await getCurrentUser();
-  const l = getLang();
+  const l    = getLang();
 
   if (!user) {
     let list = [];
@@ -360,15 +379,18 @@ async function validateCoupon(code, orderTotal) {
   };
 }
 
-// FIX: useCoupon — بيستخدم RPC function بدل الطريقة القديمة الخاطئة
+// FIX: useCoupon — بيستخدم increment_coupon_usage اللي اتعملت دلوقتي
 async function useCoupon(couponId) {
-  await db.rpc('increment_coupon_usage', { coupon_id: couponId });
+  const { error } = await db.rpc('increment_coupon_usage', { coupon_id: couponId });
+  if (error) {
+    console.error('useCoupon error:', error.message);
+  }
 }
 
 // ── Admin Auth ─────────────────────────────────────────────────
-// FIX: دالة واحدة بس — حذفنا التعريف المكرر
+// FIX: بيقرأ الـ role من app_metadata بدل user_metadata
 async function adminAuthCheck() {
-  document.body.style.opacity = '0';
+  document.body.style.opacity    = '0';
   document.body.style.transition = 'opacity 0.3s';
 
   let { data: { session } } = await db.auth.getSession();
@@ -376,7 +398,7 @@ async function adminAuthCheck() {
   if (!session) {
     await new Promise(r => setTimeout(r, 900));
     const res = await db.auth.getSession();
-    session = res.data.session;
+    session   = res.data.session;
   }
 
   if (!session) {
@@ -384,7 +406,8 @@ async function adminAuthCheck() {
     return false;
   }
 
-  const role = session.user.user_metadata?.role;
+  // FIX: app_metadata بدل user_metadata
+  const role = session.user.app_metadata?.role;
   if (role !== 'admin' && role !== 'moderator') {
     window.location.href = '/admin-antika-ctrl/login.html';
     return false;

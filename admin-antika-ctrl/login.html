@@ -54,7 +54,8 @@
     (async () => {
       const { data: { session } } = await db.auth.getSession();
       if (session) {
-        const role = session.user.user_metadata?.role;
+        // FIX: app_metadata بدل user_metadata
+        const role = session.user.app_metadata?.role;
         if (role === 'admin' || role === 'moderator') {
           window.location.href = '/admin-antika-ctrl/';
         }
@@ -72,9 +73,9 @@
     document.addEventListener('keydown', e => { if (e.key === 'Enter') handleLogin(); });
 
     async function handleLogin() {
-      const btn = document.getElementById('login-btn');
-      const errEl = document.getElementById('error-msg');
-      const email = document.getElementById('email').value.trim();
+      const btn    = document.getElementById('login-btn');
+      const errEl  = document.getElementById('error-msg');
+      const email  = document.getElementById('email').value.trim();
       const password = document.getElementById('password').value;
 
       if (!email || !password) { errEl.textContent = 'من فضلك اكتب الإيميل وكلمة المرور'; return; }
@@ -92,7 +93,8 @@
         return;
       }
 
-      const role = data.user.user_metadata?.role;
+      // FIX: app_metadata بدل user_metadata
+      const role = data.user.app_metadata?.role;
       if (role !== 'admin' && role !== 'moderator') {
         await db.auth.signOut();
         errEl.textContent = 'ليس لديك صلاحية الدخول للوحة التحكم';

@@ -9,18 +9,8 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <style>
     .settings-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.25rem}
-    @media(max-width:768px){
-      .settings-grid{grid-template-columns:1fr}
-      .rev-stat{grid-template-columns:1fr 1fr}
-      .rev-tabs{flex-wrap:wrap}
-      .rev-tab{font-size:.78rem;padding:.5rem .75rem}
-      .delete-btn-row{flex-direction:column;align-items:flex-start;gap:.75rem}
-      .delete-btn-row .btn{width:100%}
-    }
-    @media(max-width:480px){
-      .rev-stat{grid-template-columns:1fr}
-      .s-body{padding:1rem}
-    }
+    @media(max-width:768px){.settings-grid{grid-template-columns:1fr}.rev-stat{grid-template-columns:1fr 1fr}.rev-tabs{flex-wrap:wrap}.rev-tab{font-size:.78rem;padding:.5rem .75rem}.delete-btn-row{flex-direction:column;align-items:flex-start;gap:.75rem}.delete-btn-row .btn{width:100%}}
+    @media(max-width:480px){.rev-stat{grid-template-columns:1fr}.s-body{padding:1rem}}
     .s-section{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden;margin-bottom:1.25rem}
     .s-head{padding:1rem 1.5rem;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:.75rem;background:var(--bg-secondary)}
     .s-head i{color:var(--gold);font-size:1rem;width:18px;text-align:center}
@@ -282,278 +272,261 @@
   <script>
     let deleteTarget = null;
 
-    function openSidebar() { document.getElementById('admin-sidebar').classList.add('open'); document.getElementById('sidebar-overlay').classList.add('active'); }
+    function openSidebar()  { document.getElementById('admin-sidebar').classList.add('open');    document.getElementById('sidebar-overlay').classList.add('active'); }
     function closeSidebar() { document.getElementById('admin-sidebar').classList.remove('open'); document.getElementById('sidebar-overlay').classList.remove('active'); }
-    function toggleTheme() {
-      const t = getTheme() === 'light' ? 'dark' : 'light';
-      setTheme(t);
-      document.getElementById('theme-toggle').innerHTML = t === 'dark' ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
-    }
-    async function logout() { await db.auth.signOut(); window.location.href = '/admin-antika-ctrl/login.html'; }
+    function toggleTheme()  { const t=getTheme()==='light'?'dark':'light'; setTheme(t); document.getElementById('theme-toggle').innerHTML=t==='dark'?'<i class="fas fa-sun"></i>':'<i class="fas fa-moon"></i>'; }
+    async function logout() { await db.auth.signOut(); window.location.href='/admin-antika-ctrl/login.html'; }
 
-    // FIX: الإعدادات للأدمن فقط — redirect لـ login مش للـ dashboard
+    // FIX: app_metadata بدل user_metadata — settings للأدمن فقط
     async function adminAuth() {
-      document.body.style.opacity = '0';
-      document.body.style.transition = 'opacity .25s';
-      let { data: { session } } = await db.auth.getSession();
-      if (!session) {
-        await new Promise(r => setTimeout(r, 900));
-        const r = await db.auth.getSession();
-        session = r.data.session;
-      }
-      if (!session) { window.location.href = '/admin-antika-ctrl/login.html'; return false; }
-      const role = session.user.user_metadata?.role;
-      // FIX: moderator بيروح لـ login مش dashboard عشان مفيش redirect loop
-      if (role !== 'admin') {
+      document.body.style.opacity='0'; document.body.style.transition='opacity .25s';
+      let{data:{session}}=await db.auth.getSession();
+      if(!session){await new Promise(r=>setTimeout(r,900));const r=await db.auth.getSession();session=r.data.session;}
+      if(!session){window.location.href='/admin-antika-ctrl/login.html';return false;}
+      // FIX: app_metadata + أدمن فقط (مش moderator)
+      const role=session.user.app_metadata?.role;
+      if(role!=='admin'){
         await db.auth.signOut();
-        window.location.href = '/admin-antika-ctrl/login.html';
+        window.location.href='/admin-antika-ctrl/login.html';
         return false;
       }
-      document.body.style.opacity = '1';
-      initTheme();
-      document.getElementById('theme-toggle').innerHTML = getTheme() === 'dark' ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
+      document.body.style.opacity='1'; initTheme();
+      document.getElementById('theme-toggle').innerHTML=getTheme()==='dark'?'<i class="fas fa-sun"></i>':'<i class="fas fa-moon"></i>';
       return true;
     }
 
     async function loadBadge() {
-      const { count } = await db.from('orders').select('*', { count: 'exact', head: true }).eq('status', 'pending');
-      const b = document.getElementById('pending-badge');
-      if (b && count > 0) { b.textContent = count; b.style.display = 'inline'; }
+      const{count}=await db.from('orders').select('*',{count:'exact',head:true}).eq('status','pending');
+      const b=document.getElementById('pending-badge');
+      if(b&&count>0){b.textContent=count;b.style.display='inline';}
     }
 
     // ── Settings ──────────────────────────────────────────────────
     async function loadSettings() {
-      const { data } = await db.from('settings').select('*');
-      const s = {};
-      (data || []).forEach(r => s[r.key] = r.value);
-      document.getElementById('site-ar').value = s['site_name_ar'] || '';
-      document.getElementById('site-en').value = s['site_name_en'] || '';
-      document.getElementById('announcement').value = s['announcement'] || '';
-      document.getElementById('wa-num').value = s['whatsapp_number'] || '';
-      if (s['maintenance_mode'] === 'true') document.getElementById('t-maintenance').classList.add('on');
-      if (s['orders_enabled'] === 'false') document.getElementById('t-orders').classList.remove('on');
+      const{data}=await db.from('settings').select('*');
+      const s={};
+      (data||[]).forEach(r=>s[r.key]=r.value);
+      document.getElementById('site-ar').value      = s['site_name_ar']  || '';
+      document.getElementById('site-en').value      = s['site_name_en']  || '';
+      document.getElementById('announcement').value = s['announcement']  || '';
+      document.getElementById('wa-num').value       = s['whatsapp_number']|| '';
+      if(s['maintenance_mode']==='true') document.getElementById('t-maintenance').classList.add('on');
+      if(s['orders_enabled']==='false')  document.getElementById('t-orders').classList.remove('on');
     }
 
     async function toggleSetting(key, el) {
-      const on = el.classList.toggle('on');
-      await db.from('settings').upsert({ key, value: on.toString() }, { onConflict: 'key' });
-      showToast(on ? 'تم التفعيل' : 'تم الإيقاف');
-      // مسح الكاش عشان checkMaintenance يتحدث
+      const on=el.classList.toggle('on');
+      await db.from('settings').upsert({key,value:on.toString()},{onConflict:'key'});
       clearSettingsCache();
+      showToast(on?'تم التفعيل':'تم الإيقاف');
     }
 
     async function saveGeneral() {
-      const ar = document.getElementById('site-ar').value.trim();
-      const en = document.getElementById('site-en').value.trim();
+      const ar  = document.getElementById('site-ar').value.trim();
+      const en  = document.getElementById('site-en').value.trim();
       const ann = document.getElementById('announcement').value.trim();
       await Promise.all([
-        db.from('settings').upsert({ key: 'site_name_ar', value: ar }, { onConflict: 'key' }),
-        db.from('settings').upsert({ key: 'site_name_en', value: en }, { onConflict: 'key' }),
-        db.from('settings').upsert({ key: 'announcement', value: ann }, { onConflict: 'key' }),
+        db.from('settings').upsert({key:'site_name_ar', value:ar},  {onConflict:'key'}),
+        db.from('settings').upsert({key:'site_name_en', value:en},  {onConflict:'key'}),
+        db.from('settings').upsert({key:'announcement', value:ann}, {onConflict:'key'}),
       ]);
       clearSettingsCache();
       showToast('✓ تم حفظ إعدادات المتجر');
     }
 
     async function saveWA() {
-      const num = document.getElementById('wa-num').value.trim();
-      // FIX: تحقق من إن الرقم أرقام بس
-      if (num && !/^\d{8,15}$/.test(num)) {
-        showToast('رقم الواتساب غير صحيح', 'error');
-        return;
-      }
-      await db.from('settings').upsert({ key: 'whatsapp_number', value: num }, { onConflict: 'key' });
+      const num=document.getElementById('wa-num').value.trim();
+      if(num&&!/^\d{8,15}$/.test(num)){showToast('رقم الواتساب غير صحيح','error');return;}
+      await db.from('settings').upsert({key:'whatsapp_number',value:num},{onConflict:'key'});
       clearSettingsCache();
       showToast('✓ تم حفظ رقم الواتساب');
     }
 
     function testWA() {
-      const n = document.getElementById('wa-num').value.trim();
-      if (!n) { showToast('اكتب الرقم الأول', 'error'); return; }
-      window.open(`https://wa.me/2${n}`, '_blank');
+      const n=document.getElementById('wa-num').value.trim();
+      if(!n){showToast('اكتب الرقم الأول','error');return;}
+      window.open(`https://wa.me/2${n}`,'_blank');
     }
 
     // ── Revenue ───────────────────────────────────────────────────
     async function loadRevenue(period, btn) {
-      document.querySelectorAll('.rev-tab').forEach(t => t.classList.remove('active'));
-      if (btn) btn.classList.add('active');
-
-      let query = db.from('orders').select('total,status,created_at');
-      const now = new Date();
-      if (period === 'week') query = query.gte('created_at', new Date(now - 7 * 864e5).toISOString());
-      else if (period === 'month') query = query.gte('created_at', new Date(now - 30 * 864e5).toISOString());
-      else if (period === 'year') query = query.gte('created_at', new Date(now - 365 * 864e5).toISOString());
-
-      const { data: orders } = await query;
-      if (!orders) return;
-
-      const delivered = orders.filter(o => o.status === 'delivered');
-      const pending = orders.filter(o => o.status === 'pending');
-      const cancelled = orders.filter(o => o.status === 'cancelled');
-      const shipping = orders.filter(o => ['confirmed', 'processing', 'shipped'].includes(o.status));
-
-      const rev = delivered.reduce((s, o) => s + (o.total || 0), 0);
-      const avg = delivered.length ? rev / delivered.length : 0;
-
-      document.getElementById('rev-total').textContent = formatPrice(rev);
-      document.getElementById('rev-orders').textContent = delivered.length;
-      document.getElementById('rev-avg').textContent = formatPrice(avg);
-      document.getElementById('rev-pending').textContent = pending.length;
+      document.querySelectorAll('.rev-tab').forEach(t=>t.classList.remove('active'));
+      if(btn) btn.classList.add('active');
+      let query=db.from('orders').select('total,status,created_at');
+      const now=new Date();
+      if(period==='week')  query=query.gte('created_at',new Date(now-7*864e5).toISOString());
+      else if(period==='month') query=query.gte('created_at',new Date(now-30*864e5).toISOString());
+      else if(period==='year')  query=query.gte('created_at',new Date(now-365*864e5).toISOString());
+      const{data:orders}=await query;
+      if(!orders) return;
+      const delivered = orders.filter(o=>o.status==='delivered');
+      const pending   = orders.filter(o=>o.status==='pending');
+      const cancelled = orders.filter(o=>o.status==='cancelled');
+      const shipping  = orders.filter(o=>['confirmed','processing','shipped'].includes(o.status));
+      const rev = delivered.reduce((s,o)=>s+(o.total||0),0);
+      const avg = delivered.length ? rev/delivered.length : 0;
+      document.getElementById('rev-total').textContent     = formatPrice(rev);
+      document.getElementById('rev-orders').textContent    = delivered.length;
+      document.getElementById('rev-avg').textContent       = formatPrice(avg);
+      document.getElementById('rev-pending').textContent   = pending.length;
       document.getElementById('rev-cancelled').textContent = cancelled.length;
-      document.getElementById('rev-delivery').textContent = shipping.length;
+      document.getElementById('rev-delivery').textContent  = shipping.length;
     }
 
     // ── Categories ────────────────────────────────────────────────
-    let cats = [];
+    let cats=[];
     async function loadCats() {
-      const { data } = await db.from('categories').select('*').order('name');
-      cats = data || [];
-      const list = document.getElementById('cat-list');
-      if (!cats.length) { list.innerHTML = '<p style="font-size:.82rem;color:var(--text-muted)">مفيش تصنيفات</p>'; return; }
-      list.innerHTML = cats.map(c => `
+      const{data}=await db.from('categories').select('*').order('name');
+      cats=data||[];
+      const list=document.getElementById('cat-list');
+      if(!cats.length){list.innerHTML='<p style="font-size:.82rem;color:var(--text-muted)">مفيش تصنيفات</p>';return;}
+      list.innerHTML=cats.map(c=>`
         <div class="cat-tag">
-          <span>${c.name_ar || c.name}</span>
-          ${c.name_ar && c.name !== c.name_ar ? `<span style="color:var(--text-muted);font-size:.72rem">/${c.name}</span>` : ''}
-          <button onclick="delCat('${c.id}')">✕</button>
+          <span>${escapeHtml(c.name_ar||c.name)}</span>
+          ${c.name_ar&&c.name!==c.name_ar?`<span style="color:var(--text-muted);font-size:.72rem">/${escapeHtml(c.name)}</span>`:''}
+          <button onclick="delCat('${encodeURIComponent(c.id)}')">✕</button>
         </div>`).join('');
     }
 
     async function addCat() {
-      const ar = document.getElementById('cat-ar').value.trim();
-      const en = document.getElementById('cat-en').value.trim();
-      if (!ar && !en) { showToast('اكتب اسم التصنيف', 'error'); return; }
-      const name = en || ar;
-      const slug = name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '') || Date.now().toString();
-      const { error } = await db.from('categories').insert({ name, name_ar: ar || null, slug });
-      if (error) { showToast('التصنيف موجود بالفعل', 'error'); }
+      const ar=document.getElementById('cat-ar').value.trim();
+      const en=document.getElementById('cat-en').value.trim();
+      if(!ar&&!en){showToast('اكتب اسم التصنيف','error');return;}
+      const name=en||ar;
+      const slug=name.toLowerCase().replace(/\s+/g,'-').replace(/[^a-z0-9-]/g,'')||Date.now().toString();
+      const{error}=await db.from('categories').insert({name,name_ar:ar||null,slug});
+      if(error){showToast('التصنيف موجود بالفعل','error');}
       else {
-        document.getElementById('cat-ar').value = '';
-        document.getElementById('cat-en').value = '';
+        document.getElementById('cat-ar').value='';
+        document.getElementById('cat-en').value='';
         showToast('✓ تم إضافة التصنيف');
+        // FIX: مسح categories cache في sessionStorage
+        sessionStorage.removeItem('antika_cats');
+        sessionStorage.removeItem('antika_cats_at');
         loadCats();
       }
     }
 
-    async function delCat(id) {
-      if (!confirm('هتحذف التصنيف؟ المنتجات المرتبطة به مش هتتحذف.')) return;
-      await db.from('categories').delete().eq('id', id);
+    async function delCat(encodedId) {
+      const id=decodeURIComponent(encodedId);
+      if(!confirm('هتحذف التصنيف؟ المنتجات المرتبطة به مش هتتحذف.'))return;
+      await db.from('categories').delete().eq('id',id);
       showToast('تم الحذف');
+      // FIX: مسح categories cache في sessionStorage
+      sessionStorage.removeItem('antika_cats');
+      sessionStorage.removeItem('antika_cats_at');
       loadCats();
     }
 
     // ── Delete Orders ─────────────────────────────────────────────
     const deleteLabels = {
-      week: 'طلبات آخر 7 أيام المكتملة والملغية',
+      week:  'طلبات آخر 7 أيام المكتملة والملغية',
       month: 'طلبات آخر 30 يوم المكتملة والملغية',
-      year: 'طلبات آخر 365 يوم المكتملة والملغية',
-      all: 'كل الطلبات المكتملة والملغية بدون استثناء'
+      year:  'طلبات آخر 365 يوم المكتملة والملغية',
+      all:   'كل الطلبات المكتملة والملغية بدون استثناء'
     };
 
     function deleteOrders(period) {
-      deleteTarget = period;
-      document.getElementById('confirm-msg').textContent =
+      deleteTarget=period;
+      document.getElementById('confirm-msg').textContent=
         `ستقوم بحذف ${deleteLabels[period]}. هذا الإجراء لا يمكن التراجع عنه نهائياً.`;
-      document.getElementById('confirm-input').value = '';
-      document.getElementById('confirm-btn').disabled = true;
+      document.getElementById('confirm-input').value='';
+      document.getElementById('confirm-btn').disabled=true;
       document.getElementById('confirm-modal').classList.add('open');
     }
 
     function checkConfirmInput() {
-      const val = document.getElementById('confirm-input').value.trim();
-      document.getElementById('confirm-btn').disabled = (val !== 'احذف');
+      const val=document.getElementById('confirm-input').value.trim();
+      document.getElementById('confirm-btn').disabled=(val!=='احذف');
     }
 
     function closeConfirm() {
       document.getElementById('confirm-modal').classList.remove('open');
-      deleteTarget = null;
+      deleteTarget=null;
     }
 
     async function execDelete() {
-      if (!deleteTarget) return;
-      const btn = document.getElementById('confirm-btn');
-      btn.disabled = true;
-      btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري الحذف...';
+      if(!deleteTarget) return;
+      const btn=document.getElementById('confirm-btn');
+      btn.disabled=true;
+      btn.innerHTML='<i class="fas fa-spinner fa-spin"></i> جاري الحذف...';
 
-      // FIX: بنبني الـ query بشكل صحيح
-      const now = new Date();
-      let cutoff = null;
-      if (deleteTarget === 'week') cutoff = new Date(now - 7 * 864e5).toISOString();
-      else if (deleteTarget === 'month') cutoff = new Date(now - 30 * 864e5).toISOString();
-      else if (deleteTarget === 'year') cutoff = new Date(now - 365 * 864e5).toISOString();
+      const now=new Date();
+      let cutoff=null;
+      if(deleteTarget==='week')       cutoff=new Date(now-7*864e5).toISOString();
+      else if(deleteTarget==='month') cutoff=new Date(now-30*864e5).toISOString();
+      else if(deleteTarget==='year')  cutoff=new Date(now-365*864e5).toISOString();
 
-      let query = db.from('orders').delete().in('status', ['delivered', 'cancelled']);
-      // FIX: لو فيه cutoff، بنحذف الطلبات القديمة من الـ cutoff لـ الحاضر
-      if (cutoff) query = query.lte('created_at', now.toISOString()).gte('created_at', cutoff);
+      let query=db.from('orders').delete().in('status',['delivered','cancelled']);
+      if(cutoff) query=query.lte('created_at',now.toISOString()).gte('created_at',cutoff);
 
-      const { error } = await query;
-      btn.innerHTML = '<i class="fas fa-trash"></i> تأكيد الحذف';
+      const{error}=await query;
+      btn.innerHTML='<i class="fas fa-trash"></i> تأكيد الحذف';
 
-      if (error) { showToast('حصل خطأ: ' + error.message, 'error'); btn.disabled = false; }
-      else { showToast('✓ تم الحذف بنجاح'); closeConfirm(); loadRevenue('all', null); }
+      if(error){showToast('حصل خطأ: '+error.message,'error');btn.disabled=false;}
+      else{showToast('✓ تم الحذف بنجاح');closeConfirm();loadRevenue('all',null);}
     }
 
     // ── CSV Export ────────────────────────────────────────────────
     function downloadCSV(data, filename) {
-      if (!data?.length) { showToast('مفيش بيانات للتصدير', 'error'); return; }
-      const headers = Object.keys(data[0]);
-      const rows = data.map(row =>
-        headers.map(h => `"${(row[h] ?? '').toString().replace(/"/g, '""')}"`).join(',')
-      );
-      const csv = [headers.join(','), ...rows].join('\n');
-      const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url; a.download = filename; a.click();
+      if(!data?.length){showToast('مفيش بيانات للتصدير','error');return;}
+      const headers=Object.keys(data[0]);
+      const rows=data.map(row=>headers.map(h=>`"${(row[h]??'').toString().replace(/"/g,'""')}"`).join(','));
+      const csv=[headers.join(','),...rows].join('\n');
+      const blob=new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8'});
+      const url=URL.createObjectURL(blob);
+      const a=document.createElement('a');
+      a.href=url; a.download=filename; a.click();
       URL.revokeObjectURL(url);
       showToast('✓ تم التصدير بنجاح');
     }
 
     async function exportOrders() {
-      const { data } = await db.from('orders')
+      const{data}=await db.from('orders')
         .select('id,created_at,total,status,payment_method,notes')
-        .order('created_at', { ascending: false });
-      downloadCSV(data?.map(o => ({
-        'رقم الطلب': o.id.slice(0, 8).toUpperCase(),
-        'التاريخ': new Date(o.created_at).toLocaleDateString('ar-EG'),
-        'الإجمالي': o.total,
-        'الحالة': o.status,
+        .order('created_at',{ascending:false});
+      downloadCSV(data?.map(o=>({
+        'رقم الطلب': o.id.slice(0,8).toUpperCase(),
+        'التاريخ':   new Date(o.created_at).toLocaleDateString('ar-EG'),
+        'الإجمالي':  o.total,
+        'الحالة':    o.status,
         'طريقة الدفع': o.payment_method,
-        'ملاحظات': o.notes || ''
-      })), `antika-orders-${new Date().toISOString().split('T')[0]}.csv`);
+        'ملاحظات':   o.notes||''
+      })),`antika-orders-${new Date().toISOString().split('T')[0]}.csv`);
     }
 
     async function exportProducts() {
-      const { data } = await db.from('products')
+      const{data}=await db.from('products')
         .select('id,name,name_ar,price,stock,is_published,created_at,categories(name)')
-        .order('created_at', { ascending: false });
-      downloadCSV(data?.map(p => ({
-        'الاسم': p.name_ar || p.name,
+        .order('created_at',{ascending:false});
+      downloadCSV(data?.map(p=>({
+        'الاسم':          p.name_ar||p.name,
         'الاسم الإنجليزي': p.name,
-        'السعر': p.price,
-        'المخزون': p.stock,
-        'التصنيف': p.categories?.name || '',
-        'منشور': p.is_published ? 'نعم' : 'لا',
-        'التاريخ': new Date(p.created_at).toLocaleDateString('ar-EG')
-      })), `antika-products-${new Date().toISOString().split('T')[0]}.csv`);
+        'السعر':          p.price,
+        'المخزون':        p.stock,
+        'التصنيف':        p.categories?.name||'',
+        'منشور':          p.is_published?'نعم':'لا',
+        'التاريخ':        new Date(p.created_at).toLocaleDateString('ar-EG')
+      })),`antika-products-${new Date().toISOString().split('T')[0]}.csv`);
     }
 
     async function exportUsers() {
-      const { data } = await db.from('profiles')
+      const{data}=await db.from('profiles')
         .select('full_name,phone,address,created_at,is_banned')
-        .order('created_at', { ascending: false });
-      downloadCSV(data?.map(u => ({
-        'الاسم': u.full_name || '',
-        'التليفون': u.phone || '',
-        'العنوان': u.address || '',
-        'محظور': u.is_banned ? 'نعم' : 'لا',
-        'تاريخ التسجيل': new Date(u.created_at).toLocaleDateString('ar-EG')
-      })), `antika-users-${new Date().toISOString().split('T')[0]}.csv`);
+        .order('created_at',{ascending:false});
+      downloadCSV(data?.map(u=>({
+        'الاسم':           u.full_name||'',
+        'التليفون':        u.phone||'',
+        'العنوان':         u.address||'',
+        'محظور':           u.is_banned?'نعم':'لا',
+        'تاريخ التسجيل':   new Date(u.created_at).toLocaleDateString('ar-EG')
+      })),`antika-users-${new Date().toISOString().split('T')[0]}.csv`);
     }
 
     async function init() {
-      const ok = await adminAuth();
-      if (!ok) return;
-      await Promise.all([loadSettings(), loadCats(), loadRevenue('week', null)]);
+      const ok=await adminAuth();
+      if(!ok) return;
+      await Promise.all([loadSettings(),loadCats(),loadRevenue('week',null)]);
       loadBadge();
     }
     init();

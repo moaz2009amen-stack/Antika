@@ -35,13 +35,11 @@
     .avatar-preview:hover { border-color: var(--gold); }
     .strength-bar { height: 4px; border-radius: 2px; background: var(--border); margin-top: 0.5rem; overflow: hidden; }
     .strength-fill { height: 100%; border-radius: 2px; transition: all 0.3s ease; }
-    /* FIX: lock notice */
     .lock-notice { background: rgba(220,38,38,.08); border: 1px solid rgba(220,38,38,.2); border-radius: var(--radius-sm); padding: 0.75rem 1rem; font-size: 0.85rem; color: #dc2626; text-align: center; margin-bottom: 1rem; display: none; }
     @media (max-width: 768px) { body { flex-direction: column; } .auth-left { display: none; } .auth-right { width: 100%; padding: 2rem 1.5rem; border: none; } }
   </style>
 </head>
 <body>
-  <!-- Left Side -->
   <div class="auth-left">
     <div class="auth-left-content">
       <div class="auth-logo">Antika Gallery</div>
@@ -51,7 +49,6 @@
     </div>
   </div>
 
-  <!-- Right Side -->
   <div class="auth-right page-enter">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:2rem">
       <button onclick="toggleLang()" style="font-size:0.85rem;color:var(--text-muted);font-weight:600;padding:6px 14px;border:1.5px solid var(--border);border-radius:20px;transition:all var(--transition)" id="lang-btn">EN</button>
@@ -69,15 +66,11 @@
     <div class="auth-panel active" id="panel-login">
       <h2 class="auth-title" data-ar="أهلاً بعودتك" data-en="Welcome Back">أهلاً بعودتك</h2>
       <p class="auth-subtitle" data-ar="سجل دخولك للمتابعة" data-en="Sign in to continue">سجل دخولك للمتابعة</p>
-
-      <!-- FIX: lock notice -->
       <div class="lock-notice" id="lock-notice"></div>
-
       <div class="form-group">
         <label class="form-label" data-ar="البريد الإلكتروني" data-en="Email">البريد الإلكتروني</label>
         <input type="email" class="form-control" id="login-email" placeholder="example@gmail.com" dir="ltr" maxlength="254" autocomplete="email">
       </div>
-
       <div class="form-group">
         <label class="form-label" data-ar="كلمة المرور" data-en="Password">كلمة المرور</label>
         <div class="password-toggle">
@@ -85,15 +78,12 @@
           <i class="fas fa-eye toggle-eye" onclick="togglePassword('login-password', this)"></i>
         </div>
       </div>
-
       <div style="text-align:left;margin-bottom:1.5rem">
         <button onclick="showTab('forgot')" style="font-size:0.85rem;color:var(--gold);font-weight:600" data-ar="نسيت كلمة المرور؟" data-en="Forgot password?">نسيت كلمة المرور؟</button>
       </div>
-
       <button class="btn btn-primary btn-block btn-lg" onclick="handleLogin()" id="login-btn">
         <span data-ar="دخول" data-en="Sign In">دخول</span>
       </button>
-
       <div id="login-error" class="form-error" style="margin-top:1rem;text-align:center"></div>
     </div>
 
@@ -101,7 +91,6 @@
     <div class="auth-panel" id="panel-register">
       <h2 class="auth-title" data-ar="إنشاء حساب" data-en="Create Account">إنشاء حساب</h2>
       <p class="auth-subtitle" data-ar="انضم لعائلة أنتيكا" data-en="Join Antika family">انضم لعائلة أنتيكا</p>
-
       <div class="avatar-upload">
         <div class="avatar-preview" onclick="document.getElementById('avatar-input').click()" id="avatar-preview-el">
           <i class="fas fa-user"></i>
@@ -112,7 +101,6 @@
           <small style="color:var(--text-muted)" data-ar="اضغط لرفع صورة (اختياري)" data-en="Tap to upload (optional)">اضغط لرفع صورة (اختياري)</small>
         </div>
       </div>
-
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">
         <div class="form-group">
           <label class="form-label" data-ar="الاسم الكامل" data-en="Full Name">الاسم الكامل</label>
@@ -123,17 +111,14 @@
           <input type="tel" class="form-control" id="reg-phone" dir="ltr" maxlength="15" inputmode="numeric" autocomplete="tel">
         </div>
       </div>
-
       <div class="form-group">
         <label class="form-label" data-ar="البريد الإلكتروني" data-en="Email">البريد الإلكتروني</label>
         <input type="email" class="form-control" id="reg-email" dir="ltr" maxlength="254" autocomplete="email">
       </div>
-
       <div class="form-group">
         <label class="form-label" data-ar="العنوان" data-en="Address">العنوان</label>
         <input type="text" class="form-control" id="reg-address" maxlength="300">
       </div>
-
       <div class="form-group">
         <label class="form-label" data-ar="كلمة المرور" data-en="Password">كلمة المرور</label>
         <div class="password-toggle">
@@ -143,7 +128,6 @@
         <div class="strength-bar"><div class="strength-fill" id="strength-fill"></div></div>
         <small class="form-hint" id="strength-text"></small>
       </div>
-
       <div class="form-group">
         <label class="form-label" data-ar="تأكيد كلمة المرور" data-en="Confirm Password">تأكيد كلمة المرور</label>
         <div class="password-toggle">
@@ -151,11 +135,9 @@
           <i class="fas fa-eye toggle-eye" onclick="togglePassword('reg-confirm', this)"></i>
         </div>
       </div>
-
       <button class="btn btn-primary btn-block btn-lg" onclick="handleRegister()" id="register-btn">
         <span data-ar="إنشاء الحساب" data-en="Create Account">إنشاء الحساب</span>
       </button>
-
       <div id="register-error" class="form-error" style="margin-top:1rem;text-align:center"></div>
     </div>
 
@@ -184,18 +166,24 @@
     const lang = getLang();
     let avatarFile = null;
 
-    // ── FIX: Rate Limiting على اللوغين ────────────────────────
-    let loginAttempts = 0;
-    let lockUntil     = 0;
+    // ── FIX: Rate Limiting بـ localStorage بدل متغيرات JS ────────
+    // المتغيرات في الـ memory بتتصفر مع كل page reload
     const MAX_ATTEMPTS = 5;
     const LOCK_MS      = 30 * 1000; // 30 ثانية
 
+    function getAttempts()  { return parseInt(localStorage.getItem('login_attempts') || '0'); }
+    function getLockUntil() { return parseInt(localStorage.getItem('login_lock')     || '0'); }
+    function setAttempts(n) { localStorage.setItem('login_attempts', String(n)); }
+    function setLockUntil(t){ localStorage.setItem('login_lock',     String(t)); }
+    function clearLoginLock(){ localStorage.removeItem('login_attempts'); localStorage.removeItem('login_lock'); }
+
     function checkLoginLock() {
+      const lockUntil = getLockUntil();
       if (Date.now() < lockUntil) {
-        const secs = Math.ceil((lockUntil - Date.now()) / 1000);
+        const secs   = Math.ceil((lockUntil - Date.now()) / 1000);
         const notice = document.getElementById('lock-notice');
         notice.style.display = 'block';
-        notice.textContent = lang === 'ar'
+        notice.textContent   = lang === 'ar'
           ? `كتير محاولات! استني ${secs} ثانية قبل المحاولة التانية`
           : `Too many attempts. Wait ${secs}s before trying again`;
         return false;
@@ -205,27 +193,21 @@
     }
 
     function recordFailedAttempt() {
-      loginAttempts++;
-      if (loginAttempts >= MAX_ATTEMPTS) {
-        lockUntil     = Date.now() + LOCK_MS;
-        loginAttempts = 0;
-        // countdown timer
+      const attempts = getAttempts() + 1;
+      setAttempts(attempts);
+      if (attempts >= MAX_ATTEMPTS) {
+        setLockUntil(Date.now() + LOCK_MS);
+        setAttempts(0);
         const interval = setInterval(() => {
-          if (!checkLoginLock()) {
-            // still locked — update notice
-          } else {
-            clearInterval(interval);
-          }
+          if (!checkLoginLock()) { /* still locked — notice updated */ }
+          else { clearInterval(interval); }
         }, 1000);
       }
     }
 
-    // ── FIX: Safe Redirect ────────────────────────────────────
+    // ── FIX: Safe Redirect ────────────────────────────────────────
     function safeRedirect(url) {
-      // بس relative URLs — منع open redirect
-      if (!url || url.startsWith('http') || url.startsWith('//') || url.startsWith('javascript:')) {
-        return null; // هيتعامل معاه الكود التاني
-      }
+      if (!url || url.startsWith('http') || url.startsWith('//') || url.startsWith('javascript:')) return null;
       return url;
     }
 
@@ -248,16 +230,16 @@
     }
 
     function showTab(tab) {
-      document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.auth-tab').forEach(t  => t.classList.remove('active'));
       document.querySelectorAll('.auth-panel').forEach(p => p.classList.remove('active'));
       document.getElementById(`panel-${tab}`).classList.add('active');
       if (tab !== 'forgot') document.getElementById(`tab-${tab}`).classList.add('active');
     }
 
     function togglePassword(id, icon) {
-      const input = document.getElementById(id);
+      const input  = document.getElementById(id);
       const isPass = input.type === 'password';
-      input.type = isPass ? 'text' : 'password';
+      input.type   = isPass ? 'text' : 'password';
       icon.className = isPass ? 'fas fa-eye-slash toggle-eye' : 'fas fa-eye toggle-eye';
     }
 
@@ -279,22 +261,22 @@
     function checkStrength(val) {
       const fill = document.getElementById('strength-fill');
       const text = document.getElementById('strength-text');
-      const l = getLang();
-      let score = 0;
-      if (val.length >= 8) score++;
-      if (/[A-Z]/.test(val)) score++;
-      if (/[0-9]/.test(val)) score++;
+      const l    = getLang();
+      let score  = 0;
+      if (val.length >= 8)          score++;
+      if (/[A-Z]/.test(val))        score++;
+      if (/[0-9]/.test(val))        score++;
       if (/[^A-Za-z0-9]/.test(val)) score++;
-      const colors = ['#dc2626','#f59e0b','#3b82f6','#16a34a'];
+      const colors   = ['#dc2626','#f59e0b','#3b82f6','#16a34a'];
       const labels_ar = ['ضعيفة','متوسطة','جيدة','قوية'];
       const labels_en = ['Weak','Fair','Good','Strong'];
-      fill.style.width = `${score * 25}%`;
+      fill.style.width      = `${score * 25}%`;
       fill.style.background = colors[score - 1] || '#dc2626';
-      text.textContent = score > 0 ? (l === 'ar' ? labels_ar[score-1] : labels_en[score-1]) : '';
+      text.textContent      = score > 0 ? (l === 'ar' ? labels_ar[score-1] : labels_en[score-1]) : '';
     }
 
     async function handleLogin() {
-      // FIX: check lock أول حاجة
+      // FIX: تحقق من الـ lock أول حاجة
       if (!checkLoginLock()) return;
 
       const btn   = document.getElementById('login-btn');
@@ -308,56 +290,54 @@
         errEl.textContent = lang === 'ar' ? 'من فضلك اكمل البيانات' : 'Please fill all fields';
         return;
       }
-
-      // FIX: تحقق من شكل الإيميل
       if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
         errEl.textContent = lang === 'ar' ? 'الإيميل غير صحيح' : 'Invalid email';
         return;
       }
 
-      btn.disabled = true;
+      btn.disabled  = true;
       btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
       errEl.textContent = '';
 
       const { data, error } = await db.auth.signInWithPassword({ email, password });
 
       if (error) {
-        // FIX: سجّل المحاولة الفاشلة
+        // FIX: سجّل المحاولة الفاشلة في localStorage
         recordFailedAttempt();
         errEl.textContent = lang === 'ar' ? 'إيميل أو كلمة مرور غلط' : 'Invalid email or password';
-        btn.disabled = false;
+        btn.disabled  = false;
         btn.innerHTML = `<span>${lang === 'ar' ? 'دخول' : 'Sign In'}</span>`;
         return;
       }
 
-      // reset attempts on success
-      loginAttempts = 0;
-      lockUntil     = 0;
+      // FIX: مسح الـ rate limit عند النجاح
+      clearLoginLock();
 
       // Check banned
       const { data: profile } = await db.from('profiles').select('is_banned').eq('id', data.user.id).single();
       if (profile?.is_banned) {
         await db.auth.signOut();
         errEl.textContent = lang === 'ar' ? 'هذا الحساب محظور' : 'This account is banned';
-        btn.disabled = false;
+        btn.disabled  = false;
         btn.innerHTML = `<span>${lang === 'ar' ? 'دخول' : 'Sign In'}</span>`;
         return;
       }
 
-      const role = data.user.user_metadata?.role;
+      // FIX: app_metadata بدل user_metadata
+      const role = data.user.app_metadata?.role;
       if (role === 'admin' || role === 'moderator') {
         window.location.href = '/admin-antika-ctrl/';
         return;
       }
 
-      // FIX: safe redirect — بس relative URLs
+      // FIX: safe redirect
       const params   = new URLSearchParams(window.location.search);
       const redirect = safeRedirect(params.get('redirect'));
       window.location.href = redirect || '/';
     }
 
     async function handleRegister() {
-      const btn   = document.getElementById('register-btn');
+      const btn    = document.getElementById('register-btn');
       if (btn.disabled) return;
 
       const errEl   = document.getElementById('register-error');
@@ -372,13 +352,10 @@
         errEl.textContent = lang === 'ar' ? 'من فضلك اكمل البيانات' : 'Please fill all fields';
         return;
       }
-
-      // FIX: تحقق من رقم التليفون
       if (!/^[\+]?[\d\s\-]{7,15}$/.test(phone)) {
         errEl.textContent = lang === 'ar' ? 'رقم التليفون غير صحيح' : 'Invalid phone number';
         return;
       }
-
       if (password !== confirm) {
         errEl.textContent = lang === 'ar' ? 'كلمة المرور مش متطابقة' : 'Passwords do not match';
         return;
@@ -388,7 +365,7 @@
         return;
       }
 
-      btn.disabled = true;
+      btn.disabled  = true;
       btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
       errEl.textContent = '';
 
@@ -399,7 +376,7 @@
 
       if (error) {
         errEl.textContent = error.message;
-        btn.disabled = false;
+        btn.disabled  = false;
         btn.innerHTML = `<span>${lang === 'ar' ? 'إنشاء الحساب' : 'Create Account'}</span>`;
         return;
       }
@@ -410,12 +387,12 @@
         try {
           const avatarUrl = await uploadToCloudinary(avatarFile, 'avatars');
           await db.from('profiles').update({ avatar_url: avatarUrl }).eq('id', data.user.id);
-        } catch (e) { console.log('Avatar upload failed'); }
+        } catch {}
       }
 
       showToast(lang === 'ar' ? 'تم إنشاء الحساب!' : 'Account created!');
       showTab('login');
-      btn.disabled = false;
+      btn.disabled  = false;
       btn.innerHTML = `<span>${lang === 'ar' ? 'إنشاء الحساب' : 'Create Account'}</span>`;
     }
 
@@ -425,7 +402,7 @@
       const email = document.getElementById('forgot-email').value.trim();
       if (!email) return;
 
-      btn.disabled = true;
+      btn.disabled  = true;
       btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
 
       const { error } = await db.auth.resetPasswordForEmail(email, {
@@ -437,7 +414,7 @@
         ? (lang === 'ar' ? 'حصل خطأ، حاول تاني' : 'Something went wrong')
         : (lang === 'ar' ? 'تم إرسال رابط الاستعادة على إيميلك ✓' : 'Reset link sent ✓');
 
-      btn.disabled = false;
+      btn.disabled  = false;
       btn.innerHTML = `<span>${lang === 'ar' ? 'إرسال رابط الاستعادة' : 'Send Reset Link'}</span>`;
     }
 
@@ -445,7 +422,9 @@
     (async () => {
       const user = await getCurrentUser();
       if (user) {
-        const role = user.user_metadata?.role;
+        // FIX: app_metadata بدل user_metadata
+        const { data: { session } } = await db.auth.getSession();
+        const role = session?.user?.app_metadata?.role;
         if (role === 'admin' || role === 'moderator') { window.location.href = '/admin-antika-ctrl/'; return; }
         const params   = new URLSearchParams(window.location.search);
         const redirect = safeRedirect(params.get('redirect'));
@@ -455,6 +434,8 @@
 
     applyLang();
     document.getElementById('theme-btn').innerHTML = getTheme() === 'dark' ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
+    // تحقق من الـ lock عند تحميل الصفحة (لو كان reload)
+    checkLoginLock();
   </script>
 </body>
 </html>

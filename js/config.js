@@ -118,7 +118,7 @@ async function requireAdmin() {
   const { data: { session } } = await db.auth.getSession();
   if (!session) { window.location.href = '/'; return false; }
   const role = session.user.app_metadata?.role;
-  if (role !== 'admin' && role !== 'moderator') {
+  if (role !== 'admin') {
     window.location.href = '/';
     return false;
   }
@@ -408,7 +408,7 @@ async function adminAuthCheck() {
 
   // FIX: app_metadata بدل user_metadata
   const role = session.user.app_metadata?.role;
-  if (role !== 'admin' && role !== 'moderator') {
+  if (role !== 'admin') {
     window.location.href = '/admin-antika-ctrl/login.html';
     return false;
   }

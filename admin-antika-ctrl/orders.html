@@ -117,7 +117,7 @@
       if (!session) { window.location.href = '/admin-antika-ctrl/login.html'; return false; }
       // FIX: app_metadata
       const role = session.user.app_metadata?.role;
-      if (role !== 'admin' && role !== 'moderator') { window.location.href = '/admin-antika-ctrl/login.html'; return false; }
+      if (role !== 'admin') { window.location.href = '/admin-antika-ctrl/login.html'; return false; }
       document.body.style.opacity = '1';
       initTheme();
       document.getElementById('theme-toggle').innerHTML = getTheme() === 'dark' ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';

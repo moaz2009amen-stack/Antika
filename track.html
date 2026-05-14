@@ -25,6 +25,9 @@
     .step-content { padding-top: 4px; }
     .step-title { font-weight: 700; font-size: 0.9rem; }
     .step-date { font-size: 0.8rem; color: var(--text-muted); margin-top: 0.2rem; }
+    /* Success state */
+    .success-box { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 2.5rem; text-align: center; margin-bottom: 1.5rem; }
+    .success-icon { width: 72px; height: 72px; border-radius: 50%; background: rgba(22,163,74,.1); display: flex; align-items: center; justify-content: center; margin: 0 auto 1.25rem; font-size: 2rem; color: #16a34a; }
   </style>
 </head>
 <body>
@@ -50,28 +53,49 @@
         <p style="color:var(--text-muted)" data-ar="ادخلي رقم التليفون عشان تشوفي طلباتك" data-en="Enter your phone number to track your orders">ادخلي رقم التليفون عشان تشوفي طلباتك</p>
       </div>
 
-      <div class="track-search">
-        <div class="form-group">
-          <label class="form-label" data-ar="رقم التليفون" data-en="Phone Number">رقم التليفون</label>
-          <!-- FIX: maxlength + inputmode للموبايل -->
-          <input
-            type="tel"
-            class="form-control"
-            id="track-phone"
-            dir="ltr"
-            placeholder="01xxxxxxxxx"
-            maxlength="15"
-            inputmode="numeric"
-            autocomplete="tel"
-            onkeydown="if(event.key==='Enter')trackOrder()"
-            oninput="this.value=this.value.replace(/[^0-9+\-\s]/g,'')"
-          >
+      <!-- FIX: Success state بعد إتمام الطلب من checkout.html -->
+      <div id="success-box" style="display:none">
+        <div class="success-box">
+          <div class="success-icon"><i class="fas fa-check-circle"></i></div>
+          <h3 style="font-family:var(--font-display);font-size:1.5rem;margin-bottom:.5rem;color:#16a34a" data-ar="تم تأكيد طلبك! 🎉" data-en="Order Confirmed! 🎉">تم تأكيد طلبك! 🎉</h3>
+          <p style="color:var(--text-secondary);margin-bottom:1.25rem" data-ar="هنتواصل معاكِ قريباً على التليفون" data-en="We will contact you soon by phone">هنتواصل معاكِ قريباً على التليفون</p>
+          <div id="success-order-id" style="background:var(--bg-secondary);border-radius:var(--radius-sm);padding:.6rem 1.25rem;display:inline-block;margin-bottom:1.5rem">
+            <div style="font-size:.75rem;color:var(--text-muted)" data-ar="رقم الطلب" data-en="Order ID">رقم الطلب</div>
+            <div id="success-id-val" style="font-family:monospace;font-weight:700;color:var(--gold);font-size:1.1rem"></div>
+          </div>
+          <div style="display:flex;gap:.75rem;justify-content:center;flex-wrap:wrap">
+            <button onclick="showTrackForm()" class="btn btn-outline btn-sm">
+              <i class="fas fa-search"></i> <span data-ar="تتبع الطلب" data-en="Track Order">تتبع الطلب</span>
+            </button>
+            <a href="/shop.html" class="btn btn-primary btn-sm">
+              <i class="fas fa-shopping-bag"></i> <span data-ar="متابعة التسوق" data-en="Continue Shopping">متابعة التسوق</span>
+            </a>
+          </div>
         </div>
-        <button class="btn btn-primary btn-block" onclick="trackOrder()" id="track-btn">
-          <i class="fas fa-search"></i>
-          <span data-ar="تتبع الطلبات" data-en="Track Orders">تتبع الطلبات</span>
-        </button>
-        <div id="track-error" class="form-error" style="margin-top:0.75rem;text-align:center"></div>
+      </div>
+
+      <div id="track-form-wrap">
+        <div class="track-search">
+          <div class="form-group">
+            <label class="form-label" data-ar="رقم التليفون" data-en="Phone Number">رقم التليفون</label>
+            <input
+              type="tel"
+              class="form-control"
+              id="track-phone"
+              dir="ltr"
+              placeholder="01xxxxxxxxx"
+              maxlength="15"
+              inputmode="numeric"
+              autocomplete="tel"
+              onkeydown="if(event.key==='Enter')trackOrder()"
+              oninput="this.value=this.value.replace(/[^0-9+\-\s]/g,'')">
+          </div>
+          <button class="btn btn-primary btn-block" onclick="trackOrder()" id="track-btn">
+            <i class="fas fa-search"></i>
+            <span data-ar="تتبع الطلبات" data-en="Track Orders">تتبع الطلبات</span>
+          </button>
+          <div id="track-error" class="form-error" style="margin-top:0.75rem;text-align:center"></div>
+        </div>
       </div>
 
       <div id="orders-results"></div>
@@ -96,39 +120,30 @@
       });
       document.getElementById('lang-toggle').textContent = l === 'ar' ? 'EN' : 'ع';
     }
-    function toggleLang() { setLang(l === 'ar' ? 'en' : 'ar'); }
+    function toggleLang()  { setLang(l === 'ar' ? 'en' : 'ar'); }
     function toggleTheme() {
       const t = getTheme() === 'light' ? 'dark' : 'light';
       setTheme(t);
       document.getElementById('theme-toggle').innerHTML = t === 'dark' ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
     }
 
-    // FIX: escapeHTML — منع XSS في أي بيانات بتيجي من DB
-    function escHtml(str) {
-      if (!str) return '';
-      return String(str)
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;')
-        .replace(/'/g, '&#039;');
+    function showTrackForm() {
+      document.getElementById('success-box').style.display    = 'none';
+      document.getElementById('track-form-wrap').style.display = 'block';
     }
 
-    // FIX: validatePhone — تحقق صارم قبل الـ DB query
+    // FIX: validate phone
     function validatePhone(phone) {
-      // يقبل: أرقام، مسافات، +، -
-      // طول بين 7 و 15
       const cleaned = phone.replace(/[\s\-]/g, '');
-      if (!/^[\+]?[\d]{7,15}$/.test(cleaned)) return false;
-      return true;
+      return /^[\+]?[\d]{7,15}$/.test(cleaned);
     }
 
     const steps = [
-      { key: 'pending',   ar: 'تم استلام الطلب',  en: 'Order Received',  icon: 'fa-check' },
-      { key: 'confirmed', ar: 'تم تأكيد الطلب',   en: 'Order Confirmed', icon: 'fa-thumbs-up' },
-      { key: 'processing',ar: 'جاري التجهيز',      en: 'Being Prepared',  icon: 'fa-box' },
-      { key: 'shipped',   ar: 'في الطريق إليك',    en: 'On the Way',      icon: 'fa-truck' },
-      { key: 'delivered', ar: 'تم التوصيل',        en: 'Delivered',       icon: 'fa-home' }
+      { key: 'pending',    ar: 'تم استلام الطلب',  en: 'Order Received',  icon: 'fa-check' },
+      { key: 'confirmed',  ar: 'تم تأكيد الطلب',   en: 'Order Confirmed', icon: 'fa-thumbs-up' },
+      { key: 'processing', ar: 'جاري التجهيز',      en: 'Being Prepared',  icon: 'fa-box' },
+      { key: 'shipped',    ar: 'في الطريق إليك',    en: 'On the Way',      icon: 'fa-truck' },
+      { key: 'delivered',  ar: 'تم التوصيل',        en: 'Delivered',       icon: 'fa-home' }
     ];
     const statusOrder = ['pending','confirmed','processing','shipped','delivered'];
 
@@ -153,34 +168,27 @@
     async function trackOrder() {
       const btn   = document.getElementById('track-btn');
       const errEl = document.getElementById('track-error');
-
-      // FIX: منع double-submit
       if (btn.disabled) return;
 
-      const raw   = document.getElementById('track-phone').value.trim();
+      const raw = document.getElementById('track-phone').value.trim();
       errEl.textContent = '';
 
-      // FIX: validate phone قبل الـ query
       if (!raw) {
         errEl.textContent = l === 'ar' ? 'أدخلي رقم التليفون' : 'Please enter your phone number';
         return;
       }
       if (!validatePhone(raw)) {
-        errEl.textContent = l === 'ar' ? 'رقم التليفون غير صحيح — أرقام فقط (7-15 رقم)' : 'Invalid phone number (7-15 digits only)';
+        errEl.textContent = l === 'ar' ? 'رقم التليفون غير صحيح' : 'Invalid phone number';
         return;
       }
 
-      // normalize — شيل المسافات والـ dashes
       const phone = raw.replace(/[\s\-]/g, '');
-
-      btn.disabled = true;
+      btn.disabled  = true;
       btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
 
       try {
         const { data: profiles, error: profileErr } = await db
-          .from('profiles')
-          .select('id')
-          .eq('phone', phone);
+          .from('profiles').select('id').eq('phone', phone);
 
         if (profileErr) throw profileErr;
 
@@ -190,7 +198,6 @@
         }
 
         const userId = profiles[0].id;
-
         const { data: orders, error: ordersErr } = await db
           .from('orders')
           .select('*, order_items(quantity, price_at_time, products(name, name_ar, images))')
@@ -207,10 +214,9 @@
         renderOrders(orders);
 
       } catch (err) {
-        console.error('Track error:', err);
-        errEl.textContent = l === 'ar' ? 'حصل خطأ، حاولي تاني' : 'Something went wrong, please try again';
+        errEl.textContent = l === 'ar' ? 'حصل خطأ، حاولي تاني' : 'Something went wrong';
       } finally {
-        btn.disabled = false;
+        btn.disabled  = false;
         btn.innerHTML = `<i class="fas fa-search"></i> <span>${l === 'ar' ? 'تتبع الطلبات' : 'Track Orders'}</span>`;
       }
     }
@@ -224,10 +230,8 @@
         delivered:  { ar: 'تم التوصيل', en: 'Delivered',  cls: 'badge-success' },
         cancelled:  { ar: 'ملغي',        en: 'Cancelled',  cls: 'badge-danger' }
       };
-
       const placeholder = 'https://res.cloudinary.com/df3ffyrsg/image/upload/q_auto,f_auto,w_40/v1/antika/placeholder';
 
-      // FIX: كل البيانات بتمر على escHtml قبل ما تتحط في DOM
       document.getElementById('orders-results').innerHTML = orders.map(order => {
         const s = statusMap[order.status] || statusMap.pending;
         return `
@@ -235,7 +239,7 @@
             <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem;flex-wrap:wrap;gap:0.5rem">
               <div>
                 <div style="font-weight:700;font-family:monospace;color:var(--gold);font-size:1rem">
-                  #${escHtml(order.id.slice(0,8).toUpperCase())}
+                  #${escapeHtml(order.id.slice(0,8).toUpperCase())}
                 </div>
                 <div style="font-size:0.8rem;color:var(--text-muted)">${formatDate(order.created_at)}</div>
               </div>
@@ -253,31 +257,18 @@
                 ${l === 'ar' ? 'المنتجات:' : 'Products:'}
               </div>
               ${(order.order_items || []).map(oi => {
-                // FIX: escape كل البيانات
-                const pname = escHtml(
-                  l === 'ar' && oi.products?.name_ar
-                    ? oi.products.name_ar
-                    : (oi.products?.name || '—')
-                );
-                const imgSrc = oi.products?.images?.[0] || placeholder;
+                const pname = escapeHtml(l === 'ar' && oi.products?.name_ar ? oi.products.name_ar : (oi.products?.name || '—'));
+                const imgSrc = escapeHtml(oi.products?.images?.[0] || placeholder);
                 return `
                   <div style="display:flex;align-items:center;gap:0.75rem;padding:0.5rem 0">
-                    <img src="${escHtml(imgSrc)}"
-                      style="width:40px;height:50px;border-radius:4px;object-fit:cover;background:var(--bg-secondary);border:1px solid var(--border)"
-                      onerror="this.src='${placeholder}'"
-                      alt="">
+                    <img src="${imgSrc}" style="width:40px;height:50px;border-radius:4px;object-fit:cover;background:var(--bg-secondary);border:1px solid var(--border)" onerror="this.src='${placeholder}'" alt="">
                     <div style="flex:1">
                       <div style="font-size:0.9rem;font-weight:600">${pname}</div>
-                      <div style="font-size:0.8rem;color:var(--text-muted)">
-                        ${l === 'ar' ? 'الكمية:' : 'Qty:'} ${escHtml(String(oi.quantity))}
-                      </div>
+                      <div style="font-size:0.8rem;color:var(--text-muted)">${l === 'ar' ? 'الكمية:' : 'Qty:'} ${escapeHtml(String(oi.quantity))}</div>
                     </div>
-                    <div style="font-weight:700;color:var(--gold)">
-                      ${formatPrice(oi.price_at_time * oi.quantity)}
-                    </div>
+                    <div style="font-weight:700;color:var(--gold)">${formatPrice(oi.price_at_time * oi.quantity)}</div>
                   </div>`;
               }).join('')}
-
               <div style="display:flex;justify-content:space-between;margin-top:0.75rem;padding-top:0.75rem;border-top:1px solid var(--border);font-weight:700">
                 <span>${l === 'ar' ? 'الإجمالي' : 'Total'}</span>
                 <span style="color:var(--gold)">${formatPrice(order.total)}</span>
@@ -297,12 +288,31 @@
       }
     }
 
-    checkMaintenance();
-    applyLang();
-    updateCartCount();
-    initUserArea();
-    document.getElementById('theme-toggle').innerHTML = getTheme() === 'dark' ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
-    window.addEventListener('scroll', () => document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 20));
+    // ── Init ──────────────────────────────────────────────────────
+    (function init() {
+      // FIX: تحقق من success state قادم من checkout.html
+      const urlParams = new URLSearchParams(window.location.search);
+      if (urlParams.get('success') === '1') {
+        const orderId = urlParams.get('order');
+        document.getElementById('success-box').style.display    = 'block';
+        document.getElementById('track-form-wrap').style.display = 'none';
+        if (orderId) {
+          document.getElementById('success-id-val').textContent =
+            '#' + decodeURIComponent(orderId).slice(0,8).toUpperCase();
+        } else {
+          document.getElementById('success-order-id').style.display = 'none';
+        }
+        // مسح الـ URL params بدون reload
+        window.history.replaceState({}, '', '/track.html');
+      }
+
+      checkMaintenance();
+      applyLang();
+      updateCartCount();
+      initUserArea();
+      document.getElementById('theme-toggle').innerHTML = getTheme() === 'dark' ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
+      window.addEventListener('scroll', () => document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 20));
+    })();
   </script>
 </body>
 </html>

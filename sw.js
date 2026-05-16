@@ -47,8 +47,7 @@ self.addEventListener('fetch', e => {
     url.hostname.includes('cloudinary') ||
     url.pathname.includes('admin-antika-ctrl') ||
     url.pathname === '/js/config.js' ||
-    url.pathname === '/js/bot.js' ||
-    url.pathname === '/js/footer.js'
+    url.pathname === '/js/bot.js'
   ) {
     return;
   }

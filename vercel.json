@@ -15,9 +15,15 @@
       ]
     },
     {
-      "source": "/js/bot.js",
-      "headers": [
-        { "key": "Cache-Control", "value": "no-store, no-cache, must-revalidate, max-age=0" }
+  "source": "/js/bot.js",
+  "headers": [
+    { "key": "Cache-Control", "value": "no-store, no-cache, must-revalidate, max-age=0" }
+  ]
+},
+{
+     "source": "/js/footer.js",
+     "headers": [
+         { "key": "Cache-Control", "value": "no-store, no-cache, must-revalidate, max-age=0" }
       ]
     },
     {

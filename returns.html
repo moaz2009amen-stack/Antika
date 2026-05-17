@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Antika Gallery — سياسة الإرجاع والاستبدال</title>
+  <link rel="manifest" href="/manifest.json">
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <style>
+    .legal-wrap { max-width: 780px; margin: 0 auto; padding: 2.5rem 0 5rem; }
+    .legal-hero { text-align: center; margin-bottom: 3rem; padding-bottom: 2rem; border-bottom: 1px solid var(--border); }
+    .legal-hero h1 { font-family: var(--font-display); font-size: 2.2rem; font-style: italic; color: var(--gold); margin-bottom: .5rem; }
+    .legal-hero p { color: var(--text-muted); font-size: .9rem; }
+    .legal-section { margin-bottom: 2.5rem; }
+    .legal-section h2 { font-family: var(--font-display); font-size: 1.2rem; color: var(--text); margin-bottom: 1rem; padding-bottom: .5rem; border-bottom: 2px solid var(--gold); display: inline-block; }
+    .legal-section p { color: var(--text-secondary); line-height: 1.9; margin-bottom: .85rem; font-size: .95rem; }
+    .legal-section ul { color: var(--text-secondary); line-height: 1.9; padding-right: 1.5rem; margin-bottom: .85rem; font-size: .95rem; }
+    .legal-section ul li { margin-bottom: .4rem; }
+    .legal-section ul li::marker { color: var(--gold); }
+    .step-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px,1fr)); gap: 1rem; margin: 1.25rem 0; }
+    .step-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.25rem; text-align: center; }
+    .step-card .num { width: 36px; height: 36px; border-radius: 50%; background: var(--gold); color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 700; margin: 0 auto .75rem; font-size: .9rem; }
+    .step-card p { font-size: .85rem; color: var(--text-secondary); margin: 0; line-height: 1.6; }
+    .warning-box { background: rgba(220,38,38,.06); border: 1px solid rgba(220,38,38,.2); border-radius: var(--radius); padding: 1.25rem 1.5rem; margin: 1rem 0; border-right: 3px solid #dc2626; }
+    .warning-box p { margin: 0; color: var(--text-secondary); font-size: .9rem; }
+    .ok-box { background: rgba(22,163,74,.06); border: 1px solid rgba(22,163,74,.2); border-radius: var(--radius); padding: 1.25rem 1.5rem; margin: 1rem 0; border-right: 3px solid #16a34a; }
+    .ok-box p { margin: 0; color: var(--text-secondary); font-size: .9rem; }
+    .contact-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 1.5rem; display: flex; gap: 1rem; align-items: center; margin-top: 1rem; }
+    .contact-card i { font-size: 1.5rem; color: #25d366; flex-shrink: 0; }
+  </style>
+</head>
+<body>
+  <nav class="navbar" id="navbar">
+    <a href="/" class="navbar-brand">Antika Gallery</a>
+    <ul class="navbar-nav">
+      <li><a href="/">الرئيسية</a></li>
+      <li><a href="/shop.html">المتجر</a></li>
+    </ul>
+    <div class="navbar-actions">
+      <button class="navbar-icon-btn" onclick="toggleTheme()" id="theme-toggle"><i class="fas fa-moon"></i></button>
+      <a href="/cart.html" class="navbar-icon-btn"><i class="fas fa-shopping-bag"></i><span class="cart-count" style="display:none">0</span></a>
+    </div>
+  </nav>
+
+  <div class="container">
+    <div class="legal-wrap">
+
+      <div class="legal-hero">
+        <h1>سياسة الإرجاع والاستبدال</h1>
+        <p>آخر تحديث: يناير 2025</p>
+      </div>
+
+      <div class="legal-section">
+        <h2>الحالات المقبولة للإرجاع</h2>
+        <div class="ok-box">
+          <p>✅ نقبل الإرجاع أو الاستبدال في الحالات التالية فقط:</p>
+        </div>
+        <ul>
+          <li>المنتج وصل تالف أو به عيب مصنعي واضح</li>
+          <li>المنتج المستلم مختلف تماماً عن الذي طلبته</li>
+          <li>المنتج لم يصل رغم مرور الوقت المتوقع للتوصيل</li>
+        </ul>
+      </div>
+
+      <div class="legal-section">
+        <h2>الحالات غير المقبولة للإرجاع</h2>
+        <div class="warning-box">
+          <p>❌ لا نقبل الإرجاع في الحالات التالية:</p>
+        </div>
+        <ul>
+          <li>تغيير الرأي أو عدم الإعجاب بالمنتج بعد استلامه</li>
+          <li>المنتجات المستخدمة أو التي أُزيل تغليفها الأصلي</li>
+          <li>الملابس التي جُرب ارتداؤها</li>
+          <li>طلب الإرجاع بعد مرور أكثر من 48 ساعة من الاستلام</li>
+          <li>المنتجات المخصومة أو التي اشتريتها في عروض خاصة</li>
+          <li>الأنتيكات والمقتنيات القديمة (طبيعتها تختلف)</li>
+        </ul>
+      </div>
+
+      <div class="legal-section">
+        <h2>كيف تطلب الإرجاع</h2>
+        <div class="step-cards">
+          <div class="step-card">
+            <div class="num">1</div>
+            <p>تواصل معنا على الواتساب خلال 48 ساعة من استلام الطلب</p>
+          </div>
+          <div class="step-card">
+            <div class="num">2</div>
+            <p>أرسل صور واضحة للمنتج وللمشكلة مع رقم طلبك</p>
+          </div>
+          <div class="step-card">
+            <div class="num">3</div>
+            <p>ننظر في الطلب ونرد عليك خلال 24 ساعة بالقرار</p>
+          </div>
+          <div class="step-card">
+            <div class="num">4</div>
+            <p>لو القرار بالقبول، نتفق على طريقة الإرجاع والاستبدال</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="legal-section">
+        <h2>مدة ومصاريف الإرجاع</h2>
+        <ul>
+          <li><strong>مدة الطلب:</strong> خلال 48 ساعة من الاستلام فقط</li>
+          <li><strong>مصاريف الشحن:</strong> تُحسب حسب كل حالة — لو الخطأ من جهتنا فنحن ندفع</li>
+          <li><strong>الاستبدال:</strong> يتم بنفس المنتج أو منتج بنفس القيمة حسب التوافر</li>
+          <li><strong>استرداد المبلغ:</strong> في حالات معينة فقط وبعد مراجعة الطلب</li>
+        </ul>
+      </div>
+
+      <div class="legal-section">
+        <h2>ملاحظات مهمة</h2>
+        <ul>
+          <li>كل منتجاتنا مصورة على الطبيعة بعناية لتجنب الاختلافات</li>
+          <li>الألوان قد تختلف قليلاً بسبب إعدادات شاشة كل جهاز</li>
+          <li>في حالة الأنتيكات والقطع القديمة، علامات الاستخدام البسيطة طبيعية وليست عيباً</li>
+        </ul>
+      </div>
+
+      <div class="legal-section">
+        <h2>تواصل معنا</h2>
+        <p>لطلب الإرجاع أو الاستفسار عن أي طلب:</p>
+        <div class="contact-card">
+          <i class="fab fa-whatsapp"></i>
+          <div>
+            <div style="font-weight:600">تواصل معنا على الواتساب</div>
+            <div style="font-size:.85rem;color:var(--text-muted)">أرسل رقم طلبك وصور المشكلة</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <footer style="background:var(--bg-secondary);border-top:1px solid var(--border);padding:1.5rem 0">
+    <div class="container footer-bottom">
+      <p style="font-size:.85rem;color:var(--text-muted)">© 2025 Antika Gallery — جميع الحقوق محفوظة</p>
+      <div style="display:flex;gap:1.25rem">
+        <a href="/privacy.html" style="font-size:.82rem;color:var(--text-muted)">الخصوصية</a>
+        <a href="/returns.html" style="font-size:.82rem;color:var(--gold)">سياسة الإرجاع</a>
+        <a href="/terms.html" style="font-size:.82rem;color:var(--text-muted)">الشروط والأحكام</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+  <script src="/js/config.js"></script>
+  <script>
+    function toggleTheme() {
+      const t = getTheme() === 'light' ? 'dark' : 'light';
+      setTheme(t);
+      document.getElementById('theme-toggle').innerHTML = t === 'dark' ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
+    }
+    initTheme();
+    updateCartCount();
+    document.getElementById('theme-toggle').innerHTML = getTheme() === 'dark' ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
+    window.addEventListener('scroll', () => document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 20));
+  </script>
+</body>
+</html>

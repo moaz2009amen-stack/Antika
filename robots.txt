@@ -1,0 +1,12 @@
+User-agent: *
+Allow: /
+
+# منع Google من أندكسة لوحة التحكم
+Disallow: /admin-antika-ctrl/
+
+# منع صفحات الـ auth
+Disallow: /auth.html
+Disallow: /reset-password.html
+
+# السيت ماب
+Sitemap: https://antika-store.vercel.app/sitemap.xml

@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Antika Gallery — سياسة الخصوصية</title>
+  <link rel="manifest" href="/manifest.json">
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <style>
+    .legal-wrap { max-width: 780px; margin: 0 auto; padding: 2.5rem 0 5rem; }
+    .legal-hero { text-align: center; margin-bottom: 3rem; padding-bottom: 2rem; border-bottom: 1px solid var(--border); }
+    .legal-hero h1 { font-family: var(--font-display); font-size: 2.2rem; font-style: italic; color: var(--gold); margin-bottom: .5rem; }
+    .legal-hero p { color: var(--text-muted); font-size: .9rem; }
+    .legal-section { margin-bottom: 2.5rem; }
+    .legal-section h2 { font-family: var(--font-display); font-size: 1.2rem; color: var(--text); margin-bottom: 1rem; padding-bottom: .5rem; border-bottom: 2px solid var(--gold); display: inline-block; }
+    .legal-section p { color: var(--text-secondary); line-height: 1.9; margin-bottom: .85rem; font-size: .95rem; }
+    .legal-section ul { color: var(--text-secondary); line-height: 1.9; padding-right: 1.5rem; margin-bottom: .85rem; font-size: .95rem; }
+    .legal-section ul li { margin-bottom: .4rem; }
+    .legal-section ul li::marker { color: var(--gold); }
+    .info-box { background: var(--bg-secondary); border-radius: var(--radius); padding: 1.25rem 1.5rem; margin-bottom: 1rem; border-right: 3px solid var(--gold); }
+    .info-box p { margin: 0; }
+    .contact-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 1.5rem; display: flex; gap: 1rem; align-items: center; margin-top: 1rem; }
+    .contact-card i { font-size: 1.5rem; color: var(--gold); flex-shrink: 0; }
+  </style>
+</head>
+<body>
+  <nav class="navbar" id="navbar">
+    <a href="/" class="navbar-brand">Antika Gallery</a>
+    <ul class="navbar-nav">
+      <li><a href="/">الرئيسية</a></li>
+      <li><a href="/shop.html">المتجر</a></li>
+    </ul>
+    <div class="navbar-actions">
+      <button class="navbar-icon-btn" onclick="toggleTheme()" id="theme-toggle"><i class="fas fa-moon"></i></button>
+      <a href="/cart.html" class="navbar-icon-btn"><i class="fas fa-shopping-bag"></i><span class="cart-count" style="display:none">0</span></a>
+    </div>
+  </nav>
+
+  <div class="container">
+    <div class="legal-wrap">
+
+      <div class="legal-hero">
+        <h1>سياسة الخصوصية</h1>
+        <p>آخر تحديث: يناير 2025</p>
+      </div>
+
+      <div class="info-box">
+        <p>أنتيكا جاليري تلتزم بحماية خصوصيتك وبياناتك الشخصية. بموجب استخدامك لموقعنا، فأنت توافق على سياسة الخصوصية هذه.</p>
+      </div>
+
+      <div class="legal-section">
+        <h2>البيانات التي نجمعها</h2>
+        <p>عند التسجيل أو الطلب، نجمع البيانات التالية:</p>
+        <ul>
+          <li>الاسم الكامل ورقم الهاتف والعنوان</li>
+          <li>البريد الإلكتروني لإنشاء الحساب</li>
+          <li>صورة الملف الشخصي (اختيارية)</li>
+          <li>بيانات الطلبات والمنتجات المفضلة</li>
+          <li>إيصالات الدفع عند استخدام المحفظة الإلكترونية</li>
+        </ul>
+      </div>
+
+      <div class="legal-section">
+        <h2>كيف نستخدم بياناتك</h2>
+        <ul>
+          <li>معالجة طلباتك وتنسيق التوصيل</li>
+          <li>التواصل معك بشأن طلباتك وحالتها</li>
+          <li>إرسال إشعارات المنتجات الجديدة (يمكن إيقافها)</li>
+          <li>تحسين تجربة الاستخدام على الموقع</li>
+        </ul>
+        <p>لا نستخدم بياناتك لأي أغراض تجارية أخرى ولا نبيعها لأي طرف ثالث.</p>
+      </div>
+
+      <div class="legal-section">
+        <h2>تخزين البيانات وأمانها</h2>
+        <ul>
+          <li>بياناتك محفوظة على خوادم Supabase بتشفير SSL</li>
+          <li>الصور محفوظة على Cloudinary بأمان</li>
+          <li>كلمات المرور مشفرة ولا يمكن لأحد الاطلاع عليها</li>
+          <li>لوحة التحكم محمية بصلاحيات وصول مقيدة</li>
+        </ul>
+      </div>
+
+      <div class="legal-section">
+        <h2>ملفات الكوكيز والتخزين المحلي</h2>
+        <p>نستخدم التخزين المحلي للمتصفح (localStorage) لحفظ:</p>
+        <ul>
+          <li>محتويات سلة التسوق</li>
+          <li>تفضيلات اللغة والثيم</li>
+          <li>قائمة المفضلة (للزوار غير المسجلين)</li>
+        </ul>
+        <p>لا نستخدم ملفات تتبع أو إعلانات من أي نوع.</p>
+      </div>
+
+      <div class="legal-section">
+        <h2>حقوقك</h2>
+        <ul>
+          <li><strong>الاطلاع:</strong> يمكنك عرض بياناتك من صفحة حسابك</li>
+          <li><strong>التعديل:</strong> يمكنك تعديل بياناتك في أي وقت من الملف الشخصي</li>
+          <li><strong>الحذف:</strong> يمكنك طلب حذف حسابك وبياناتك بالتواصل معنا</li>
+          <li><strong>الإيقاف:</strong> يمكنك إيقاف إشعارات الموقع في أي وقت</li>
+        </ul>
+      </div>
+
+      <div class="legal-section">
+        <h2>التواصل معنا</h2>
+        <p>لأي استفسار بشأن خصوصيتك أو لطلب حذف بياناتك:</p>
+        <div class="contact-card">
+          <i class="fab fa-whatsapp" style="color:#25d366"></i>
+          <div>
+            <div style="font-weight:600">تواصل معنا على الواتساب</div>
+            <div style="font-size:.85rem;color:var(--text-muted)">سنرد خلال 24 ساعة</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <footer style="background:var(--bg-secondary);border-top:1px solid var(--border);padding:1.5rem 0">
+    <div class="container footer-bottom">
+      <p style="font-size:.85rem;color:var(--text-muted)">© 2025 Antika Gallery — جميع الحقوق محفوظة</p>
+      <div style="display:flex;gap:1.25rem">
+        <a href="/privacy.html" style="font-size:.82rem;color:var(--gold)">الخصوصية</a>
+        <a href="/returns.html" style="font-size:.82rem;color:var(--text-muted)">سياسة الإرجاع</a>
+        <a href="/terms.html" style="font-size:.82rem;color:var(--text-muted)">الشروط والأحكام</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+  <script src="/js/config.js"></script>
+  <script>
+    function toggleTheme() {
+      const t = getTheme() === 'light' ? 'dark' : 'light';
+      setTheme(t);
+      document.getElementById('theme-toggle').innerHTML = t === 'dark' ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
+    }
+    initTheme();
+    updateCartCount();
+    document.getElementById('theme-toggle').innerHTML = getTheme() === 'dark' ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
+    window.addEventListener('scroll', () => document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 20));
+  </script>
+</body>
+</html>

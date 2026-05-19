@@ -3,250 +3,59 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- Google Search Console Verification -->
   <meta name="google-site-verification" content="rz5pNaKLcGue7H5nqnFgN0AXCPKMKLcjwRay3X4sPCw" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Antika Gallery متجر متخصص في بيع الملابس الحريمي، اللانجري، الإكسسوارات والتحف المميزة بأحدث التصميمات وجودة عالية وأسعار مناسبة في مصر">
-  <title>Antika Gallery — أنتيكا جاليري</title>
+
+  <!-- SEO أساسي -->
+  <title>Antika Gallery | أنتيكا جاليري — ملابس حريمي، أنتيكات، هوم وير بأقل الأسعار</title>
+  <meta name="description" content="أنتيكا جاليري — أحدث تريندات الملابس الحريمي، اللانجري، الأنتيكات والهوم وير بأقل الأسعار في مصر. صور حقيقية، توصيل لكل المحافظات، كاش عند الاستلام.">
+  <meta name="keywords" content="ملابس حريمي, لانجري, هوم وير, أنتيكات, تريند, أزياء مصر, توصيل, أنتيكا جاليري">
+  <meta name="author" content="Antika Gallery">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://antika-store.vercel.app/">
+
+  <!-- Open Graph -->
+  <meta property="og:type"        content="website">
+  <meta property="og:url"         content="https://antika-store.vercel.app/">
+  <meta property="og:title"       content="Antika Gallery | أنتيكا جاليري">
+  <meta property="og:description" content="أحدث تريندات الملابس الحريمي، الأنتيكات والهوم وير بأقل الأسعار في مصر. توصيل لكل المحافظات.">
+  <meta property="og:image"       content="https://res.cloudinary.com/df3ffyrsg/image/upload/q_auto/f_auto/w_1200/v1776645596/ChatGPT_Image_20_%D8%A3%D8%A8%D8%B1%D9%8A%D9%84_2026_02_28_38_%D8%B5_etwl3l.png">
+  <meta property="og:image:width"  content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:locale"      content="ar_EG">
+  <meta property="og:site_name"   content="Antika Gallery">
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card"        content="summary_large_image">
+  <meta name="twitter:title"       content="Antika Gallery | أنتيكا جاليري">
+  <meta name="twitter:description" content="أحدث تريندات الملابس الحريمي، الأنتيكات والهوم وير بأقل الأسعار في مصر.">
+  <meta name="twitter:image"       content="https://res.cloudinary.com/df3ffyrsg/image/upload/q_auto/f_auto/w_1200/v1776645596/ChatGPT_Image_20_%D8%A3%D8%A8%D8%B1%D9%8A%D9%84_2026_02_28_38_%D8%B5_etwl3l.png">
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="https://res.cloudinary.com/df3ffyrsg/image/upload/q_auto/f_auto/w_32/v1776645596/ChatGPT_Image_20_%D8%A3%D8%A8%D8%B1%D9%8A%D9%84_2026_02_28_38_%D8%B5_etwl3l.png">
+  <link rel="apple-touch-icon"     href="https://res.cloudinary.com/df3ffyrsg/image/upload/q_auto/f_auto/w_180/v1776645596/ChatGPT_Image_20_%D8%A3%D8%A8%D8%B1%D9%8A%D9%84_2026_02_28_38_%D8%B5_etwl3l.png">
+
+  <!-- Schema.org Store -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Store",
+    "name": "Antika Gallery",
+    "alternateName": "أنتيكا جاليري",
+    "url": "https://antika-store.vercel.app",
+    "logo": "https://res.cloudinary.com/df3ffyrsg/image/upload/q_auto/f_auto/w_200/v1776645596/ChatGPT_Image_20_%D8%A3%D8%A8%D8%B1%D9%8A%D9%84_2026_02_28_38_%D8%B5_etwl3l.png",
+    "description": "متجر أنتيكا جاليري للملابس الحريمي، الأنتيكات والهوم وير بأقل الأسعار في مصر",
+    "address": { "@type": "PostalAddress", "addressCountry": "EG" },
+    "priceRange": "$$",
+    "currenciesAccepted": "EGP",
+    "paymentAccepted": "Cash, Electronic Wallet"
+  }
+  </script>
+
   <link rel="manifest" href="/manifest.json">
   <link rel="stylesheet" href="/css/main.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-  <style>
-    /* Hero */
-    .hero {
-      min-height: calc(100vh - 70px);
-      display: flex;
-      align-items: center;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .hero-bg {
-      position: absolute;
-      inset: 0;
-      background: var(--bg-secondary);
-      z-index: 0;
-    }
-
-    .hero-bg::before {
-      content: '';
-      position: absolute;
-      top: -20%;
-      right: -10%;
-      width: 600px;
-      height: 600px;
-      border-radius: 50%;
-      background: radial-gradient(circle, rgba(201,168,76,0.10) 0%, transparent 70%);
-    }
-
-    .hero-bg::after {
-      content: '';
-      position: absolute;
-      bottom: -20%;
-      left: -10%;
-      width: 500px;
-      height: 500px;
-      border-radius: 50%;
-      background: radial-gradient(circle, rgba(201,168,76,0.07) 0%, transparent 70%);
-    }
-
-    .hero-content {
-      position: relative;
-      z-index: 1;
-      max-width: 620px;
-    }
-
-    .hero-eyebrow {
-      font-size: 0.8rem;
-      font-weight: 700;
-      letter-spacing: 0.2em;
-      text-transform: uppercase;
-      color: var(--gold);
-      margin-bottom: 1.5rem;
-    }
-
-    .hero-title {
-      font-family: var(--font-display);
-      font-size: clamp(3rem, 7vw, 5.5rem);
-      font-style: italic;
-      color: var(--text);
-      line-height: 1.1;
-      margin-bottom: 1.5rem;
-    }
-
-    .hero-title span { color: var(--gold); }
-
-    .hero-desc {
-      font-size: 1.05rem;
-      color: var(--text-secondary);
-      margin-bottom: 2.5rem;
-      max-width: 480px;
-      line-height: 1.9;
-    }
-
-    .hero-actions { display: flex; gap: 1rem; flex-wrap: wrap; }
-
-    .hero-stats {
-      display: flex;
-      gap: 2.5rem;
-      margin-top: 3rem;
-      padding-top: 2rem;
-      border-top: 1px solid var(--border);
-    }
-
-    .hero-stat-num {
-      font-family: var(--font-display);
-      font-size: 2rem;
-      font-weight: 600;
-      color: var(--gold);
-    }
-
-    .hero-stat-label {
-      font-size: 0.8rem;
-      color: var(--text-muted);
-      letter-spacing: 0.05em;
-    }
-
-    /* Categories */
-    .categories-section { padding: 5rem 0; }
-
-    .categories-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-      gap: 1rem;
-      margin-top: 2.5rem;
-    }
-
-    .category-card {
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 1.75rem 1.25rem;
-      text-align: center;
-      cursor: pointer;
-      transition: all var(--transition);
-      text-decoration: none;
-      color: var(--text);
-      display: block;
-    }
-
-    .category-card:hover {
-      border-color: var(--gold);
-      transform: translateY(-3px);
-      box-shadow: var(--shadow-lg);
-    }
-
-    .category-icon {
-      font-size: 2rem;
-      margin-bottom: 0.75rem;
-      color: var(--gold);
-    }
-
-    .category-name {
-      font-weight: 700;
-      font-size: 0.95rem;
-    }
-
-    .category-count {
-      font-size: 0.8rem;
-      color: var(--text-muted);
-      margin-top: 0.25rem;
-    }
-
-    /* Featured */
-    .featured-section { padding: 5rem 0; background: var(--bg-secondary); }
-
-    /* New Arrivals */
-    .new-section { padding: 5rem 0; }
-
-    /* Banner */
-    .banner {
-      margin: 2rem 0;
-      padding: 3rem 2.5rem;
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-lg);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 2rem;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .banner::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 3px;
-      background: linear-gradient(90deg, var(--gold-dark), var(--gold), var(--gold-light), var(--gold));
-    }
-
-    .banner-title {
-      font-family: var(--font-display);
-      font-size: 1.6rem;
-      font-style: italic;
-      color: var(--text);
-      margin-bottom: 0.5rem;
-    }
-
-    .banner-desc { color: var(--text-secondary); font-size: 0.95rem; }
-
-    /* Notification bar */
-    .notif-bar {
-      background: var(--gold);
-      color: #fff;
-      text-align: center;
-      padding: 0.6rem;
-      font-size: 0.85rem;
-      font-weight: 600;
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      z-index: 1001;
-      letter-spacing: 0.03em;
-    }
-
-    body:has(.notif-bar) .navbar { top: 38px; }
-
-    /* Features */
-    .features-section { padding: 4rem 0; }
-
-    .features-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-      gap: 1.5rem;
-      margin-top: 2.5rem;
-    }
-
-    .feature-card {
-      text-align: center;
-      padding: 2rem 1.5rem;
-    }
-
-    .feature-icon {
-      width: 60px;
-      height: 60px;
-      border-radius: 50%;
-      background: rgba(201,168,76,0.12);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin: 0 auto 1rem;
-      font-size: 1.4rem;
-      color: var(--gold);
-    }
-
-    .feature-title {
-      font-weight: 700;
-      margin-bottom: 0.5rem;
-      font-size: 0.95rem;
-    }
-
-    .feature-desc { font-size: 0.85rem; color: var(--text-muted); line-height: 1.7; }
-  </style>
 </head>
 <body>
 

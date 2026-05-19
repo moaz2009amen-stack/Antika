@@ -1,50 +1,42 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
+<!--
+  ════════════════════════════════════════════════════════
+  product.html — استبدل الـ <head> الموجود بالكامل بده
+  ════════════════════════════════════════════════════════
+-->
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Antika Gallery — المنتج</title>
+
+  <!-- بيتحدثوا ديناميكياً من JS بعد تحميل المنتج -->
+  <title>Antika Gallery — منتج</title>
+  <meta name="description" content="تسوقي من متجر أنتيكا جاليري" id="meta-desc">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://antika-store.vercel.app/product.html" id="canonical-tag">
+
+  <meta property="og:type"        content="product">
+  <meta property="og:url"         content="https://antika-store.vercel.app/product.html" id="og-url">
+  <meta property="og:title"       content="Antika Gallery" id="og-title">
+  <meta property="og:description" content="تسوقي من متجر أنتيكا جاليري" id="og-desc">
+  <meta property="og:image"       content="https://res.cloudinary.com/df3ffyrsg/image/upload/q_auto/f_auto/w_1200/v1776645596/ChatGPT_Image_20_%D8%A3%D8%A8%D8%B1%D9%8A%D9%84_2026_02_28_38_%D8%B5_etwl3l.png" id="og-image">
+  <meta property="og:locale"      content="ar_EG">
+  <meta property="og:site_name"   content="Antika Gallery">
+  <meta property="product:price:amount"   content="" id="og-price">
+  <meta property="product:price:currency" content="EGP">
+
+  <meta name="twitter:card"  content="summary_large_image">
+  <meta name="twitter:title" content="Antika Gallery" id="tw-title">
+  <meta name="twitter:image" content="" id="tw-image">
+
+  <link rel="icon" type="image/png" href="https://res.cloudinary.com/df3ffyrsg/image/upload/q_auto/f_auto/w_32/v1776645596/ChatGPT_Image_20_%D8%A3%D8%A8%D8%B1%D9%8A%D9%84_2026_02_28_38_%D8%B5_etwl3l.png">
+  <link rel="apple-touch-icon"     href="https://res.cloudinary.com/df3ffyrsg/image/upload/q_auto/f_auto/w_180/v1776645596/ChatGPT_Image_20_%D8%A3%D8%A8%D8%B1%D9%8A%D9%84_2026_02_28_38_%D8%B5_etwl3l.png">
+
   <link rel="manifest" href="/manifest.json">
-  <link rel="icon" href="https://res.cloudinary.com/df3ffyrsg/image/upload/q_auto/f_auto/v1776645596/ChatGPT_Image_20_%D8%A3%D8%A8%D8%B1%D9%8A%D9%84_2026_02_28_38_%D8%B5_etwl3l.png">
   <link rel="stylesheet" href="/css/main.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-  <style>
-    .product-layout{display:grid;grid-template-columns:1fr 1fr;gap:3rem;padding:2rem 0 4rem}
-    .product-gallery{position:sticky;top:90px;height:fit-content}
-    .main-media{aspect-ratio:3/4;border-radius:var(--radius-lg);overflow:hidden;background:var(--bg-secondary);border:1px solid var(--border);position:relative;touch-action:pan-y;user-select:none}
-    .main-media img,.main-media video{width:100%;height:100%;object-fit:cover}
-    .media-badge{position:absolute;top:12px;right:12px;background:rgba(0,0,0,.6);color:#fff;padding:4px 10px;border-radius:20px;font-size:.75rem;display:flex;align-items:center;gap:4px}
-    .thumbnails{display:flex;gap:.6rem;margin-top:.75rem;flex-wrap:wrap}
-    .thumb{width:70px;height:90px;border-radius:var(--radius-sm);overflow:hidden;cursor:pointer;border:2px solid transparent;transition:border-color .2s;background:var(--bg-secondary);flex-shrink:0;display:flex;align-items:center;justify-content:center}
-    .thumb:hover,.thumb.active{border-color:var(--gold)}
-    .thumb img,.thumb video{width:100%;height:100%;object-fit:cover}
-    .thumb-video{background:#1a1510}
-    .thumb-video i{color:#fff;font-size:1.2rem}
-    .product-info{padding-top:.5rem}
-    .product-category{font-size:.8rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--gold);margin-bottom:.75rem}
-    .product-title{font-family:var(--font-display);font-size:2rem;margin-bottom:1rem;line-height:1.3}
-    .product-price{font-size:2rem;font-weight:700;color:var(--gold);margin-bottom:1.5rem}
-    .product-desc{color:var(--text-secondary);line-height:1.9;margin-bottom:2rem;font-size:.95rem}
-    .quantity-selector{display:flex;align-items:center;border:1.5px solid var(--border);border-radius:var(--radius-sm);width:fit-content;overflow:hidden;margin-bottom:1.5rem}
-    .qty-btn{width:40px;height:44px;display:flex;align-items:center;justify-content:center;font-size:1.1rem;color:var(--text);transition:all .2s}
-    .qty-btn:hover{background:var(--bg-secondary);color:var(--gold)}
-    .qty-display{width:50px;height:44px;text-align:center;border:none;border-right:1.5px solid var(--border);border-left:1.5px solid var(--border);background:var(--bg-card);color:var(--text);font-size:1rem;font-weight:700;font-family:inherit;outline:none}
-    .product-actions{display:flex;gap:.75rem;margin-bottom:2rem}
-    .product-meta{display:flex;flex-direction:column;gap:.75rem;padding-top:1.5rem;border-top:1px solid var(--border)}
-    .meta-row{display:flex;align-items:center;gap:.75rem;font-size:.9rem}
-    .meta-icon{width:36px;height:36px;border-radius:50%;background:rgba(201,168,76,.1);display:flex;align-items:center;justify-content:center;color:var(--gold);font-size:.9rem;flex-shrink:0}
-    .related-section{padding:3rem 0;border-top:1px solid var(--border)}
-    .wishlist-btn{width:44px;height:44px;border-radius:50%;border:1.5px solid var(--border);background:var(--bg-card);color:var(--text-muted);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:1.1rem;transition:all .2s;flex-shrink:0}
-    .wishlist-btn:hover,.wishlist-btn.wishlisted{border-color:#dc2626;color:#dc2626;background:rgba(220,38,38,.05)}
-    /* Zoom overlay */
-    .zoom-overlay{position:fixed;inset:0;background:rgba(0,0,0,.9);z-index:5000;display:none;align-items:center;justify-content:center;cursor:zoom-out}
-    .zoom-overlay.open{display:flex}
-    .zoom-overlay img{max-width:95vw;max-height:95vh;object-fit:contain;border-radius:8px}
-    /* Rating Summary */
-    .rating-summary{display:flex;align-items:center;gap:.75rem;margin:1.5rem 0;padding:1rem;background:var(--bg-secondary);border-radius:var(--radius-sm)}
-    @media(max-width:900px){.product-layout{grid-template-columns:1fr;gap:2rem}.product-gallery{position:static}.product-title{font-size:1.5rem}}
-  </style>
 </head>
+  
 <body>
 
   <!-- Zoom Overlay -->

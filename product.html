@@ -184,6 +184,49 @@
       product = p;
 
       const name = l==='ar'&&p.name_ar ? p.name_ar : p.name;
+      // ✅ تحديث SEO ديناميكي
+const productUrl = `https://antika-store.vercel.app/product.html?id=${p.id}`;
+const productImg = p.images?.[0] && !isVideo(p.images[0]) ? detailImage(p.images[0]) : '';
+const productDesc = (l==='ar' && p.description_ar ? p.description_ar : p.description) ||
+                    `${name} — متوفر في أنتيكا جاليري بسعر ${formatPrice(p.price)}`;
+
+document.title = `${name} | Antika Gallery`;
+document.getElementById('meta-desc')?.setAttribute('content', productDesc.slice(0,160));
+document.getElementById('canonical-tag')?.setAttribute('href', productUrl);
+document.getElementById('og-url')?.setAttribute('content', productUrl);
+document.getElementById('og-title')?.setAttribute('content', `${name} | Antika Gallery`);
+document.getElementById('og-desc')?.setAttribute('content', productDesc.slice(0,160));
+document.getElementById('og-price')?.setAttribute('content', p.price);
+document.getElementById('tw-title')?.setAttribute('content', `${name} | Antika Gallery`);
+if (productImg) {
+  document.getElementById('og-image')?.setAttribute('content', productImg);
+  document.getElementById('tw-image')?.setAttribute('content', productImg);
+}
+
+// ✅ Schema.org Product
+const existing = document.getElementById('product-schema');
+if (existing) existing.remove();
+const schema = document.createElement('script');
+schema.id = 'product-schema';
+schema.type = 'application/ld+json';
+schema.textContent = JSON.stringify({
+  "@context": "https://schema.org",
+  "@type": "Product",
+  "name": name,
+  "description": productDesc.slice(0,200),
+  "image": (p.images||[]).filter(u=>!isVideo(u)),
+  "url": productUrl,
+  "offers": {
+    "@type": "Offer",
+    "priceCurrency": "EGP",
+    "price": p.price,
+    "availability": p.stock > 0
+      ? "https://schema.org/InStock"
+      : "https://schema.org/OutOfStock",
+    "seller": { "@type": "Organization", "name": "Antika Gallery" }
+  }
+});
+document.head.appendChild(schema);
       const desc = l==='ar'&&p.description_ar ? p.description_ar : p.description;
       const catName = p.categories ? (l==='ar'&&p.categories.name_ar ? p.categories.name_ar : p.categories.name) : '';
 

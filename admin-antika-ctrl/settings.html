@@ -113,7 +113,6 @@
 
       <div class="settings-grid">
         <div>
-          <!-- إعدادات المتجر -->
           <div class="s-section">
             <div class="s-head"><i class="fas fa-store"></i><div class="s-head-title">إعدادات المتجر</div></div>
             <div class="s-body">
@@ -133,7 +132,6 @@
             </div>
           </div>
 
-          <!-- واتساب -->
           <div class="s-section">
             <div class="s-head"><i class="fab fa-whatsapp" style="color:#25d366"></i><div class="s-head-title">الواتساب</div></div>
             <div class="s-body">
@@ -149,7 +147,6 @@
             </div>
           </div>
 
-          <!-- التشغيل -->
           <div class="s-section">
             <div class="s-head"><i class="fas fa-toggle-on"></i><div class="s-head-title">التشغيل</div></div>
             <div class="s-body" style="padding-top:.5rem;padding-bottom:.5rem">
@@ -238,7 +235,7 @@
     </div>
   </main>
 
-  <!-- Confirm Modal -->
+  <!-- Confirm Modal (طلبات) -->
   <div class="confirm-overlay" id="confirm-modal">
     <div class="confirm-box">
       <div class="confirm-head">
@@ -267,29 +264,54 @@
     </div>
   </div>
 
+  <!-- FIX: Confirm Modal (تصنيفات) — custom modal بدل confirm() -->
+  <div class="confirm-overlay" id="cat-del-modal">
+    <div class="confirm-box">
+      <div class="confirm-head">
+        <h3 style="color:#dc2626;font-size:1rem;display:flex;align-items:center;gap:.5rem">
+          <i class="fas fa-exclamation-triangle"></i> تأكيد حذف التصنيف
+        </h3>
+        <button onclick="closeCatDelModal()" style="width:30px;height:30px;border-radius:50%;border:1.5px solid var(--border);background:none;cursor:pointer;color:var(--text-muted);font-size:.8rem;display:flex;align-items:center;justify-content:center">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      <div class="confirm-body">
+        <div style="background:rgba(220,38,38,.08);border:1px solid rgba(220,38,38,.25);border-radius:var(--radius-sm);padding:1rem;margin-bottom:1.25rem">
+          <p style="font-weight:700;color:#dc2626;margin-bottom:.4rem">⚠️ هيتحذف التصنيف نهائياً!</p>
+          <p style="font-size:.875rem;color:var(--text-secondary)" id="cat-del-name"></p>
+          <p style="font-size:.8rem;color:var(--text-muted);margin-top:.4rem">المنتجات المرتبطة به مش هتتحذف، بس هتبقى بدون تصنيف.</p>
+        </div>
+        <p style="font-size:.82rem;color:var(--text-muted);margin-bottom:.75rem">اكتب <strong style="color:var(--text)">احذف</strong> للتأكيد:</p>
+        <input type="text" class="form-control" id="cat-del-input" placeholder="اكتب: احذف"
+          oninput="checkCatDelInput()" autocomplete="off" maxlength="10">
+      </div>
+      <div class="confirm-foot">
+        <button class="btn btn-ghost" onclick="closeCatDelModal()">إلغاء</button>
+        <button class="btn btn-danger" id="cat-del-btn" onclick="execDelCat()" disabled>
+          <i class="fas fa-trash"></i> حذف
+        </button>
+      </div>
+    </div>
+  </div>
+
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
   <script src="/js/config.js"></script>
   <script>
     let deleteTarget = null;
+    let deleteCatId  = null;
 
     function openSidebar()  { document.getElementById('admin-sidebar').classList.add('open');    document.getElementById('sidebar-overlay').classList.add('active'); }
     function closeSidebar() { document.getElementById('admin-sidebar').classList.remove('open'); document.getElementById('sidebar-overlay').classList.remove('active'); }
     function toggleTheme()  { const t=getTheme()==='light'?'dark':'light'; setTheme(t); document.getElementById('theme-toggle').innerHTML=t==='dark'?'<i class="fas fa-sun"></i>':'<i class="fas fa-moon"></i>'; }
     async function logout() { await db.auth.signOut(); window.location.href='/admin-antika-ctrl/login.html'; }
 
-    // FIX: app_metadata بدل user_metadata — settings للأدمن فقط
     async function adminAuth() {
       document.body.style.opacity='0'; document.body.style.transition='opacity .25s';
       let{data:{session}}=await db.auth.getSession();
       if(!session){await new Promise(r=>setTimeout(r,900));const r=await db.auth.getSession();session=r.data.session;}
       if(!session){window.location.href='/admin-antika-ctrl/login.html';return false;}
-      // FIX: app_metadata + أدمن فقط (مش moderator)
       const role=session.user.app_metadata?.role;
-      if(role!=='admin'){
-        await db.auth.signOut();
-        window.location.href='/admin-antika-ctrl/login.html';
-        return false;
-      }
+      if(role!=='admin'){await db.auth.signOut();window.location.href='/admin-antika-ctrl/login.html';return false;}
       document.body.style.opacity='1'; initTheme();
       document.getElementById('theme-toggle').innerHTML=getTheme()==='dark'?'<i class="fas fa-sun"></i>':'<i class="fas fa-moon"></i>';
       return true;
@@ -301,7 +323,6 @@
       if(b&&count>0){b.textContent=count;b.style.display='inline';}
     }
 
-    // ── Settings ──────────────────────────────────────────────────
     async function loadSettings() {
       const{data}=await db.from('settings').select('*');
       const s={};
@@ -348,13 +369,12 @@
       window.open(`https://wa.me/2${n}`,'_blank');
     }
 
-    // ── Revenue ───────────────────────────────────────────────────
     async function loadRevenue(period, btn) {
       document.querySelectorAll('.rev-tab').forEach(t=>t.classList.remove('active'));
       if(btn) btn.classList.add('active');
       let query=db.from('orders').select('total,status,created_at');
       const now=new Date();
-      if(period==='week')  query=query.gte('created_at',new Date(now-7*864e5).toISOString());
+      if(period==='week')       query=query.gte('created_at',new Date(now-7*864e5).toISOString());
       else if(period==='month') query=query.gte('created_at',new Date(now-30*864e5).toISOString());
       else if(period==='year')  query=query.gte('created_at',new Date(now-365*864e5).toISOString());
       const{data:orders}=await query;
@@ -373,7 +393,6 @@
       document.getElementById('rev-delivery').textContent  = shipping.length;
     }
 
-    // ── Categories ────────────────────────────────────────────────
     let cats=[];
     async function loadCats() {
       const{data}=await db.from('categories').select('*').order('name');
@@ -384,7 +403,7 @@
         <div class="cat-tag">
           <span>${escapeHtml(c.name_ar||c.name)}</span>
           ${c.name_ar&&c.name!==c.name_ar?`<span style="color:var(--text-muted);font-size:.72rem">/${escapeHtml(c.name)}</span>`:''}
-          <button onclick="delCat('${encodeURIComponent(c.id)}')">✕</button>
+          <button onclick="openCatDelModal('${encodeURIComponent(c.id)}','${escapeHtml(c.name_ar||c.name)}')">✕</button>
         </div>`).join('');
     }
 
@@ -400,21 +419,43 @@
         document.getElementById('cat-ar').value='';
         document.getElementById('cat-en').value='';
         showToast('✓ تم إضافة التصنيف');
-        // FIX: مسح categories cache في sessionStorage
         sessionStorage.removeItem('antika_cats');
         sessionStorage.removeItem('antika_cats_at');
         loadCats();
       }
     }
 
-    async function delCat(encodedId) {
-      const id=decodeURIComponent(encodedId);
-      if(!confirm('هتحذف التصنيف؟ المنتجات المرتبطة به مش هتتحذف.'))return;
-      await db.from('categories').delete().eq('id',id);
+    // FIX: custom modal لحذف التصنيف بدل confirm()
+    function openCatDelModal(encodedId, name) {
+      deleteCatId = decodeURIComponent(encodedId);
+      document.getElementById('cat-del-name').textContent = `ستحذف التصنيف: ${name}`;
+      document.getElementById('cat-del-input').value = '';
+      document.getElementById('cat-del-btn').disabled = true;
+      document.getElementById('cat-del-modal').classList.add('open');
+    }
+
+    function closeCatDelModal() {
+      document.getElementById('cat-del-modal').classList.remove('open');
+      deleteCatId = null;
+    }
+
+    function checkCatDelInput() {
+      const val = document.getElementById('cat-del-input').value.trim();
+      document.getElementById('cat-del-btn').disabled = (val !== 'احذف');
+    }
+
+    async function execDelCat() {
+      if (!deleteCatId) return;
+      const btn = document.getElementById('cat-del-btn');
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+      const { error } = await db.from('categories').delete().eq('id', deleteCatId);
+      btn.innerHTML = '<i class="fas fa-trash"></i> حذف';
+      if (error) { showToast('حصل خطأ', 'error'); btn.disabled = false; return; }
       showToast('تم الحذف');
-      // FIX: مسح categories cache في sessionStorage
       sessionStorage.removeItem('antika_cats');
       sessionStorage.removeItem('antika_cats_at');
+      closeCatDelModal();
       loadCats();
     }
 
@@ -452,13 +493,19 @@
       btn.innerHTML='<i class="fas fa-spinner fa-spin"></i> جاري الحذف...';
 
       const now=new Date();
-      let cutoff=null;
-      if(deleteTarget==='week')       cutoff=new Date(now-7*864e5).toISOString();
-      else if(deleteTarget==='month') cutoff=new Date(now-30*864e5).toISOString();
-      else if(deleteTarget==='year')  cutoff=new Date(now-365*864e5).toISOString();
-
       let query=db.from('orders').delete().in('status',['delivered','cancelled']);
-      if(cutoff) query=query.lte('created_at',now.toISOString()).gte('created_at',cutoff);
+
+      if(deleteTarget==='week') {
+        const cutoff=new Date(now-7*864e5).toISOString();
+        query=query.gte('created_at',cutoff).lte('created_at',now.toISOString());
+      } else if(deleteTarget==='month') {
+        const cutoff=new Date(now-30*864e5).toISOString();
+        query=query.gte('created_at',cutoff).lte('created_at',now.toISOString());
+      } else if(deleteTarget==='year') {
+        const cutoff=new Date(now-365*864e5).toISOString();
+        query=query.gte('created_at',cutoff).lte('created_at',now.toISOString());
+      }
+      // لو 'all' — بيحذف كل الطلبات المكتملة والملغية بدون قيد تاريخ
 
       const{error}=await query;
       btn.innerHTML='<i class="fas fa-trash"></i> تأكيد الحذف';

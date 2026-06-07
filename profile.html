@@ -7,38 +7,7 @@
   <link rel="manifest" href="/manifest.json">
   <link rel="stylesheet" href="/css/main.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-  <style>
-    .profile-layout { display: grid; grid-template-columns: 280px 1fr; gap: 2rem; padding: 2rem 0 4rem; }
-    .profile-sidebar { height: fit-content; }
-    .profile-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 2rem; text-align: center; margin-bottom: 1rem; }
-    .avatar-container { position: relative; width: 90px; height: 90px; margin: 0 auto 1rem; }
-    .avatar-img { width: 90px; height: 90px; border-radius: 50%; object-fit: cover; border: 3px solid var(--gold); background: var(--bg-secondary); }
-    .avatar-edit { position: absolute; bottom: 0; right: 0; width: 28px; height: 28px; border-radius: 50%; background: var(--gold); display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 0.75rem; color: #fff; }
-    [dir="ltr"] .avatar-edit { right: auto; left: 0; }
-    .profile-name { font-family: var(--font-display); font-size: 1.2rem; margin-bottom: 0.25rem; }
-    .profile-email { font-size: 0.85rem; color: var(--text-muted); }
-    .profile-nav { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); overflow: hidden; }
-    .profile-nav-item { display: flex; align-items: center; gap: 0.75rem; padding: 0.9rem 1.25rem; cursor: pointer; transition: all var(--transition); font-size: 0.9rem; font-weight: 600; color: var(--text-secondary); border-bottom: 1px solid var(--border); }
-    .profile-nav-item:last-child { border-bottom: none; }
-    .profile-nav-item:hover { background: var(--bg-secondary); color: var(--gold); }
-    .profile-nav-item.active { background: rgba(201,168,76,0.08); color: var(--gold); border-right: 3px solid var(--gold); }
-    [dir="ltr"] .profile-nav-item.active { border-right: none; border-left: 3px solid var(--gold); }
-    .profile-nav-item i { width: 20px; text-align: center; }
-    .profile-panel { display: none; }
-    .profile-panel.active { display: block; animation: fadeUp 0.3s ease; }
-    .order-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.25rem; margin-bottom: 0.75rem; transition: all var(--transition); }
-    .order-card:hover { border-color: var(--gold-light); }
-    .order-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.75rem; flex-wrap: wrap; gap: 0.5rem; }
-    .order-id { font-weight: 700; font-family: monospace; font-size: 0.9rem; color: var(--gold); }
-    .order-items-preview { display: flex; gap: 0.5rem; margin-bottom: 0.75rem; }
-    .order-item-thumb { width: 48px; height: 60px; border-radius: var(--radius-sm); object-fit: cover; background: var(--bg-secondary); border: 1px solid var(--border); }
-    .notif-item { display: flex; gap: 1rem; padding: 1rem; background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); margin-bottom: 0.5rem; cursor: pointer; transition: all var(--transition); }
-    .notif-item:hover { border-color: var(--gold-light); }
-    .notif-item.unread { border-right: 3px solid var(--gold); background: rgba(201,168,76,0.03); }
-    [dir="ltr"] .notif-item.unread { border-right: none; border-left: 3px solid var(--gold); }
-    .notif-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--gold); flex-shrink: 0; margin-top: 6px; }
-    @media (max-width: 900px) { .profile-layout { grid-template-columns: 1fr; } }
-  </style>
+  <link rel="stylesheet" href="/css/profile.css">
 </head>
 <body>
   <nav class="navbar" id="navbar">

@@ -37,7 +37,7 @@
 
   <footer style="background:var(--bg-secondary);border-top:1px solid var(--border);padding:1.5rem 0">
     <div class="container footer-bottom">
-      <p style="font-size:.85rem;color:var(--text-muted)">© 2024 Antika Gallery</p>
+      <p style="font-size:.85rem;color:var(--text-muted)">© 2025 Antika Gallery</p>
       <p class="footer-dev">Developed by <a href="https://www.facebook.com/profile.php?id=61552026802548&locale=ar_AR" target="_blank" rel="noopener" style="color:var(--gold);font-weight:600">Moaz</a></p>
     </div>
   </footer>
@@ -47,13 +47,12 @@
   <script>
     const l = getLang();
     let currentUser   = null;
-    let couponData    = null;   // { valid, discount, couponId, msg }
+    let couponData    = null;
     let proofFile     = null;
     let proofUrl      = null;
     let paymentMethod = 'cash';
     let waNum         = null;
 
-    // ── Lang / Theme ──────────────────────────────────────────────
     function applyLang() {
       document.querySelectorAll('[data-ar]').forEach(el => {
         if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') return;
@@ -68,7 +67,6 @@
       document.getElementById('theme-toggle').innerHTML = t === 'dark' ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
     }
 
-    // ── Init ──────────────────────────────────────────────────────
     async function init() {
       checkMaintenance();
       applyLang();
@@ -79,7 +77,6 @@
       const cart = getCart();
       if (!cart.length) { renderEmptyCart(); return; }
 
-      // تحقق من orders_enabled
       const ordersEnabled = await getSetting('orders_enabled');
       if (ordersEnabled === 'false') {
         document.getElementById('checkout-content').innerHTML = `
@@ -108,7 +105,6 @@
       renderCheckout(cart, profile);
     }
 
-    // ── Render Empty ──────────────────────────────────────────────
     function renderEmptyCart() {
       document.getElementById('checkout-content').innerHTML = `
         <div class="empty-cart-msg">
@@ -123,18 +119,13 @@
         </div>`;
     }
 
-    // ── Render Checkout ───────────────────────────────────────────
     function renderCheckout(cart, profile) {
       const subtotal = cart.reduce((s, i) => s + i.price * i.quantity, 0);
       const placeholder = 'https://res.cloudinary.com/df3ffyrsg/image/upload/q_auto,f_auto,w_52/v1/antika/placeholder';
 
       document.getElementById('checkout-content').innerHTML = `
         <div class="checkout-layout">
-
-          <!-- الجانب الأيسر: بيانات الطلب -->
           <div>
-
-            <!-- بيانات التوصيل -->
             <div class="section-card">
               <h3><i class="fas fa-map-marker-alt"></i> ${l === 'ar' ? 'بيانات التوصيل' : 'Delivery Details'}</h3>
               <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">
@@ -153,14 +144,12 @@
               </div>
             </div>
 
-            <!-- ملاحظات -->
             <div class="section-card">
               <h3><i class="fas fa-sticky-note"></i> ${l === 'ar' ? 'ملاحظات (اختياري)' : 'Notes (optional)'}</h3>
               <textarea class="form-control" id="c-notes" rows="2"
                 placeholder="${l === 'ar' ? 'أي تعليمات خاصة للتوصيل...' : 'Any special delivery instructions...'}"></textarea>
             </div>
 
-            <!-- طريقة الدفع -->
             <div class="section-card">
               <h3><i class="fas fa-credit-card"></i> ${l === 'ar' ? 'طريقة الدفع' : 'Payment Method'}</h3>
               <div class="payment-options">
@@ -180,7 +169,6 @@
                 </div>
               </div>
 
-              <!-- تفاصيل المحفظة -->
               <div class="wallet-details" id="wallet-details">
                 <div style="font-size:.85rem;color:var(--text-secondary);margin-bottom:.75rem">
                   ${l === 'ar' ? 'حوّل المبلغ على الرقم ده ثم ارفع صورة الإيصال:' : 'Transfer the amount to this number then upload the receipt:'}
@@ -203,15 +191,12 @@
                 <div id="proof-status" style="font-size:.8rem;color:var(--text-muted);margin-top:.4rem"></div>
               </div>
             </div>
-
           </div>
 
-          <!-- الجانب الأيمن: ملخص الطلب -->
           <div>
             <div class="section-card" style="position:sticky;top:90px">
               <h3><i class="fas fa-receipt"></i> ${l === 'ar' ? 'ملخص الطلب' : 'Order Summary'}</h3>
 
-              <!-- المنتجات -->
               <div style="margin-bottom:1rem">
                 ${cart.map(item => `
                   <div class="order-item">
@@ -227,7 +212,6 @@
                   </div>`).join('')}
               </div>
 
-              <!-- كوبون -->
               <div style="margin-bottom:1rem">
                 <label class="form-label" style="font-size:.8rem">${l === 'ar' ? 'كود الخصم' : 'Discount Code'}</label>
                 <div class="coupon-row">
@@ -243,7 +227,6 @@
                 <div class="coupon-msg" id="coupon-msg"></div>
               </div>
 
-              <!-- الحسابات -->
               <div class="summary-divider"></div>
               <div class="summary-row">
                 <span style="color:var(--text-secondary)">${l === 'ar' ? 'الإجمالي الفرعي' : 'Subtotal'}</span>
@@ -263,7 +246,6 @@
                 <span id="sum-total">${formatPrice(subtotal)}</span>
               </div>
 
-              <!-- زر التأكيد -->
               <button class="btn btn-primary btn-block btn-lg" style="margin-top:1.25rem" onclick="placeOrder()" id="place-btn">
                 <i class="fas fa-check-circle"></i>
                 ${l === 'ar' ? 'تأكيد الطلب' : 'Place Order'}
@@ -278,14 +260,11 @@
               </div>
             </div>
           </div>
-
         </div>`;
 
-      // تحديث الـ user area
       initUserArea(profile);
     }
 
-    // ── Payment Selection ─────────────────────────────────────────
     function selectPayment(method) {
       paymentMethod = method;
       document.getElementById('opt-cash').classList.toggle('selected',   method === 'cash');
@@ -300,11 +279,9 @@
       }
     }
 
-    // ── Proof Upload ──────────────────────────────────────────────
     async function handleProof(input) {
       const file = input.files[0];
       if (!file) return;
-
       const allowed = ['image/jpeg', 'image/png', 'image/webp'];
       if (!allowed.includes(file.type)) {
         showToast(l === 'ar' ? 'اختر صورة JPG أو PNG' : 'Choose JPG or PNG', 'error');
@@ -314,9 +291,7 @@
         showToast(l === 'ar' ? 'الصورة أكبر من 5MB' : 'Image exceeds 5MB', 'error');
         input.value = ''; return;
       }
-
       proofFile = file;
-      // preview
       const reader = new FileReader();
       reader.onload = e => {
         document.getElementById('proof-img').src = e.target.result;
@@ -326,12 +301,10 @@
       document.getElementById('proof-status').textContent = l === 'ar' ? 'هيترفع الإيصال عند تأكيد الطلب' : 'Receipt will upload on order confirmation';
     }
 
-    // ── Coupon ────────────────────────────────────────────────────
     async function applyCoupon() {
       const code    = document.getElementById('coupon-input').value.trim().toUpperCase();
       const msgEl   = document.getElementById('coupon-msg');
       const btn     = document.getElementById('coupon-btn');
-
       if (!code) return;
 
       btn.disabled  = true;
@@ -358,14 +331,12 @@
       msgEl.style.color = '#16a34a';
       msgEl.textContent = result.msg;
 
-      // تحديث الأرقام
       const discounted = subtotal - result.discount;
       document.getElementById('sum-discount-row').style.display = 'flex';
       document.getElementById('sum-discount').textContent  = `−${formatPrice(result.discount)}`;
       document.getElementById('sum-total').textContent     = formatPrice(discounted);
     }
 
-    // ── Place Order ───────────────────────────────────────────────
     async function placeOrder() {
       const name    = document.getElementById('c-name')?.value.trim();
       const phone   = document.getElementById('c-phone')?.value.trim();
@@ -376,7 +347,6 @@
 
       errEl.style.display = 'none';
 
-      // Validation
       if (!name) {
         errEl.textContent = l === 'ar' ? 'اكتب اسمك الكامل' : 'Enter your full name';
         errEl.style.display = 'block'; return;
@@ -394,6 +364,8 @@
         errEl.style.display = 'block'; return;
       }
 
+      // منع double submit
+      if (btn.disabled) return;
       btn.disabled  = true;
       btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> ${l === 'ar' ? 'جاري التأكيد...' : 'Processing...'}`;
 
@@ -413,22 +385,22 @@
 
         // إنشاء الطلب
         const { data: order, error: orderErr } = await db.from('orders').insert({
-          user_id:          currentUser.id,
+          user_id:           currentUser.id,
           total,
-          status:           'pending',
-          payment_method:   paymentMethod,
+          status:            'pending',
+          payment_method:    paymentMethod,
           payment_proof_url: proofUrl || null,
-          notes:            notes || null
+          notes:             notes || null
         }).select().single();
 
         if (orderErr) throw orderErr;
 
         // إضافة عناصر الطلب
         const items = cart.map(item => ({
-          order_id:       order.id,
-          product_id:     item.id,
-          quantity:       item.quantity,
-          price_at_time:  item.price
+          order_id:      order.id,
+          product_id:    item.id,
+          quantity:      item.quantity,
+          price_at_time: item.price
         }));
 
         const { error: itemsErr } = await db.from('order_items').insert(items);
@@ -439,11 +411,21 @@
           await useCoupon(couponData.couponId);
         }
 
-        // تحديث المخزون
+        // FIX: تحديث المخزون باستخدام الـ decrement RPC الصح
         for (const item of cart) {
-          await db.from('products')
-            .update({ stock: db.rpc('decrement', { x: item.quantity }) })
-            .eq('id', item.id);
+          const { error: stockErr } = await db.rpc('decrement', {
+            row_id: item.id,
+            x: item.quantity
+          });
+          // لو الـ RPC فشل لأي سبب، نعمل fallback يدوي
+          if (stockErr) {
+            const { data: prod } = await db.from('products').select('stock').eq('id', item.id).single();
+            if (prod) {
+              await db.from('products')
+                .update({ stock: Math.max(0, prod.stock - item.quantity) })
+                .eq('id', item.id);
+            }
+          }
         }
 
         // مسح السلة
@@ -453,6 +435,7 @@
         window.location.href = `/track.html?success=1&order=${encodeURIComponent(order.id)}`;
 
       } catch (err) {
+        console.error('placeOrder error:', err);
         errEl.textContent   = l === 'ar' ? 'حصل خطأ، حاول تاني' : 'Something went wrong, try again';
         errEl.style.display = 'block';
         btn.disabled        = false;
@@ -460,7 +443,6 @@
       }
     }
 
-    // ── User Area ─────────────────────────────────────────────────
     function initUserArea(profile) {
       const area = document.getElementById('user-area');
       if (!area) return;

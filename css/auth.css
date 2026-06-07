@@ -1,0 +1,229 @@
+/* ══════════════════════════════════════════════════════════════
+   ANTIKA — css/auth.css
+   ══════════════════════════════════════════════════════════════ */
+
+/* ── Auth Layout ─────────────────────────────────────────────── */
+.auth-wrap {
+  display: flex;
+  min-height: 100vh;
+  /* FIX: padding-top 0 لأن body بيعمل flex */
+  padding-top: 0 !important;
+}
+
+.auth-left {
+  flex: 1;
+  background: var(--bg-secondary);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem 2rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.auth-left::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at 30% 50%, rgba(201,168,76,0.12) 0%, transparent 70%);
+}
+
+.auth-left-content {
+  position: relative;
+  z-index: 1;
+  text-align: center;
+}
+
+.auth-logo {
+  font-family: var(--font-display);
+  font-size: 3rem;
+  font-style: italic;
+  color: var(--gold);
+  margin-bottom: 1rem;
+}
+
+.auth-tagline {
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+  max-width: 280px;
+  line-height: 1.8;
+}
+
+.auth-deco {
+  margin: 1.75rem auto;
+  width: 60px;
+  height: 1px;
+  background: var(--gold);
+}
+
+/* ── Auth Right Panel ────────────────────────────────────────── */
+.auth-right {
+  width: 460px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 2.5rem 2rem;
+  background: var(--bg-card);
+  border-right: 1px solid var(--border);
+  /* FIX: scroll على موبايل */
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+[dir="ltr"] .auth-right { border-right: none; border-left: 1px solid var(--border); }
+
+/* ── Tabs ────────────────────────────────────────────────────── */
+.auth-tabs {
+  display: flex;
+  margin-bottom: 1.75rem;
+  border-bottom: 2px solid var(--border);
+}
+
+.auth-tab {
+  flex: 1;
+  padding: 0.7rem;
+  text-align: center;
+  font-weight: 600;
+  font-size: 0.875rem;
+  color: var(--text-muted);
+  border-bottom: 2px solid transparent;
+  margin-bottom: -2px;
+  transition: all var(--transition);
+  cursor: pointer;
+  /* FIX: touch target */
+  min-height: 44px;
+}
+
+.auth-tab.active { color: var(--gold); border-bottom-color: var(--gold); }
+
+/* ── Auth Panels ─────────────────────────────────────────────── */
+.auth-panel { display: none; }
+.auth-panel.active {
+  display: block;
+  animation: fadeUp 0.3s ease;
+}
+
+.auth-title {
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  margin-bottom: 0.4rem;
+}
+
+.auth-subtitle {
+  color: var(--text-muted);
+  font-size: 0.875rem;
+  margin-bottom: 1.75rem;
+}
+
+/* ── Password Toggle ─────────────────────────────────────────── */
+.password-toggle { position: relative; }
+
+.password-toggle .toggle-eye {
+  position: absolute;
+  top: 50%;
+  left: 1rem;
+  transform: translateY(-50%);
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: color var(--transition);
+  /* FIX: touch target */
+  padding: 4px;
+}
+
+[dir="ltr"] .password-toggle .toggle-eye { left: auto; right: 1rem; }
+.password-toggle .toggle-eye:hover { color: var(--gold); }
+.password-toggle .form-control { padding-left: 2.8rem; }
+[dir="ltr"] .password-toggle .form-control { padding-left: 1rem; padding-right: 2.8rem; }
+
+/* ── Avatar Upload ───────────────────────────────────────────── */
+.avatar-upload {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+  flex-wrap: wrap;
+}
+
+.avatar-preview {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  border: 2px solid var(--border);
+  object-fit: cover;
+  background: var(--bg-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.4rem;
+  color: var(--text-muted);
+  overflow: hidden;
+  cursor: pointer;
+  transition: border-color var(--transition);
+  flex-shrink: 0;
+}
+
+.avatar-preview:hover { border-color: var(--gold); }
+
+/* ── Register Form Grid ──────────────────────────────────────── */
+.reg-grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+/* ── Strength Bar ────────────────────────────────────────────── */
+.strength-bar {
+  height: 4px;
+  border-radius: 2px;
+  background: var(--border);
+  margin-top: 0.5rem;
+  overflow: hidden;
+}
+
+.strength-fill {
+  height: 100%;
+  border-radius: 2px;
+  transition: all 0.3s ease;
+}
+
+/* ── Lock Notice ─────────────────────────────────────────────── */
+.lock-notice {
+  background: rgba(220,38,38,0.08);
+  border: 1px solid rgba(220,38,38,0.2);
+  border-radius: var(--radius-sm);
+  padding: 0.75rem 1rem;
+  font-size: 0.85rem;
+  color: #dc2626;
+  text-align: center;
+  margin-bottom: 1rem;
+  display: none;
+}
+
+/* ── Responsive ──────────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .auth-left { display: none; }
+
+  .auth-right {
+    width: 100%;
+    padding: 2rem 1.25rem;
+    border: none;
+    min-height: 100vh;
+    justify-content: flex-start;
+    padding-top: 3rem;
+  }
+
+  .auth-title { font-size: 1.35rem; }
+}
+
+@media (max-width: 480px) {
+  .auth-right { padding: 2rem 1rem; }
+
+  .reg-grid-2 { grid-template-columns: 1fr; gap: 0; }
+
+  .avatar-upload { gap: 0.75rem; }
+  .avatar-preview { width: 60px; height: 60px; font-size: 1.2rem; }
+
+  .auth-title { font-size: 1.25rem; }
+  .auth-subtitle { font-size: 0.82rem; margin-bottom: 1.25rem; }
+}

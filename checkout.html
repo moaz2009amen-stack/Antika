@@ -7,40 +7,7 @@
   <link rel="manifest" href="/manifest.json">
   <link rel="stylesheet" href="/css/main.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-  <style>
-    .checkout-layout { display: grid; grid-template-columns: 1fr 380px; gap: 2rem; padding: 2rem 0 4rem; }
-    .section-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 1.75rem; margin-bottom: 1.25rem; }
-    .section-card h3 { font-family: var(--font-display); font-size: 1.1rem; margin-bottom: 1.25rem; display: flex; align-items: center; gap: .6rem; }
-    .section-card h3 i { color: var(--gold); font-size: .95rem; }
-    .payment-options { display: grid; grid-template-columns: 1fr 1fr; gap: .75rem; }
-    .payment-opt { border: 2px solid var(--border); border-radius: var(--radius); padding: 1rem 1.25rem; cursor: pointer; transition: all .2s; display: flex; align-items: center; gap: .75rem; }
-    .payment-opt:hover { border-color: var(--gold-light); }
-    .payment-opt.selected { border-color: var(--gold); background: rgba(201,168,76,.06); }
-    .payment-opt i { font-size: 1.4rem; color: var(--text-muted); }
-    .payment-opt.selected i { color: var(--gold); }
-    .payment-opt-label { font-weight: 600; font-size: .9rem; }
-    .payment-opt-desc { font-size: .75rem; color: var(--text-muted); margin-top: .15rem; }
-    .wallet-details { margin-top: 1rem; padding: 1rem; background: var(--bg-secondary); border-radius: var(--radius); display: none; }
-    .wallet-details.show { display: block; }
-    .wallet-number { font-size: 1.4rem; font-weight: 700; color: var(--gold); font-family: monospace; letter-spacing: .05em; }
-    .coupon-row { display: flex; gap: .5rem; }
-    .coupon-row input { flex: 1; }
-    .coupon-msg { font-size: .82rem; margin-top: .4rem; }
-    .order-item { display: flex; gap: .75rem; align-items: center; padding: .6rem 0; border-bottom: 1px solid var(--border); }
-    .order-item:last-child { border-bottom: none; }
-    .order-item img { width: 52px; height: 66px; border-radius: var(--radius-sm); object-fit: cover; background: var(--bg-secondary); flex-shrink: 0; }
-    .summary-row { display: flex; justify-content: space-between; align-items: center; padding: .5rem 0; font-size: .9rem; }
-    .summary-divider { height: 1px; background: var(--border); margin: .5rem 0; }
-    .summary-total { font-size: 1.15rem; font-weight: 700; color: var(--gold); }
-    .upload-proof { border: 2px dashed var(--border); border-radius: var(--radius); padding: 1.5rem; text-align: center; cursor: pointer; transition: all .2s; color: var(--text-muted); margin-top: .75rem; }
-    .upload-proof:hover { border-color: var(--gold); color: var(--gold); }
-    .proof-preview { margin-top: .75rem; border-radius: var(--radius); overflow: hidden; max-height: 200px; display: none; }
-    .proof-preview img { width: 100%; object-fit: cover; max-height: 200px; }
-    .empty-cart-msg { text-align: center; padding: 4rem 2rem; }
-    .empty-cart-msg i { font-size: 3.5rem; color: var(--border); display: block; margin-bottom: 1rem; }
-    @media(max-width:900px) { .checkout-layout { grid-template-columns: 1fr; } }
-    @media(max-width:600px) { .payment-options { grid-template-columns: 1fr; } }
-  </style>
+  <link rel="stylesheet" href="/css/checkout.css">
 </head>
 <body>
   <nav class="navbar" id="navbar">

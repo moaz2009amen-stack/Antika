@@ -1,0 +1,284 @@
+/* ══════════════════════════════════════════════════════════════
+   ANTIKA — css/shop.css
+   ══════════════════════════════════════════════════════════════ */
+
+/* ── Layout ──────────────────────────────────────────────────── */
+.shop-layout {
+  display: grid;
+  grid-template-columns: 240px 1fr;
+  gap: 1.75rem;
+  padding-top: 1.75rem;
+  padding-bottom: 4rem;
+}
+
+/* ── Sidebar ─────────────────────────────────────────────────── */
+.sidebar {
+  position: sticky;
+  top: 90px;
+  height: fit-content;
+}
+
+.sidebar-section { margin-bottom: 1.5rem; }
+
+.sidebar-title {
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 0.875rem;
+}
+
+.filter-option {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.45rem 0;
+  cursor: pointer;
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  transition: color var(--transition);
+  min-height: 36px;
+}
+
+.filter-option:hover,
+.filter-option.active { color: var(--gold); }
+
+.filter-option input[type="radio"],
+.filter-option input[type="checkbox"] { accent-color: var(--gold); }
+
+.price-range {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.price-input {
+  width: 80px;
+  padding: 0.4rem 0.6rem;
+  font-size: max(16px, 0.85rem);
+}
+
+/* ── Shop Header ─────────────────────────────────────────────── */
+.shop-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.25rem;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.results-count {
+  font-size: 0.875rem;
+  color: var(--text-muted);
+}
+
+.sort-select {
+  padding: 0.5rem 0.875rem;
+  font-size: max(16px, 0.85rem);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--bg-card);
+  color: var(--text);
+  font-family: inherit;
+  cursor: pointer;
+  outline: none;
+}
+
+.sort-select:focus { border-color: var(--gold); }
+
+/* ── Search Bar ──────────────────────────────────────────────── */
+.search-bar {
+  position: relative;
+  margin-bottom: 1rem;
+}
+
+.search-bar input { padding-right: 2.75rem; }
+[dir="ltr"] .search-bar input { padding-right: 1rem; padding-left: 2.75rem; }
+
+.search-bar i {
+  position: absolute;
+  top: 50%;
+  right: 0.9rem;
+  transform: translateY(-50%);
+  color: var(--text-muted);
+  pointer-events: none;
+}
+[dir="ltr"] .search-bar i { right: auto; left: 0.9rem; }
+
+/* ── Active Filters ──────────────────────────────────────────── */
+.active-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 0.875rem;
+}
+
+.filter-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 4px 10px;
+  background: rgba(201,168,76,0.12);
+  border: 1px solid var(--gold-light);
+  border-radius: 20px;
+  font-size: 0.78rem;
+  color: var(--gold-dark);
+  cursor: pointer;
+  transition: background var(--transition);
+}
+
+.filter-tag:hover { background: rgba(201,168,76,0.2); }
+.filter-tag i { font-size: 0.68rem; }
+
+/* ── Empty State ─────────────────────────────────────────────── */
+.empty-state {
+  text-align: center;
+  padding: 4rem 2rem;
+  color: var(--text-muted);
+}
+
+.empty-state i {
+  font-size: 3rem;
+  color: var(--border);
+  margin-bottom: 1rem;
+  display: block;
+  opacity: 0.5;
+}
+
+/* ── Mobile Filter Button ────────────────────────────────────── */
+.mobile-filter-btn { display: none; }
+
+/* ── Filter Drawer Overlay ───────────────────────────────────── */
+.filter-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  z-index: 500;
+  opacity: 0;
+  visibility: hidden;
+  transition: all var(--transition);
+}
+
+.filter-overlay.open {
+  display: block;
+  opacity: 1;
+  visibility: visible;
+}
+
+/* ── Filter Drawer ───────────────────────────────────────────── */
+.filter-drawer {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: min(300px, 85vw);
+  background: var(--bg-card);
+  z-index: 501;
+  padding: 1.25rem;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  transform: translateX(100%);
+  transition: transform var(--transition);
+  box-shadow: var(--shadow-lg);
+}
+
+[dir="ltr"] .filter-drawer { right: auto; left: 0; transform: translateX(-100%); }
+.filter-drawer.open { transform: translateX(0); }
+
+/* ── Quick View Modal ────────────────────────────────────────── */
+.qv-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.65);
+  z-index: 3000;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  backdrop-filter: blur(4px);
+}
+
+.qv-overlay.open { display: flex; }
+
+.qv-box {
+  background: var(--bg-card);
+  border-radius: var(--radius-lg);
+  width: 100%;
+  max-width: 820px;
+  max-height: min(90vh, 700px);
+  overflow: hidden;
+  border: 1px solid var(--border);
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+
+.qv-media {
+  background: var(--bg-secondary);
+  overflow: hidden;
+  min-height: 200px;
+}
+
+.qv-media img,
+.qv-media video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.qv-info {
+  padding: 1.5rem;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  display: flex;
+  flex-direction: column;
+  gap: 0.875rem;
+}
+
+.qv-close {
+  position: absolute;
+  top: 0.875rem;
+  right: 0.875rem;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+  transition: all 0.2s;
+  z-index: 10;
+}
+
+.qv-close:hover { border-color: var(--gold); color: var(--gold); }
+
+/* ── Responsive ──────────────────────────────────────────────── */
+@media (max-width: 900px) {
+  .shop-layout { grid-template-columns: 1fr; gap: 1rem; }
+  .sidebar { display: none; }
+  .mobile-filter-btn { display: flex; }
+}
+
+@media (max-width: 600px) {
+  .qv-box {
+    grid-template-columns: 1fr;
+    max-height: 92vh;
+    overflow-y: auto;
+  }
+  .qv-media { height: 240px; }
+  .qv-info { padding: 1rem; }
+}
+
+@media (max-width: 480px) {
+  .shop-header { gap: 0.5rem; }
+  .results-count { font-size: 0.8rem; }
+  .price-input { width: 70px; }
+  .filter-drawer { padding: 1rem; }
+  .shop-layout { padding-top: 1.25rem; padding-bottom: 3rem; }
+}

@@ -53,7 +53,6 @@
           <div class="profile-nav-item" onclick="showPanel('notifications')" id="nav-notifications">
             <i class="fas fa-bell"></i>
             <span data-ar="الإشعارات" data-en="Notifications">الإشعارات</span>
-            <!-- FIX: font-size كانت 0.75px والمفروض 0.7rem -->
             <span id="notif-badge" style="margin-right:auto;background:var(--gold);color:#fff;border-radius:20px;padding:2px 8px;font-size:0.7rem;display:none"></span>
           </div>
           <div class="profile-nav-item" onclick="showPanel('password')" id="nav-password">
@@ -119,7 +118,7 @@
           <div class="card" style="max-width:480px">
             <div class="form-group">
               <label class="form-label" data-ar="كلمة المرور الجديدة" data-en="New Password">كلمة المرور الجديدة</label>
-              <input type="password" class="form-control" id="new-password" dir="ltr" minlength="8" maxlength="128">
+              <input type="password" class="form-control" id="new-password" dir="ltr" minlength="6" maxlength="128">
             </div>
             <div class="form-group">
               <label class="form-label" data-ar="تأكيد كلمة المرور" data-en="Confirm Password">تأكيد كلمة المرور</label>
@@ -243,7 +242,6 @@
       const el = document.getElementById('notifications-list');
       const unreadCount = notifs?.filter(n => !n.is_read).length || 0;
 
-      // FIX: font-size كانت 0.75px — المفروض display وfont-size بس
       if (unreadCount > 0) {
         const badge = document.getElementById('notif-badge');
         badge.textContent = unreadCount;
@@ -273,7 +271,6 @@
       await db.from('notifications').update({ is_read: true }).eq('id', id);
       el.classList.remove('unread');
       el.querySelector('.notif-dot')?.remove();
-      // تحديث الـ badge
       const remaining = document.querySelectorAll('.notif-item.unread').length;
       const badge = document.getElementById('notif-badge');
       if (remaining === 0) badge.style.display = 'none';
@@ -321,9 +318,9 @@
       const msg = document.getElementById('pass-msg');
       const btn = document.getElementById('change-pass-btn');
 
-      if (np.length < 8) {
+      if (np.length < 6) {
         msg.style.color = '#dc2626';
-        msg.textContent = l === 'ar' ? 'لازم 8 حروف على الأقل' : 'At least 8 characters';
+        msg.textContent = l === 'ar' ? 'لازم 6 حروف على الأقل' : 'At least 6 characters';
         return;
       }
       if (np !== cp) {
@@ -355,7 +352,6 @@
       const file = input.files[0];
       if (!file) return;
 
-      // FIX: تحقق صارم من نوع الملف
       const allowedTypes = ['image/jpeg', 'image/png', 'image/webp'];
       if (!allowedTypes.includes(file.type)) {
         showToast(l === 'ar' ? 'يرجى اختيار صورة JPG أو PNG أو WebP فقط' : 'Please select JPG, PNG, or WebP only', 'error');
@@ -363,7 +359,6 @@
         return;
       }
 
-      // FIX: تحقق من الحجم (3MB للأفاتار)
       if (file.size > 3 * 1024 * 1024) {
         showToast(l === 'ar' ? 'الصورة أكبر من 3MB' : 'Image exceeds 3MB', 'error');
         input.value = '';
@@ -395,7 +390,6 @@
 
       const { data: profile } = await db.from('profiles').select('*').eq('id', currentUser.id).single();
 
-      // FIX: تحقق إن المستخدم مش محظور
       if (profile?.is_banned) {
         await db.auth.signOut();
         window.location.href = '/auth.html';

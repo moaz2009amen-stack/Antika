@@ -3,7 +3,7 @@
  * FAQ محلي أولاً ← Gemini AI fallback مجاني
  * حط الـ Gemini API key هنا ↓
  */
-const GEMINI_KEY = 'AQ.Ab8RN6LRQ5gJaApLbQM6YRO4vjevJeOksVUNAr7tLIPNufe-bA';
+const GEMINI_KEY = 'AQ.Ab8RN6Lb-Ojnud1pxHafHktNQXUokiEM_VRNyz8siPlwsggHaQ';
 
 (function () {
   'use strict';

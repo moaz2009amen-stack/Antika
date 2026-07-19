@@ -6,8 +6,8 @@
   <title>Antika Gallery — تسجيل الدخول</title>
   <link rel="manifest" href="/manifest.json">
   <link rel="stylesheet" href="/css/main.css">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <link rel="stylesheet" href="/css/auth.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 </head>
 <body>
   <div class="auth-left">
@@ -18,24 +18,19 @@
       <p class="auth-tagline" id="tagline-en" style="display:none">Discover all trends here — fashion, antiques, and homewear at the best prices</p>
     </div>
   </div>
-
   <div class="auth-right page-enter">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:2rem">
-      <button onclick="toggleLang()" style="font-size:0.85rem;color:var(--text-muted);font-weight:600;padding:6px 14px;border:1.5px solid var(--border);border-radius:20px;transition:all var(--transition)" id="lang-btn">EN</button>
-      <button onclick="toggleTheme()" style="font-size:1.1rem;color:var(--text-muted);width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;transition:all var(--transition)" id="theme-btn">
-        <i class="fas fa-moon"></i>
-      </button>
+      <button onclick="toggleLang()" style="font-size:0.85rem;color:var(--text-muted);font-weight:600;padding:6px 14px;border:1.5px solid var(--border);border-radius:20px" id="lang-btn">EN</button>
+      <button onclick="toggleTheme()" style="font-size:1.1rem;color:var(--text-muted);width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center" id="theme-btn"><i class="fas fa-moon"></i></button>
     </div>
-
     <div class="auth-tabs">
       <button class="auth-tab active" onclick="showTab('login')" id="tab-login" data-ar="تسجيل الدخول" data-en="Sign In">تسجيل الدخول</button>
       <button class="auth-tab" onclick="showTab('register')" id="tab-register" data-ar="حساب جديد" data-en="Register">حساب جديد</button>
     </div>
-
-    <!-- Login Panel -->
+    <!-- Login -->
     <div class="auth-panel active" id="panel-login">
-      <h2 class="auth-title" data-ar="أهلاً بعودتك" data-en="Welcome Back">أهلاً بعودتك</h2>
-      <p class="auth-subtitle" data-ar="سجل دخولك للمتابعة" data-en="Sign in to continue">سجل دخولك للمتابعة</p>
+      <h2 class="auth-title" data-ar="أهلاً بعودتك 👋" data-en="Welcome Back 👋">أهلاً بعودتك 👋</h2>
+      <p class="auth-subtitle" data-ar="سجّلي دخولك وابدئي التسوق" data-en="Sign in to start shopping">سجّلي دخولك وابدئي التسوق</p>
       <div class="lock-notice" id="lock-notice"></div>
       <div class="form-group">
         <label class="form-label" data-ar="البريد الإلكتروني" data-en="Email">البريد الإلكتروني</label>
@@ -45,80 +40,83 @@
         <label class="form-label" data-ar="كلمة المرور" data-en="Password">كلمة المرور</label>
         <div class="password-toggle">
           <input type="password" class="form-control" id="login-password" dir="ltr" maxlength="128" autocomplete="current-password">
-          <i class="fas fa-eye toggle-eye" onclick="togglePassword('login-password', this)"></i>
+          <i class="fas fa-eye toggle-eye" onclick="togglePassword('login-password',this)"></i>
         </div>
       </div>
       <div style="text-align:left;margin-bottom:1.5rem">
         <button onclick="showTab('forgot')" style="font-size:0.85rem;color:var(--gold);font-weight:600" data-ar="نسيت كلمة المرور؟" data-en="Forgot password?">نسيت كلمة المرور؟</button>
       </div>
       <button class="btn btn-primary btn-block btn-lg" onclick="handleLogin()" id="login-btn">
-        <span data-ar="دخول" data-en="Sign In">دخول</span>
+        <i class="fas fa-sign-in-alt"></i><span data-ar="دخول" data-en="Sign In">دخول</span>
       </button>
       <div id="login-error" class="form-error" style="margin-top:1rem;text-align:center"></div>
+      <p style="text-align:center;margin-top:1.5rem;font-size:0.875rem;color:var(--text-muted)">
+        <span data-ar="مش عندك حساب؟ " data-en="New here? ">مش عندك حساب؟ </span>
+        <button onclick="showTab('register')" style="color:var(--gold);font-weight:700" data-ar="سجّلي دلوقتي" data-en="Register now">سجّلي دلوقتي</button>
+      </p>
     </div>
-
-    <!-- Register Panel -->
+    <!-- Register -->
     <div class="auth-panel" id="panel-register">
-      <h2 class="auth-title" data-ar="إنشاء حساب" data-en="Create Account">إنشاء حساب</h2>
-      <p class="auth-subtitle" data-ar="انضم لعائلة أنتيكا" data-en="Join Antika family">انضم لعائلة أنتيكا</p>
+      <h2 class="auth-title" data-ar="انضمي لأنتيكا 🛍️" data-en="Join Antika 🛍️">انضمي لأنتيكا 🛍️</h2>
+      <p class="auth-subtitle" data-ar="مجاني — بدون تأكيد إيميل، ابدئي فوراً" data-en="Free — no email confirmation needed">مجاني — بدون تأكيد إيميل، ابدئي فوراً</p>
       <div class="avatar-upload">
-        <div class="avatar-preview" onclick="document.getElementById('avatar-input').click()" id="avatar-preview-el">
-          <i class="fas fa-user"></i>
-        </div>
+        <div class="avatar-preview" onclick="document.getElementById('avatar-input').click()" id="avatar-preview-el"><i class="fas fa-user"></i></div>
         <input type="file" id="avatar-input" accept="image/jpeg,image/png,image/webp" style="display:none" onchange="previewAvatar(this)">
         <div>
-          <p style="font-weight:600;font-size:0.9rem" data-ar="صورة شخصية" data-en="Profile Photo">صورة شخصية</p>
-          <small style="color:var(--text-muted)" data-ar="اضغط لرفع صورة (اختياري)" data-en="Tap to upload (optional)">اضغط لرفع صورة (اختياري)</small>
+          <p style="font-weight:600;font-size:0.875rem" data-ar="صورة شخصية" data-en="Profile Photo">صورة شخصية</p>
+          <small style="color:var(--text-muted)" data-ar="اضغطي لرفع صورة (اختياري)" data-en="Tap to upload (optional)">اضغطي لرفع صورة (اختياري)</small>
         </div>
       </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">
+      <div class="reg-grid-2">
         <div class="form-group">
-          <label class="form-label" data-ar="الاسم الكامل" data-en="Full Name">الاسم الكامل</label>
+          <label class="form-label" data-ar="الاسم الكامل *" data-en="Full Name *">الاسم الكامل *</label>
           <input type="text" class="form-control" id="reg-name" maxlength="100" autocomplete="name">
         </div>
         <div class="form-group">
-          <label class="form-label" data-ar="رقم التليفون" data-en="Phone">رقم التليفون</label>
+          <label class="form-label" data-ar="رقم التليفون *" data-en="Phone *">رقم التليفون *</label>
           <input type="tel" class="form-control" id="reg-phone" dir="ltr" maxlength="15" inputmode="numeric" autocomplete="tel">
         </div>
       </div>
       <div class="form-group">
-        <label class="form-label" data-ar="البريد الإلكتروني" data-en="Email">البريد الإلكتروني</label>
+        <label class="form-label" data-ar="البريد الإلكتروني *" data-en="Email *">البريد الإلكتروني *</label>
         <input type="email" class="form-control" id="reg-email" dir="ltr" maxlength="254" autocomplete="email">
       </div>
       <div class="form-group">
-        <label class="form-label" data-ar="العنوان" data-en="Address">العنوان</label>
+        <label class="form-label" data-ar="العنوان (اختياري)" data-en="Address (optional)">العنوان (اختياري)</label>
         <input type="text" class="form-control" id="reg-address" maxlength="300">
       </div>
       <div class="form-group">
-        <label class="form-label" data-ar="كلمة المرور" data-en="Password">كلمة المرور</label>
+        <label class="form-label" data-ar="كلمة المرور *" data-en="Password *">كلمة المرور *</label>
         <div class="password-toggle">
-          <input type="password" class="form-control" id="reg-password" dir="ltr" oninput="checkStrength(this.value)" maxlength="128" autocomplete="new-password">
-          <i class="fas fa-eye toggle-eye" onclick="togglePassword('reg-password', this)"></i>
+          <input type="password" class="form-control" id="reg-password" dir="ltr" oninput="checkStrength(this.value)" minlength="6" maxlength="128" autocomplete="new-password">
+          <i class="fas fa-eye toggle-eye" onclick="togglePassword('reg-password',this)"></i>
         </div>
         <div class="strength-bar"><div class="strength-fill" id="strength-fill"></div></div>
-        <small class="form-hint" id="strength-text"></small>
+        <small class="form-hint" id="strength-text" data-ar="6 حروف على الأقل" data-en="At least 6 characters">6 حروف على الأقل</small>
       </div>
       <div class="form-group">
-        <label class="form-label" data-ar="تأكيد كلمة المرور" data-en="Confirm Password">تأكيد كلمة المرور</label>
+        <label class="form-label" data-ar="تأكيد كلمة المرور *" data-en="Confirm Password *">تأكيد كلمة المرور *</label>
         <div class="password-toggle">
-          <input type="password" class="form-control" id="reg-confirm" dir="ltr" maxlength="128" autocomplete="new-password">
-          <i class="fas fa-eye toggle-eye" onclick="togglePassword('reg-confirm', this)"></i>
+          <input type="password" class="form-control" id="reg-confirm" dir="ltr" minlength="6" maxlength="128" autocomplete="new-password">
+          <i class="fas fa-eye toggle-eye" onclick="togglePassword('reg-confirm',this)"></i>
         </div>
       </div>
       <button class="btn btn-primary btn-block btn-lg" onclick="handleRegister()" id="register-btn">
-        <span data-ar="إنشاء الحساب" data-en="Create Account">إنشاء الحساب</span>
+        <i class="fas fa-user-plus"></i><span data-ar="سجّلي وابدئي التسوق 🛍️" data-en="Create Account & Shop 🛍️">سجّلي وابدئي التسوق 🛍️</span>
       </button>
       <div id="register-error" class="form-error" style="margin-top:1rem;text-align:center"></div>
+      <p style="text-align:center;margin-top:1.25rem;font-size:0.875rem;color:var(--text-muted)">
+        <span data-ar="عندك حساب؟ " data-en="Already have an account? ">عندك حساب؟ </span>
+        <button onclick="showTab('login')" style="color:var(--gold);font-weight:700" data-ar="ادخلي هنا" data-en="Sign in">ادخلي هنا</button>
+      </p>
     </div>
-
-    <!-- Forgot Password Panel -->
+    <!-- Forgot -->
     <div class="auth-panel" id="panel-forgot">
       <button onclick="showTab('login')" style="color:var(--text-muted);font-size:0.85rem;margin-bottom:1.5rem;display:flex;align-items:center;gap:0.5rem">
-        <i class="fas fa-arrow-right"></i>
-        <span data-ar="رجوع" data-en="Back">رجوع</span>
+        <i class="fas fa-arrow-right"></i><span data-ar="رجوع" data-en="Back">رجوع</span>
       </button>
       <h2 class="auth-title" data-ar="نسيت كلمة المرور؟" data-en="Forgot Password?">نسيت كلمة المرور؟</h2>
-      <p class="auth-subtitle" data-ar="هنبعتلك رابط لإعادة التعيين على إيميلك" data-en="We'll send a reset link to your email">هنبعتلك رابط لإعادة التعيين على إيميلك</p>
+      <p class="auth-subtitle" data-ar="هنبعتلك رابط على إيميلك عشان تغيّريها" data-en="We'll send a reset link to your email">هنبعتلك رابط على إيميلك عشان تغيّريها</p>
       <div class="form-group">
         <label class="form-label" data-ar="البريد الإلكتروني" data-en="Email">البريد الإلكتروني</label>
         <input type="email" class="form-control" id="forgot-email" dir="ltr" maxlength="254">
@@ -129,283 +127,117 @@
       <div id="forgot-msg" style="margin-top:1rem;text-align:center;font-size:0.9rem"></div>
     </div>
   </div>
-
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
   <script src="/js/config.js"></script>
   <script>
     const lang = getLang();
     let avatarFile = null;
-
-    // ── FIX: Rate Limiting بـ localStorage بدل متغيرات JS ────────
-    // المتغيرات في الـ memory بتتصفر مع كل page reload
-    const MAX_ATTEMPTS = 5;
-    const LOCK_MS      = 30 * 1000; // 30 ثانية
-
-    function getAttempts()  { return parseInt(localStorage.getItem('login_attempts') || '0'); }
-    function getLockUntil() { return parseInt(localStorage.getItem('login_lock')     || '0'); }
-    function setAttempts(n) { localStorage.setItem('login_attempts', String(n)); }
-    function setLockUntil(t){ localStorage.setItem('login_lock',     String(t)); }
-    function clearLoginLock(){ localStorage.removeItem('login_attempts'); localStorage.removeItem('login_lock'); }
-
-    function checkLoginLock() {
-      const lockUntil = getLockUntil();
-      if (Date.now() < lockUntil) {
-        const secs   = Math.ceil((lockUntil - Date.now()) / 1000);
-        const notice = document.getElementById('lock-notice');
-        notice.style.display = 'block';
-        notice.textContent   = lang === 'ar'
-          ? `كتير محاولات! استني ${secs} ثانية قبل المحاولة التانية`
-          : `Too many attempts. Wait ${secs}s before trying again`;
+    const MAX_ATTEMPTS=5,LOCK_MS=30000;
+    function getAttempts(){return parseInt(localStorage.getItem('login_attempts')||'0');}
+    function getLockUntil(){return parseInt(localStorage.getItem('login_lock')||'0');}
+    function setAttempts(n){localStorage.setItem('login_attempts',String(n));}
+    function setLockUntil(t){localStorage.setItem('login_lock',String(t));}
+    function clearLoginLock(){localStorage.removeItem('login_attempts');localStorage.removeItem('login_lock');}
+    function checkLoginLock(){
+      const lu=getLockUntil();
+      if(Date.now()<lu){
+        const s=Math.ceil((lu-Date.now())/1000);
+        const n=document.getElementById('lock-notice');
+        n.style.display='block';
+        n.textContent=lang==='ar'?`كتير محاولات! استني ${s} ثانية`:`Too many attempts. Wait ${s}s`;
         return false;
       }
-      document.getElementById('lock-notice').style.display = 'none';
+      document.getElementById('lock-notice').style.display='none';
       return true;
     }
-
-    function recordFailedAttempt() {
-      const attempts = getAttempts() + 1;
-      setAttempts(attempts);
-      if (attempts >= MAX_ATTEMPTS) {
-        setLockUntil(Date.now() + LOCK_MS);
-        setAttempts(0);
-        const interval = setInterval(() => {
-          if (!checkLoginLock()) { /* still locked — notice updated */ }
-          else { clearInterval(interval); }
-        }, 1000);
-      }
+    function recordFailedAttempt(){
+      const a=getAttempts()+1;setAttempts(a);
+      if(a>=MAX_ATTEMPTS){setLockUntil(Date.now()+LOCK_MS);setAttempts(0);const iv=setInterval(()=>{if(!checkLoginLock()){}else clearInterval(iv);},1000);}
     }
-
-    // ── FIX: Safe Redirect ────────────────────────────────────────
-    function safeRedirect(url) {
-      if (!url || url.startsWith('http') || url.startsWith('//') || url.startsWith('javascript:')) return null;
-      return url;
+    function safeRedirect(url){if(!url||url.startsWith('http')||url.startsWith('//')||url.startsWith('javascript:'))return null;return url;}
+    function applyLang(){
+      const l=getLang();
+      document.querySelectorAll('[data-ar]').forEach(el=>{el.textContent=l==='ar'?el.dataset.ar:el.dataset.en;});
+      document.getElementById('tagline-ar').style.display=l==='ar'?'block':'none';
+      document.getElementById('tagline-en').style.display=l==='en'?'block':'none';
+      document.getElementById('lang-btn').textContent=l==='ar'?'EN':'ع';
     }
-
-    function applyLang() {
-      const l = getLang();
-      document.querySelectorAll('[data-ar]').forEach(el => {
-        el.textContent = l === 'ar' ? el.dataset.ar : el.dataset.en;
-      });
-      document.getElementById('tagline-ar').style.display = l === 'ar' ? 'block' : 'none';
-      document.getElementById('tagline-en').style.display = l === 'en' ? 'block' : 'none';
-      document.getElementById('lang-btn').textContent = l === 'ar' ? 'EN' : 'ع';
+    function toggleLang(){setLang(getLang()==='ar'?'en':'ar');}
+    function toggleTheme(){const t=getTheme()==='light'?'dark':'light';setTheme(t);document.getElementById('theme-btn').innerHTML=t==='dark'?'<i class="fas fa-sun"></i>':'<i class="fas fa-moon"></i>';}
+    function showTab(tab){
+      document.querySelectorAll('.auth-tab').forEach(t=>t.classList.remove('active'));
+      document.querySelectorAll('.auth-panel').forEach(p=>p.classList.remove('active'));
+      document.getElementById('panel-'+tab).classList.add('active');
+      if(tab!=='forgot')document.getElementById('tab-'+tab)?.classList.add('active');
     }
-
-    function toggleLang() { setLang(getLang() === 'ar' ? 'en' : 'ar'); }
-
-    function toggleTheme() {
-      const t = getTheme() === 'light' ? 'dark' : 'light';
-      setTheme(t);
-      document.getElementById('theme-btn').innerHTML = t === 'dark' ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
+    function togglePassword(id,icon){const i=document.getElementById(id);const p=i.type==='password';i.type=p?'text':'password';icon.className=p?'fas fa-eye-slash toggle-eye':'fas fa-eye toggle-eye';}
+    function previewAvatar(input){
+      const f=input.files[0];if(!f)return;
+      if(!['image/jpeg','image/png','image/webp'].includes(f.type)){showToast('يرجى اختيار صورة JPG أو PNG','error');input.value='';return;}
+      if(f.size>3*1024*1024){showToast('الصورة أكبر من 3MB','error');input.value='';return;}
+      avatarFile=f;
+      const r=new FileReader();r.onload=e=>{document.getElementById('avatar-preview-el').innerHTML=`<img src="${e.target.result}" style="width:100%;height:100%;object-fit:cover">`;};r.readAsDataURL(f);
     }
-
-    function showTab(tab) {
-      document.querySelectorAll('.auth-tab').forEach(t  => t.classList.remove('active'));
-      document.querySelectorAll('.auth-panel').forEach(p => p.classList.remove('active'));
-      document.getElementById(`panel-${tab}`).classList.add('active');
-      if (tab !== 'forgot') document.getElementById(`tab-${tab}`).classList.add('active');
+    function checkStrength(val){
+      const fill=document.getElementById('strength-fill'),text=document.getElementById('strength-text'),l=getLang();
+      let s=0;if(val.length>=6)s++;if(val.length>=10)s++;if(/[0-9]/.test(val))s++;if(/[^A-Za-z0-9]/.test(val))s++;
+      const c=['#dc2626','#f59e0b','#3b82f6','#16a34a'],ar=['ضعيفة','متوسطة','جيدة','قوية'],en=['Weak','Fair','Good','Strong'];
+      fill.style.width=`${s*25}%`;fill.style.background=c[s-1]||'#dc2626';
+      text.textContent=s>0?(l==='ar'?ar[s-1]:en[s-1]):(l==='ar'?'6 حروف على الأقل':'At least 6 characters');
     }
-
-    function togglePassword(id, icon) {
-      const input  = document.getElementById(id);
-      const isPass = input.type === 'password';
-      input.type   = isPass ? 'text' : 'password';
-      icon.className = isPass ? 'fas fa-eye-slash toggle-eye' : 'fas fa-eye toggle-eye';
-    }
-
-    function previewAvatar(input) {
-      const file = input.files[0];
-      if (!file) return;
-      const allowed = ['image/jpeg', 'image/png', 'image/webp'];
-      if (!allowed.includes(file.type)) { showToast('يرجى اختيار صورة JPG أو PNG أو WebP', 'error'); input.value = ''; return; }
-      if (file.size > 3 * 1024 * 1024) { showToast('الصورة أكبر من 3MB', 'error'); input.value = ''; return; }
-      avatarFile = file;
-      const reader = new FileReader();
-      reader.onload = e => {
-        const el = document.getElementById('avatar-preview-el');
-        el.innerHTML = `<img src="${e.target.result}" style="width:100%;height:100%;object-fit:cover">`;
-      };
-      reader.readAsDataURL(file);
-    }
-
-    function checkStrength(val) {
-      const fill = document.getElementById('strength-fill');
-      const text = document.getElementById('strength-text');
-      const l    = getLang();
-      let score  = 0;
-      if (val.length >= 6)          score++;
-      if (/[A-Z]/.test(val))        score++;
-      if (/[0-9]/.test(val))        score++;
-      if (/[^A-Za-z0-9]/.test(val)) score++;
-      const colors   = ['#dc2626','#f59e0b','#3b82f6','#16a34a'];
-      const labels_ar = ['ضعيفة','متوسطة','جيدة','قوية'];
-      const labels_en = ['Weak','Fair','Good','Strong'];
-      fill.style.width      = `${score * 25}%`;
-      fill.style.background = colors[score - 1] || '#dc2626';
-      text.textContent      = score > 0 ? (l === 'ar' ? labels_ar[score-1] : labels_en[score-1]) : '';
-    }
-
-    async function handleLogin() {
-      // FIX: تحقق من الـ lock أول حاجة
-      if (!checkLoginLock()) return;
-
-      const btn   = document.getElementById('login-btn');
-      if (btn.disabled) return;
-
-      const errEl    = document.getElementById('login-error');
-      const email    = document.getElementById('login-email').value.trim();
-      const password = document.getElementById('login-password').value;
-
-      if (!email || !password) {
-        errEl.textContent = lang === 'ar' ? 'من فضلك اكمل البيانات' : 'Please fill all fields';
-        return;
-      }
-      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-        errEl.textContent = lang === 'ar' ? 'الإيميل غير صحيح' : 'Invalid email';
-        return;
-      }
-
-      btn.disabled  = true;
-      btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
-      errEl.textContent = '';
-
-      const { data, error } = await db.auth.signInWithPassword({ email, password });
-
-      if (error) {
-        // FIX: سجّل المحاولة الفاشلة في localStorage
-        recordFailedAttempt();
-        errEl.textContent = lang === 'ar' ? 'إيميل أو كلمة مرور غلط' : 'Invalid email or password';
-        btn.disabled  = false;
-        btn.innerHTML = `<span>${lang === 'ar' ? 'دخول' : 'Sign In'}</span>`;
-        return;
-      }
-
-      // FIX: مسح الـ rate limit عند النجاح
+    async function handleLogin(){
+      if(!checkLoginLock())return;
+      const btn=document.getElementById('login-btn');if(btn.disabled)return;
+      const errEl=document.getElementById('login-error');
+      const email=document.getElementById('login-email').value.trim();
+      const password=document.getElementById('login-password').value;
+      if(!email||!password){errEl.textContent=lang==='ar'?'من فضلك اكملي البيانات':'Please fill all fields';return;}
+      if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){errEl.textContent=lang==='ar'?'الإيميل غير صحيح':'Invalid email';return;}
+      btn.disabled=true;btn.innerHTML='<i class="fas fa-spinner fa-spin"></i>';errEl.textContent='';
+      const{data,error}=await db.auth.signInWithPassword({email,password});
+      if(error){recordFailedAttempt();errEl.textContent=lang==='ar'?'إيميل أو كلمة مرور غلط':'Invalid email or password';btn.disabled=false;btn.innerHTML=`<i class="fas fa-sign-in-alt"></i><span>${lang==='ar'?'دخول':'Sign In'}</span>`;return;}
       clearLoginLock();
-
-      // Check banned
-      const { data: profile } = await db.from('profiles').select('is_banned').eq('id', data.user.id).single();
-      if (profile?.is_banned) {
-        await db.auth.signOut();
-        errEl.textContent = lang === 'ar' ? 'هذا الحساب محظور' : 'This account is banned';
-        btn.disabled  = false;
-        btn.innerHTML = `<span>${lang === 'ar' ? 'دخول' : 'Sign In'}</span>`;
-        return;
-      }
-
-      // FIX: app_metadata بدل user_metadata
-      const role = data.user.app_metadata?.role;
-      if (role === 'admin') {
-        window.location.href = '/admin-antika-ctrl/';
-        return;
-      }
-
-      // FIX: safe redirect
-      const params   = new URLSearchParams(window.location.search);
-      const redirect = safeRedirect(params.get('redirect'));
-      window.location.href = redirect || '/';
+      const{data:profile}=await db.from('profiles').select('is_banned').eq('id',data.user.id).single();
+      if(profile?.is_banned){await db.auth.signOut();errEl.textContent=lang==='ar'?'هذا الحساب محظور':'This account is banned';btn.disabled=false;btn.innerHTML=`<i class="fas fa-sign-in-alt"></i><span>${lang==='ar'?'دخول':'Sign In'}</span>`;return;}
+      const role=data.user.app_metadata?.role;
+      if(role==='admin'){window.location.href='/admin-antika-ctrl/';return;}
+      const params=new URLSearchParams(window.location.search);
+      const redirect=safeRedirect(params.get('redirect'));
+      window.location.href=redirect||'/';
     }
-
-    async function handleRegister() {
-      const btn    = document.getElementById('register-btn');
-      if (btn.disabled) return;
-
-      const errEl   = document.getElementById('register-error');
-      const name    = document.getElementById('reg-name').value.trim();
-      const phone   = document.getElementById('reg-phone').value.trim();
-      const email   = document.getElementById('reg-email').value.trim();
-      const address = document.getElementById('reg-address').value.trim();
-      const password = document.getElementById('reg-password').value;
-      const confirm  = document.getElementById('reg-confirm').value;
-
-      if (!name || !phone || !email || !password) {
-        errEl.textContent = lang === 'ar' ? 'من فضلك اكمل البيانات' : 'Please fill all fields';
-        return;
-      }
-      if (!/^[\+]?[\d\s\-]{7,15}$/.test(phone)) {
-        errEl.textContent = lang === 'ar' ? 'رقم التليفون غير صحيح' : 'Invalid phone number';
-        return;
-      }
-      if (password !== confirm) {
-        errEl.textContent = lang === 'ar' ? 'كلمة المرور مش متطابقة' : 'Passwords do not match';
-        return;
-      }
-      if (password.length < 6) {
-        errEl.textContent = lang === 'ar' ? 'كلمة المرور لازم تكون 6 حروف على الأقل' : 'Password must be at least 6 characters';
-        return;
-      }
-
-      btn.disabled  = true;
-      btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
-      errEl.textContent = '';
-
-      const { data, error } = await db.auth.signUp({
-        email, password,
-        options: { data: { full_name: name, role: 'customer' } }
-      });
-
-      if (error) {
-        errEl.textContent = error.message;
-        btn.disabled  = false;
-        btn.innerHTML = `<span>${lang === 'ar' ? 'إنشاء الحساب' : 'Create Account'}</span>`;
-        return;
-      }
-
-      await db.from('profiles').update({ full_name: name, phone, address }).eq('id', data.user.id);
-
-      if (avatarFile && data.user) {
-        try {
-          const avatarUrl = await uploadToCloudinary(avatarFile, 'avatars');
-          await db.from('profiles').update({ avatar_url: avatarUrl }).eq('id', data.user.id);
-        } catch {}
-      }
-
-      showToast(lang === 'ar' ? 'تم إنشاء الحساب!' : 'Account created!');
-      showTab('login');
-      btn.disabled  = false;
-      btn.innerHTML = `<span>${lang === 'ar' ? 'إنشاء الحساب' : 'Create Account'}</span>`;
+    async function handleRegister(){
+      const btn=document.getElementById('register-btn');if(btn.disabled)return;
+      const errEl=document.getElementById('register-error');
+      const name=document.getElementById('reg-name').value.trim();
+      const phone=document.getElementById('reg-phone').value.trim();
+      const email=document.getElementById('reg-email').value.trim();
+      const address=document.getElementById('reg-address').value.trim();
+      const password=document.getElementById('reg-password').value;
+      const confirm=document.getElementById('reg-confirm').value;
+      if(!name||!phone||!email||!password){errEl.textContent=lang==='ar'?'من فضلك اكملي البيانات المطلوبة':'Please fill required fields';return;}
+      if(!/^[\+]?[\d\s\-]{7,15}$/.test(phone)){errEl.textContent=lang==='ar'?'رقم التليفون غير صحيح':'Invalid phone number';return;}
+      if(password!==confirm){errEl.textContent=lang==='ar'?'كلمة المرور مش متطابقة':'Passwords do not match';return;}
+      if(password.length<6){errEl.textContent=lang==='ar'?'كلمة المرور لازم تكون 6 حروف على الأقل':'Password must be at least 6 characters';return;}
+      btn.disabled=true;btn.innerHTML='<i class="fas fa-spinner fa-spin"></i>';errEl.textContent='';
+      const{data,error}=await db.auth.signUp({email,password,options:{data:{full_name:name,role:'customer'}}});
+      if(error){errEl.textContent=error.code==='user_already_exists'?(lang==='ar'?'الإيميل ده مسجّل بالفعل — ادخلي من هنا':'Email already registered — Sign in instead'):error.message;btn.disabled=false;btn.innerHTML=`<i class="fas fa-user-plus"></i><span>${lang==='ar'?'سجّلي وابدئي التسوق 🛍️':'Create Account & Shop 🛍️'}</span>`;return;}
+      await db.from('profiles').update({full_name:name,phone,address:address||null}).eq('id',data.user.id);
+      if(avatarFile&&data.user){try{const url=await uploadToCloudinary(avatarFile,'avatars');await db.from('profiles').update({avatar_url:url}).eq('id',data.user.id);}catch{}}
+      showToast(lang==='ar'?'✓ أهلاً بيكِ في أنتيكا! 🎉':'✓ Welcome to Antika! 🎉');
+      setTimeout(()=>{const params=new URLSearchParams(window.location.search);const redirect=safeRedirect(params.get('redirect'));window.location.href=redirect||'/';},1500);
     }
-
-    async function handleForgot() {
-      const btn   = document.getElementById('forgot-btn');
-      const msgEl = document.getElementById('forgot-msg');
-      const email = document.getElementById('forgot-email').value.trim();
-      if (!email) return;
-
-      btn.disabled  = true;
-      btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
-
-      const { error } = await db.auth.resetPasswordForEmail(email, {
-        redirectTo: `${window.location.origin}/reset-password.html`
-      });
-
-      msgEl.style.color = error ? '#dc2626' : '#16a34a';
-      msgEl.textContent = error
-        ? (lang === 'ar' ? 'حصل خطأ، حاول تاني' : 'Something went wrong')
-        : (lang === 'ar' ? 'تم إرسال رابط الاستعادة على إيميلك ✓' : 'Reset link sent ✓');
-
-      btn.disabled  = false;
-      btn.innerHTML = `<span>${lang === 'ar' ? 'إرسال رابط الاستعادة' : 'Send Reset Link'}</span>`;
+    async function handleForgot(){
+      const btn=document.getElementById('forgot-btn'),msgEl=document.getElementById('forgot-msg');
+      const email=document.getElementById('forgot-email').value.trim();if(!email)return;
+      btn.disabled=true;btn.innerHTML='<i class="fas fa-spinner fa-spin"></i>';
+      const{error}=await db.auth.resetPasswordForEmail(email,{redirectTo:`${window.location.origin}/reset-password.html`});
+      msgEl.style.color=error?'#dc2626':'#16a34a';
+      msgEl.textContent=error?(lang==='ar'?'حصل خطأ، حاولي تاني':'Something went wrong'):(lang==='ar'?'✓ تم إرسال رابط الاستعادة على إيميلك':'✓ Reset link sent to your email');
+      btn.disabled=false;btn.innerHTML=`<span>${lang==='ar'?'إرسال رابط الاستعادة':'Send Reset Link'}</span>`;
     }
-
-    // Redirect لو موجود session
-    (async () => {
-      const user = await getCurrentUser();
-      if (user) {
-        // FIX: app_metadata بدل user_metadata
-        const { data: { session } } = await db.auth.getSession();
-        const role = session?.user?.app_metadata?.role;
-        if (role === 'admin') { window.location.href = '/admin-antika-ctrl/'; return; }
-        const params   = new URLSearchParams(window.location.search);
-        const redirect = safeRedirect(params.get('redirect'));
-        window.location.href = redirect || '/';
-      }
-    })();
-
-    applyLang();
-    document.getElementById('theme-btn').innerHTML = getTheme() === 'dark' ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
-    // تحقق من الـ lock عند تحميل الصفحة (لو كان reload)
-    checkLoginLock();
+    document.addEventListener('keydown',e=>{if(e.key!=='Enter')return;const a=document.querySelector('.auth-panel.active')?.id;if(a==='panel-login')handleLogin();if(a==='panel-register')handleRegister();if(a==='panel-forgot')handleForgot();});
+    (async()=>{const user=await getCurrentUser();if(user){const{data:{session}}=await db.auth.getSession();const role=session?.user?.app_metadata?.role;if(role==='admin'){window.location.href='/admin-antika-ctrl/';return;}const params=new URLSearchParams(window.location.search);const redirect=safeRedirect(params.get('redirect'));window.location.href=redirect||'/';}})();
+    applyLang();document.getElementById('theme-btn').innerHTML=getTheme()==='dark'?'<i class="fas fa-sun"></i>':'<i class="fas fa-moon"></i>';checkLoginLock();
   </script>
 </body>
 </html>

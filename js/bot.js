@@ -86,14 +86,12 @@
     return bestScore>=3?best:null;
   }
 
-  // الـ Gemini call بيروح لـ Supabase Edge Function — الـ key على السيرفر مش في الـ browser
+  // الـ Gemini call بيروح لـ Supabase Edge Function — بدون auth عشان الزوار يستخدموا البوت
   async function askGemini(msg) {
     try{
-      const{data:{session}}=await db.auth.getSession();
-      const token=session?.access_token;
       const res=await fetch('https://tutcepymwnjvbbmdmsjm.supabase.co/functions/v1/gemini-proxy',{
         method:'POST',
-        headers:{'Content-Type':'application/json',...(token?{'Authorization':`Bearer ${token}`}:{})},
+        headers:{'Content-Type':'application/json'},
         body:JSON.stringify({message:msg})
       });
       if(!res.ok)return null;

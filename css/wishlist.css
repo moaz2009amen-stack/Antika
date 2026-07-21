@@ -1,0 +1,89 @@
+/* ══════════════════════════════════════════════════════════════
+   ANTIKA — css/wishlist.css
+   ══════════════════════════════════════════════════════════════ */
+
+/* ── Page Header ─────────────────────────────────────────────── */
+.page-header {
+  padding: 2rem 0 1.5rem;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 2rem;
+}
+
+.page-header h1 {
+  font-family: var(--font-display);
+  font-size: clamp(1.5rem, 4vw, 2rem);
+}
+
+/* ── Empty State ─────────────────────────────────────────────── */
+.empty-wishlist {
+  text-align: center;
+  padding: 5rem 2rem;
+}
+
+.empty-wishlist i {
+  font-size: 4rem;
+  color: var(--border);
+  margin-bottom: 1.5rem;
+  display: block;
+  opacity: 0.5;
+}
+
+.empty-wishlist h3 {
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.empty-wishlist p {
+  color: var(--text-muted);
+  margin-bottom: 2rem;
+}
+
+/* ── Wishlist Card ───────────────────────────────────────────── */
+.wishlist-card { position: relative; }
+
+.remove-wishlist-btn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 10;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.92);
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #dc2626;
+  font-size: 0.9rem;
+  transition: all 0.2s;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+}
+
+[dir="ltr"] .remove-wishlist-btn { right: auto; left: 10px; }
+
+[data-theme="dark"] .remove-wishlist-btn {
+  background: rgba(31,28,22,0.92);
+}
+
+.remove-wishlist-btn:hover {
+  transform: scale(1.1);
+  background: #dc2626;
+  color: #fff;
+}
+
+/* ── Responsive ──────────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .page-header { padding: 1.5rem 0 1rem; margin-bottom: 1.5rem; }
+  .empty-wishlist { padding: 3rem 1rem; }
+  .empty-wishlist i { font-size: 3rem; }
+  .empty-wishlist h3 { font-size: 1.25rem; }
+}
+
+@media (max-width: 480px) {
+  .page-header { padding: 1rem 0 0.875rem; margin-bottom: 1.25rem; }
+  .empty-wishlist { padding: 2.5rem 1rem; }
+  .remove-wishlist-btn { width: 30px; height: 30px; font-size: 0.8rem; }
+}

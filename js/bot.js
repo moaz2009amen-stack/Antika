@@ -3,7 +3,7 @@
  * FAQ محلي أولاً ← Gemini AI fallback مجاني
  * حط الـ Gemini API key هنا ↓
  */
-const GEMINI_KEY = 'AQ.Ab8RN6Lb-Ojnud1pxHafHktNQXUokiEM_VRNyz8siPlwsggHaQ';
+// الـ Gemini key محفوظ في Supabase Edge Function — مش هنا
 
 (function () {
   'use strict';
@@ -86,16 +86,19 @@ const GEMINI_KEY = 'AQ.Ab8RN6Lb-Ojnud1pxHafHktNQXUokiEM_VRNyz8siPlwsggHaQ';
     return bestScore>=3?best:null;
   }
 
+  // الـ Gemini call بيروح لـ Supabase Edge Function — الـ key على السيرفر مش في الـ browser
   async function askGemini(msg) {
-    if(!GEMINI_KEY||GEMINI_KEY==='YOUR_GEMINI_API_KEY_HERE')return null;
     try{
-      const res=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_KEY}`,{
-        method:'POST',headers:{'Content-Type':'application/json'},
-        body:JSON.stringify({contents:[{parts:[{text:`${STORE_CONTEXT}\n\nسؤال العميل: ${msg}`}]}],generationConfig:{maxOutputTokens:250,temperature:0.7}})
+      const{data:{session}}=await db.auth.getSession();
+      const token=session?.access_token;
+      const res=await fetch('https://tutcepymwnjvbbmdmsjm.supabase.co/functions/v1/gemini-proxy',{
+        method:'POST',
+        headers:{'Content-Type':'application/json',...(token?{'Authorization':`Bearer ${token}`}:{})},
+        body:JSON.stringify({message:msg})
       });
       if(!res.ok)return null;
       const data=await res.json();
-      return data?.candidates?.[0]?.content?.parts?.[0]?.text?.trim()||null;
+      return data?.reply||null;
     }catch{return null;}
   }
 

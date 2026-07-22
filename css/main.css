@@ -66,18 +66,42 @@ html {
   font-size: 16px;
   /* FIX: منع horizontal scroll */
   overflow-x: hidden;
+  width: 100%;
 }
 
+/* ══════════════════════════════════════════════════════════════
+   FIX: STICKY FOOTER SYSTEM — موحّد لكل صفحات الموقع
+   body بيبقى flex column بارتفاع الشاشة كامل
+   أي محتوى main بياخد flex:1 فيدفع الفوتر لآخر الصفحة دايماً
+   حتى لو المحتوى قصير جداً (سلة فاضية، نتائج بحث فاضية...)
+   ══════════════════════════════════════════════════════════════ */
 body {
   font-family: var(--font-body);
   background: var(--bg);
   color: var(--text);
   line-height: 1.7;
   transition: background var(--transition), color var(--transition);
-  min-height: 100vh;
   padding-top: var(--navbar-h);
   /* FIX: منع horizontal scroll */
   overflow-x: hidden;
+  width: 100%;
+  /* FIX: sticky footer — flex column بارتفاع الشاشة كامل */
+  min-height: 100vh;
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* FIX: أي عنصر مباشر تحت body غير navbar/notif-bar/footer/script
+   بيتحدد له flex-shrink:0 (طبيعي) لكن بياخد min-height مناسب،
+   والفوتر بيتثبّت آخر حاجة بـ margin-top:auto — ده أقوى وأعم من
+   الاعتماد على .container واحد، وبيشتغل مع أي هيكل صفحة
+   (sections متعددة، أو container واحد، أو أي تركيب) */
+body > footer,
+body > .footer,
+body > .footer-simple {
+  margin-top: auto;
+  flex-shrink: 0;
   width: 100%;
 }
 
@@ -734,6 +758,51 @@ textarea.form-control {
 }
 .footer-dev a:hover { color: var(--gold-dark); }
 
+/* ══════════════════════════════════════════════════════════════
+   FIX: FOOTER SIMPLE — component موحّد للصفحات البسيطة
+   (shop, cart, checkout, profile, track, terms, privacy, returns)
+   بدل ما كل صفحة كانت بتكرر <footer style="..."> بقيم مختلفة شوية
+   دلوقتي كلهم بيستخدموا نفس الـ class بالظبط — تناسق كامل
+   ══════════════════════════════════════════════════════════════ */
+.footer-simple {
+  background: var(--bg-secondary);
+  border-top: 1px solid var(--border);
+  padding: 1.5rem 0;
+  flex-shrink: 0;
+}
+
+.footer-simple .container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.footer-simple p {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin: 0;
+}
+
+/* FIX: روابط قانونية إضافية (خصوصية/إرجاع/شروط) في نفس الـ footer-simple */
+.footer-legal-links {
+  display: flex;
+  gap: 1.25rem;
+  flex-wrap: wrap;
+}
+
+.footer-legal-links a {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  transition: color var(--transition);
+}
+
+.footer-legal-links a:hover,
+.footer-legal-links a.active {
+  color: var(--gold);
+}
+
 /* ── Pagination ───────────────────────────────────────────────── */
 .pagination {
   display: flex;
@@ -845,14 +914,29 @@ textarea.form-control {
 
 /* ── Tablet & Mobile (≤768px) ─────────────────────────────────── */
 @media (max-width: 768px) {
-  :root { --navbar-h: 60px; }
+  :root { --navbar-h: 58px; }
 
+  /* ══════════════════════════════════════════════════════════
+     FIX: NAVBAR OVERFLOW — حل بحساب دقيق للمساحة
+     المشكلة الأصلية: على شاشة 375px (iPhone SE) كانت العناصر
+     الست (theme+lang+wishlist+cart+user+hamburger) + الـ brand
+     بياخدوا ~382px فعلياً — أكبر من عرض الشاشة نفسه (overflow 35px+)
+     الحل: تصغير كل عنصر + تقليل الـ gaps + إخفاء wishlist على
+     الشاشات الصغيرة جداً (موجود بالفعل في wishlist.html كـ heart icon)
+     ══════════════════════════════════════════════════════════ */
   .navbar {
-    padding: 0 0.875rem;
-    gap: 0.375rem;
+    padding: 0 0.75rem;
+    gap: 0.25rem;
   }
 
-  .navbar-brand { font-size: 1.15rem; }
+  .navbar-brand {
+    font-size: 1.05rem;
+    /* FIX: تحديد أقصى عرض عشان الاسم ميضغطش باقي العناصر */
+    max-width: 40vw;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
 
   /* FIX: navbar-nav mobile menu */
   .navbar-nav {
@@ -868,7 +952,9 @@ textarea.form-control {
     border-bottom: 1px solid var(--border);
     box-shadow: var(--shadow-lg);
     z-index: 999;
-    /* FIX: smooth open */
+    max-height: calc(100svh - var(--navbar-h));
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
     animation: slideDown 0.2s ease;
   }
 
@@ -890,16 +976,42 @@ textarea.form-control {
 
   .navbar-nav li:last-child a { border-bottom: none; }
 
-  /* FIX: إخفاء بعض الـ icons على موبايل صغير */
   .hamburger { display: flex; }
 
-  .navbar-actions { gap: 0.25rem; }
+  /* FIX: تقليل الـ gap بين الأيقونات لأقصى درجة ممكنة بدون ما تلزق ببعض */
+  .navbar-actions { gap: 0.125rem; }
 
-  /* FIX: navbar-icon-btn أصغر شوية */
+  /* FIX: navbar-icon-btn أصغر — 34px بدل 40px، بيوفر مساحة كافية */
   .navbar-icon-btn {
-    width: 36px;
-    height: 36px;
-    font-size: 0.95rem;
+    width: 34px;
+    height: 34px;
+    font-size: 0.88rem;
+  }
+
+  /* FIX: زرار اللغة "EN/ع" — تصغير الـ padding بدل width ثابت */
+  #lang-toggle {
+    width: 34px;
+    height: 34px;
+    font-size: 0.68rem !important;
+  }
+
+  /* FIX: على الموبايل الأساسي، إخفاء أيقونة المفضلة من الـ navbar
+     (لسه موجودة كـ heart icon جوا صفحة المنتج نفسها + صفحة wishlist منفصلة)
+     ده بيوفر عنصر كامل من الـ 6 عناصر الأصليين */
+  .navbar-actions .wishlist-hide {
+    display: none;
+  }
+
+  /* FIX: user-area (صورة البروفايل/زرار دخول) — تحديد حجم ثابت صغير */
+  #user-area {
+    flex-shrink: 0;
+  }
+
+  #user-area .navbar-icon-btn,
+  #user-area img,
+  #user-area > div {
+    width: 32px !important;
+    height: 32px !important;
   }
 
   /* FIX: products-grid responsive */
@@ -933,6 +1045,20 @@ textarea.form-control {
   .footer { padding: 2rem 0 1.25rem; margin-top: 3rem; }
   .footer-bottom { flex-direction: column; text-align: center; }
 
+  /* FIX: footer-simple على الموبايل — عمودي ومتوسط */
+  .footer-simple { padding: 1.25rem 0; }
+  .footer-simple .container {
+    flex-direction: column;
+    text-align: center;
+    gap: 0.5rem;
+  }
+
+  /* FIX: footer-legal-links على الموبايل — تتوسط وتتلف صح */
+  .footer-legal-links {
+    justify-content: center;
+    gap: 0.875rem;
+  }
+
   /* FIX: btn-lg على موبايل */
   .btn-lg {
     padding: 0.75rem 1.5rem;
@@ -950,10 +1076,13 @@ textarea.form-control {
 @media (max-width: 480px) {
   :root { --navbar-h: 56px; }
 
-  .navbar-brand { font-size: 1rem; }
+  .navbar-brand { font-size: 1rem; max-width: 38vw; }
 
   /* FIX: على الشاشات الصغيرة جداً إخفاء wishlist */
   .navbar-actions .wishlist-hide { display: none; }
+
+  /* FIX: navbar padding أضيق شوية كمان */
+  .navbar { padding: 0 0.625rem; gap: 0.1875rem; }
 
   /* FIX: products-grid 2 columns دايماً */
   .products-grid {
@@ -983,6 +1112,18 @@ textarea.form-control {
   /* FIX: modal */
   .modal { padding: 1rem; }
   .modal-title { font-size: 1.05rem; }
+}
+
+/* ── Extra Small (≤360px) — Galaxy Fold, أقدم iPhone SE ─────── */
+@media (max-width: 360px) {
+  .navbar { padding: 0 0.5rem; gap: 0.125rem; }
+  .navbar-brand { font-size: 0.9rem; max-width: 34vw; }
+  .navbar-icon-btn { width: 32px; height: 32px; font-size: 0.82rem; }
+  #lang-toggle { width: 32px; height: 32px; }
+  #user-area .navbar-icon-btn,
+  #user-area img,
+  #user-area > div { width: 30px !important; height: 30px !important; }
+  .hamburger { padding: 6px; }
 }
 
 /* ── Touch Devices ────────────────────────────────────────────── */

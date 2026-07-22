@@ -1,14 +1,8 @@
 /* ══════════════════════════════════════════════════════════════
    ANTIKA — css/track.css
+   ملاحظة: sticky-footer body{display:flex...} بقى global
+   في main.css دلوقتي — مش محتاجينه هنا تاني
    ══════════════════════════════════════════════════════════════ */
-
-body {
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-}
-
-body > .container.page-enter { flex: 1; }
 
 /* ── Track Container ─────────────────────────────────────────── */
 .track-container {

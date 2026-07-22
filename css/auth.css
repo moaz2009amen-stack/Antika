@@ -2,14 +2,18 @@
    ANTIKA — css/auth.css
    ══════════════════════════════════════════════════════════════ */
 
-/* ── Auth Layout ─────────────────────────────────────────────── */
-.auth-wrap {
-  display: flex;
-  min-height: 100vh;
-  /* FIX: padding-top 0 لأن body بيعمل flex */
+/* ── FIX: Auth Body Override ─────────────────────────────────────
+   main.css بيخلي كل body{display:flex;flex-direction:column}
+   عشان الـ sticky-footer، لكن صفحة auth محتاجة flex-row
+   (يمين/شمال) بدل column، فبنعمل override هنا خصيصاً لها */
+body {
+  flex-direction: row !important;
   padding-top: 0 !important;
+  min-height: 100vh !important;
+  min-height: 100svh !important;
 }
 
+/* ── Auth Layout ─────────────────────────────────────────────── */
 .auth-left {
   flex: 1;
   background: var(--bg-secondary);

@@ -181,7 +181,13 @@
         Promise.resolve({ data: null })
       ]);
 
-      if (!p) { window.location.href = '/shop.html'; return; }
+      // FIX: لو المنتج مش موجود، أو موجود لكن مخفي (is_published=false)
+      // نوجّه المستخدم لصفحة المتجر — قبل كده كان أي حد معاه الـ id
+      // المباشر يقدر يشوف المنتج حتى لو الأدمن أخفاه
+      if (!p || p.is_published === false) {
+        window.location.href = '/shop.html';
+        return;
+      }
       product = p;
 
       const name = l==='ar'&&p.name_ar ? p.name_ar : p.name;

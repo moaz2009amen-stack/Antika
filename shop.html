@@ -388,10 +388,17 @@
 
     // ── FIX: Quick View — كل القيم escaped، event listeners منفصلة ─
     async function openQuickView(productId) {
+      // FIX: فلتر is_published — منع ظهور منتج مخفي في الـ Quick View
+      // حتى لو الـ productMap عنده نسخة قديمة cached
       const { data: product } = await db.from('products')
         .select('*,categories(name,name_ar)')
-        .eq('id', productId).single();
-      if (!product) return;
+        .eq('id', productId)
+        .eq('is_published', true)
+        .single();
+      if (!product) {
+        showToast(getLang() === 'ar' ? 'المنتج غير متاح حالياً' : 'Product unavailable', 'error');
+        return;
+      }
 
       const l = getLang();
 

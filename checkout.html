@@ -375,6 +375,46 @@
       const total    = Math.max(0, subtotal - discount);
 
       try {
+        // ═══════════════════════════════════════════════════════
+        // FIX: تحقق من توفر المخزون الفعلي قبل إتمام الطلب
+        // قبل كده كان النظام بيقبل أي طلب حتى لو الكمية المطلوبة
+        // أكبر من المتاح فعلياً — العميل كان بيدفع/يطلب حاجة
+        // مش موجودة في المخزون خالص
+        // ═══════════════════════════════════════════════════════
+        const productIds = cart.map(item => item.id);
+        const { data: currentProducts, error: stockCheckErr } = await db
+          .from('products')
+          .select('id, stock, name, name_ar')
+          .in('id', productIds);
+
+        if (stockCheckErr) throw stockCheckErr;
+
+        const stockMap = new Map((currentProducts || []).map(p => [p.id, p]));
+        const outOfStockItems = [];
+
+        for (const item of cart) {
+          const prod = stockMap.get(item.id);
+          if (!prod || prod.stock < item.quantity) {
+            const pname = l === 'ar' ? (prod?.name_ar || item.name) : (prod?.name || item.name);
+            outOfStockItems.push({ name: pname, available: prod?.stock ?? 0 });
+          }
+        }
+
+        if (outOfStockItems.length > 0) {
+          const namesList = outOfStockItems.map(i =>
+            l === 'ar'
+              ? `${i.name} (متبقي ${i.available} فقط)`
+              : `${i.name} (only ${i.available} left)`
+          ).join('، ');
+          errEl.textContent = l === 'ar'
+            ? `للأسف الكمية المطلوبة مش متوفرة: ${namesList}`
+            : `Requested quantity not available: ${namesList}`;
+          errEl.style.display = 'block';
+          btn.disabled  = false;
+          btn.innerHTML = `<i class="fas fa-check-circle"></i> ${l === 'ar' ? 'تأكيد الطلب' : 'Place Order'}`;
+          return;
+        }
+
         // رفع الإيصال لو موجود
         if (paymentMethod === 'wallet' && proofFile) {
           proofUrl = await uploadToCloudinary(proofFile, 'payments');
@@ -382,6 +422,30 @@
 
         // تحديث بيانات الـ profile
         await db.from('profiles').update({ full_name: name, phone, address }).eq('id', currentUser.id);
+
+        // ═══════════════════════════════════════════════════════
+        // FIX: خصم المخزون أولاً (atomic عن طريق decrement RPC)
+        // قبل إنشاء الطلب — ده بيقلل احتمال الـ race condition:
+        // لو اتنين عملاء بيحاولوا يشتروا نفس آخر قطعة في نفس اللحظة،
+        // الـ decrement (اللي بيستخدم greatest(0, stock-x) في
+        // transaction واحدة داخل postgres) هيمنع الكمية توصل لسالب،
+        // ولو الستوك خلص فعلاً هيبان في الطلبات اللي بعد كده
+        // ═══════════════════════════════════════════════════════
+        for (const item of cart) {
+          const { error: stockErr } = await db.rpc('decrement', {
+            row_id: item.id,
+            x: item.quantity
+          });
+          if (stockErr) {
+            // fallback يدوي لو الـ RPC مش موجودة لأي سبب
+            const prod = stockMap.get(item.id);
+            if (prod) {
+              await db.from('products')
+                .update({ stock: Math.max(0, prod.stock - item.quantity) })
+                .eq('id', item.id);
+            }
+          }
+        }
 
         // إنشاء الطلب
         const { data: order, error: orderErr } = await db.from('orders').insert({
@@ -393,7 +457,20 @@
           notes:             notes || null
         }).select().single();
 
-        if (orderErr) throw orderErr;
+        // FIX: لو إنشاء الطلب فشل بعد ما المخزون اتخصم، نرجّع المخزون
+        // (compensating transaction) — عشان المخزون ميفضلش ناقص
+        // من غير ما يكون فيه طلب فعلي وراه
+        if (orderErr) {
+          for (const item of cart) {
+            const prod = stockMap.get(item.id);
+            if (prod) {
+              await db.from('products')
+                .update({ stock: prod.stock })
+                .eq('id', item.id);
+            }
+          }
+          throw orderErr;
+        }
 
         // إضافة عناصر الطلب
         const items = cart.map(item => ({
@@ -404,28 +481,25 @@
         }));
 
         const { error: itemsErr } = await db.from('order_items').insert(items);
-        if (itemsErr) throw itemsErr;
+
+        // FIX: لو إضافة عناصر الطلب فشلت، نرجّع المخزون ونحذف الطلب
+        // اليتيم (طلب بدون عناصر) — منع بيانات ناقصة في النظام
+        if (itemsErr) {
+          for (const item of cart) {
+            const prod = stockMap.get(item.id);
+            if (prod) {
+              await db.from('products')
+                .update({ stock: prod.stock })
+                .eq('id', item.id);
+            }
+          }
+          await db.from('orders').delete().eq('id', order.id);
+          throw itemsErr;
+        }
 
         // استخدام الكوبون لو موجود
         if (couponData?.couponId) {
           await useCoupon(couponData.couponId);
-        }
-
-        // FIX: تحديث المخزون باستخدام الـ decrement RPC الصح
-        for (const item of cart) {
-          const { error: stockErr } = await db.rpc('decrement', {
-            row_id: item.id,
-            x: item.quantity
-          });
-          // لو الـ RPC فشل لأي سبب، نعمل fallback يدوي
-          if (stockErr) {
-            const { data: prod } = await db.from('products').select('stock').eq('id', item.id).single();
-            if (prod) {
-              await db.from('products')
-                .update({ stock: Math.max(0, prod.stock - item.quantity) })
-                .eq('id', item.id);
-            }
-          }
         }
 
         // مسح السلة

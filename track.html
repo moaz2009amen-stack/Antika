@@ -3,34 +3,11 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Antika Gallery — تتبع الطلب</title>
+  <title>Antika Gallery — طلباتي</title>
   <link rel="manifest" href="/manifest.json">
   <link rel="stylesheet" href="/css/main.css">
+  <link rel="stylesheet" href="/css/track.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-  <style>
-    .track-container { max-width: 680px; margin: 0 auto; padding: 2rem 0 4rem; }
-    .track-search { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 2rem; margin-bottom: 1.5rem; }
-    .order-result { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 2rem; display: none; }
-    .order-result.show { display: block; animation: fadeUp 0.3s ease; }
-    .status-timeline { margin: 2rem 0; }
-    .timeline-step { display: flex; gap: 1rem; padding-bottom: 1.5rem; position: relative; }
-    .timeline-step:last-child { padding-bottom: 0; }
-    .timeline-step:not(:last-child)::before { content: ''; position: absolute; right: 15px; top: 32px; bottom: 0; width: 2px; background: var(--border); }
-    [dir="ltr"] .timeline-step:not(:last-child)::before { right: auto; left: 15px; }
-    .timeline-step.done::before { background: var(--gold); }
-    .step-circle { width: 32px; height: 32px; border-radius: 50%; border: 2px solid var(--border); display: flex; align-items: center; justify-content: center; flex-shrink: 0; background: var(--bg-card); font-size: 0.8rem; color: var(--text-muted); z-index: 1; }
-    .timeline-step.done .step-circle { border-color: var(--gold); background: var(--gold); color: #fff; }
-    .timeline-step.current .step-circle { border-color: var(--gold); color: var(--gold); animation: pulse 1.5s infinite; }
-    @keyframes pulse { 0%,100% { box-shadow: 0 0 0 0 rgba(201,168,76,0.4); } 50% { box-shadow: 0 0 0 6px rgba(201,168,76,0); } }
-    .step-content { padding-top: 4px; }
-    .step-title { font-weight: 700; font-size: 0.9rem; }
-    .step-date { font-size: 0.8rem; color: var(--text-muted); margin-top: 0.2rem; }
-    /* Success state */
-    .success-box { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 2.5rem; text-align: center; margin-bottom: 1.5rem; }
-    .success-icon { width: 72px; height: 72px; border-radius: 50%; background: rgba(22,163,74,.1); display: flex; align-items: center; justify-content: center; margin: 0 auto 1.25rem; font-size: 2rem; color: #16a34a; }
-    body { min-height: 100vh; display: flex; flex-direction: column; }
-    body > .container.page-enter { flex: 1; }
-  </style>
 </head>
 <body>
   <nav class="navbar" id="navbar">
@@ -51,11 +28,11 @@
   <div class="container page-enter" style="padding-top:2rem">
     <div class="track-container">
       <div style="text-align:center;margin-bottom:2rem">
-        <h1 style="font-family:var(--font-display);font-size:2rem;font-style:italic;margin-bottom:0.5rem" data-ar="تتبع طلبك" data-en="Track Your Order">تتبع طلبك</h1>
-        <p style="color:var(--text-muted)" data-ar="ادخلي رقم التليفون عشان تشوفي طلباتك" data-en="Enter your phone number to track your orders">ادخلي رقم التليفون عشان تشوفي طلباتك</p>
+        <h1 style="font-family:var(--font-display);font-size:2rem;font-style:italic;margin-bottom:0.5rem" data-ar="طلباتي" data-en="My Orders">طلباتي</h1>
+        <p style="color:var(--text-muted)" data-ar="كل طلباتك في مكان واحد" data-en="All your orders in one place">كل طلباتك في مكان واحد</p>
       </div>
 
-      <!-- FIX: Success state بعد إتمام الطلب من checkout.html -->
+      <!-- Success state بعد إتمام الطلب من checkout.html -->
       <div id="success-box" style="display:none">
         <div class="success-box">
           <div class="success-icon"><i class="fas fa-check-circle"></i></div>
@@ -66,8 +43,8 @@
             <div id="success-id-val" style="font-family:monospace;font-weight:700;color:var(--gold);font-size:1.1rem"></div>
           </div>
           <div style="display:flex;gap:.75rem;justify-content:center;flex-wrap:wrap">
-            <button onclick="showTrackForm()" class="btn btn-outline btn-sm">
-              <i class="fas fa-search"></i> <span data-ar="تتبع الطلب" data-en="Track Order">تتبع الطلب</span>
+            <button onclick="scrollToOrders()" class="btn btn-outline btn-sm">
+              <i class="fas fa-list"></i> <span data-ar="كل طلباتي" data-en="My Orders">كل طلباتي</span>
             </button>
             <a href="/shop.html" class="btn btn-primary btn-sm">
               <i class="fas fa-shopping-bag"></i> <span data-ar="متابعة التسوق" data-en="Continue Shopping">متابعة التسوق</span>
@@ -76,30 +53,8 @@
         </div>
       </div>
 
-      <div id="track-form-wrap">
-        <div class="track-search">
-          <div class="form-group">
-            <label class="form-label" data-ar="رقم التليفون" data-en="Phone Number">رقم التليفون</label>
-            <input
-              type="tel"
-              class="form-control"
-              id="track-phone"
-              dir="ltr"
-              placeholder="01xxxxxxxxx"
-              maxlength="15"
-              inputmode="numeric"
-              autocomplete="tel"
-              onkeydown="if(event.key==='Enter')trackOrder()"
-              oninput="this.value=this.value.replace(/[^0-9+\-\s]/g,'')">
-          </div>
-          <button class="btn btn-primary btn-block" onclick="trackOrder()" id="track-btn">
-            <i class="fas fa-search"></i>
-            <span data-ar="تتبع الطلبات" data-en="Track Orders">تتبع الطلبات</span>
-          </button>
-          <div id="track-error" class="form-error" style="margin-top:0.75rem;text-align:center"></div>
-        </div>
-      </div>
-
+      <!-- FIX: مفيش فورم بحث بالتليفون خالص — الطلبات بتظهر تلقائي
+           حسب المستخدم المسجل دخول -->
       <div id="orders-results"></div>
     </div>
   </div>
@@ -107,14 +62,18 @@
   <footer class="footer-simple">
     <div class="container">
       <p>© 2026 Antika Gallery</p>
-      <p class="footer-dev">Developed by <a href="https://www.facebook.com/profile.php?id=61552026802548&locale=ar_AR" target="_blank" rel="noopener" style="color:var(--gold);font-weight:600">Moaz</a></p>
+      <p class="footer-dev">Developed by <a href="https://www.facebook.com/profile.php?id=61552026802548&locale=ar_AR" target="_blank" rel="noopener">Moaz</a></p>
     </div>
   </footer>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+  <!-- FIX: jsPDF لتوليد فواتير PDF في المتصفح مباشرة -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="/js/config.js"></script>
   <script>
     const l = getLang();
+    let currentUser = null;
+    let invoiceSettings = {};
 
     function applyLang() {
       document.querySelectorAll('[data-ar]').forEach(el => {
@@ -129,15 +88,8 @@
       document.getElementById('theme-toggle').innerHTML = t === 'dark' ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
     }
 
-    function showTrackForm() {
-      document.getElementById('success-box').style.display    = 'none';
-      document.getElementById('track-form-wrap').style.display = 'block';
-    }
-
-    // FIX: validate phone
-    function validatePhone(phone) {
-      const cleaned = phone.replace(/[\s\-]/g, '');
-      return /^[\+]?[\d]{7,15}$/.test(cleaned);
+    function scrollToOrders() {
+      document.getElementById('orders-results').scrollIntoView({ behavior: 'smooth' });
     }
 
     const steps = [
@@ -167,60 +119,36 @@
       }).join('');
     }
 
-    async function trackOrder() {
-      const btn   = document.getElementById('track-btn');
-      const errEl = document.getElementById('track-error');
-      if (btn.disabled) return;
+    // FIX: تحميل طلبات المستخدم المسجل دخول تلقائياً — مفيش بحث
+    // بتليفون خالص. requireAuth() بتوجه لصفحة الدخول لو مش مسجل.
+    async function loadMyOrders() {
+      const container = document.getElementById('orders-results');
+      container.innerHTML = `<div style="text-align:center;padding:3rem"><div class="spinner" style="margin:0 auto"></div></div>`;
 
-      const raw = document.getElementById('track-phone').value.trim();
-      errEl.textContent = '';
+      const { data: orders, error } = await db
+        .from('orders')
+        .select('*, order_items(quantity, price_at_time, products(name, name_ar, images))')
+        .eq('user_id', currentUser.id)
+        .order('created_at', { ascending: false });
 
-      if (!raw) {
-        errEl.textContent = l === 'ar' ? 'أدخلي رقم التليفون' : 'Please enter your phone number';
+      if (error) {
+        container.innerHTML = `<div style="text-align:center;padding:3rem;color:var(--text-muted)">
+          <i class="fas fa-exclamation-circle" style="font-size:2.5rem;display:block;margin-bottom:1rem;color:var(--border)"></i>
+          <p>${l === 'ar' ? 'حصل خطأ في تحميل الطلبات' : 'Error loading orders'}</p>
+        </div>`;
         return;
       }
-      if (!validatePhone(raw)) {
-        errEl.textContent = l === 'ar' ? 'رقم التليفون غير صحيح' : 'Invalid phone number';
+
+      if (!orders?.length) {
+        container.innerHTML = `<div style="text-align:center;padding:4rem 1rem;color:var(--text-muted)">
+          <i class="fas fa-box-open" style="font-size:3rem;display:block;margin-bottom:1.25rem;color:var(--border)"></i>
+          <p style="font-size:1rem;font-weight:600;margin-bottom:1.5rem">${l === 'ar' ? 'مفيش طلبات لحد دلوقتي' : 'No orders yet'}</p>
+          <a href="/shop.html" class="btn btn-primary">${l === 'ar' ? 'ابدئي التسوق' : 'Start Shopping'}</a>
+        </div>`;
         return;
       }
 
-      const phone = raw.replace(/[\s\-]/g, '');
-      btn.disabled  = true;
-      btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
-
-      try {
-        const { data: profiles, error: profileErr } = await db
-          .from('profiles').select('id').eq('phone', phone);
-
-        if (profileErr) throw profileErr;
-
-        if (!profiles?.length) {
-          errEl.textContent = l === 'ar' ? 'مفيش طلبات بالرقم ده' : 'No orders found for this number';
-          return;
-        }
-
-        const userId = profiles[0].id;
-        const { data: orders, error: ordersErr } = await db
-          .from('orders')
-          .select('*, order_items(quantity, price_at_time, products(name, name_ar, images))')
-          .eq('user_id', userId)
-          .order('created_at', { ascending: false });
-
-        if (ordersErr) throw ordersErr;
-
-        if (!orders?.length) {
-          errEl.textContent = l === 'ar' ? 'مفيش طلبات بالرقم ده' : 'No orders found';
-          return;
-        }
-
-        renderOrders(orders);
-
-      } catch (err) {
-        errEl.textContent = l === 'ar' ? 'حصل خطأ، حاولي تاني' : 'Something went wrong';
-      } finally {
-        btn.disabled  = false;
-        btn.innerHTML = `<i class="fas fa-search"></i> <span>${l === 'ar' ? 'تتبع الطلبات' : 'Track Orders'}</span>`;
-      }
+      renderOrders(orders);
     }
 
     function renderOrders(orders) {
@@ -245,7 +173,13 @@
                 </div>
                 <div style="font-size:0.8rem;color:var(--text-muted)">${formatDate(order.created_at)}</div>
               </div>
-              <span class="badge ${s.cls}">${l === 'ar' ? s.ar : s.en}</span>
+              <div style="display:flex;align-items:center;gap:.5rem">
+                <span class="badge ${s.cls}">${l === 'ar' ? s.ar : s.en}</span>
+                <!-- FIX: زر تحميل الفاتورة PDF -->
+                <button class="btn btn-ghost btn-sm" onclick="downloadInvoice('${encodeURIComponent(order.id)}')" title="${l === 'ar' ? 'تحميل الفاتورة' : 'Download Invoice'}">
+                  <i class="fas fa-file-pdf"></i>
+                </button>
+              </div>
             </div>
 
             ${order.status !== 'cancelled'
@@ -271,6 +205,11 @@
                     <div style="font-weight:700;color:var(--gold)">${formatPrice(oi.price_at_time * oi.quantity)}</div>
                   </div>`;
               }).join('')}
+              ${order.delivery_fee > 0 ? `
+              <div style="display:flex;justify-content:space-between;margin-top:0.5rem;font-size:0.85rem;color:var(--text-muted)">
+                <span>${l === 'ar' ? 'رسوم التوصيل' : 'Delivery Fee'}</span>
+                <span>${formatPrice(order.delivery_fee)}</span>
+              </div>` : ''}
               <div style="display:flex;justify-content:space-between;margin-top:0.75rem;padding-top:0.75rem;border-top:1px solid var(--border);font-weight:700">
                 <span>${l === 'ar' ? 'الإجمالي' : 'Total'}</span>
                 <span style="color:var(--gold)">${formatPrice(order.total)}</span>
@@ -278,42 +217,187 @@
             </div>
           </div>`;
       }).join('');
+
+      // FIX: خزّن الطلبات في متغير global عشان downloadInvoice تقدر توصلها
+      window._myOrders = orders;
     }
 
-    async function initUserArea() {
-      const user = await getCurrentUser();
-      const area = document.getElementById('user-area');
-      if (user) {
-        area.innerHTML = `<a href="/profile.html" class="btn btn-ghost btn-sm">${l === 'ar' ? 'حسابي' : 'My Account'}</a>`;
-      } else {
-        area.innerHTML = `<a href="/auth.html" class="btn btn-primary btn-sm">${l === 'ar' ? 'دخول' : 'Sign In'}</a>`;
+    // ══════════════════════════════════════════════════════════════
+    // FIX: توليد فاتورة PDF — بيانات المتجر من إعدادات لوحة التحكم
+    // ══════════════════════════════════════════════════════════════
+    async function downloadInvoice(encodedOrderId) {
+      const orderId = decodeURIComponent(encodedOrderId);
+      const order = (window._myOrders || []).find(o => o.id === orderId);
+      if (!order) return;
+
+      showToast(l === 'ar' ? 'جاري تجهيز الفاتورة...' : 'Preparing invoice...', 'info');
+
+      const { data: profile } = await db.from('profiles')
+        .select('full_name, phone, address').eq('id', currentUser.id).single();
+
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF({ unit: 'pt', format: 'a4' });
+
+      const pageWidth = doc.internal.pageSize.getWidth();
+      const margin = 40;
+      let y = 50;
+
+      doc.setFontSize(20);
+      doc.text(invoiceSettings.storeName || 'Antika Gallery', pageWidth / 2, y, { align: 'center' });
+      y += 22;
+
+      doc.setFontSize(9);
+      doc.setTextColor(100);
+      if (invoiceSettings.address) {
+        doc.text(invoiceSettings.address, pageWidth / 2, y, { align: 'center' });
+        y += 14;
       }
+      const contactLine = [invoiceSettings.phone, invoiceSettings.email].filter(Boolean).join('  |  ');
+      if (contactLine) {
+        doc.text(contactLine, pageWidth / 2, y, { align: 'center' });
+        y += 14;
+      }
+      if (invoiceSettings.taxNumber) {
+        doc.text(`Tax No: ${invoiceSettings.taxNumber}`, pageWidth / 2, y, { align: 'center' });
+        y += 14;
+      }
+
+      y += 10;
+      doc.setDrawColor(201, 168, 76);
+      doc.setLineWidth(1.5);
+      doc.line(margin, y, pageWidth - margin, y);
+      y += 30;
+
+      doc.setTextColor(0);
+      doc.setFontSize(14);
+      doc.text('INVOICE', margin, y);
+      doc.setFontSize(10);
+      doc.text(`#${order.id.slice(0, 8).toUpperCase()}`, pageWidth - margin, y, { align: 'right' });
+      y += 18;
+
+      doc.setFontSize(9);
+      doc.setTextColor(100);
+      doc.text(`Date: ${new Date(order.created_at).toLocaleDateString('en-GB')}`, margin, y);
+      doc.text(`Status: ${order.status}`, pageWidth - margin, y, { align: 'right' });
+      y += 30;
+
+      doc.setTextColor(0);
+      doc.setFontSize(10);
+      doc.text('Bill To:', margin, y);
+      y += 14;
+      doc.setFontSize(9);
+      doc.setTextColor(80);
+      doc.text(profile?.full_name || '-', margin, y); y += 12;
+      doc.text(profile?.phone || '-', margin, y); y += 12;
+      if (profile?.address) { doc.text(profile.address, margin, y); y += 12; }
+      y += 20;
+
+      doc.setFillColor(245, 240, 225);
+      doc.rect(margin, y, pageWidth - margin * 2, 22, 'F');
+      doc.setTextColor(0);
+      doc.setFontSize(9);
+      doc.text('Item', margin + 8, y + 15);
+      doc.text('Qty', pageWidth - margin - 160, y + 15, { align: 'center' });
+      doc.text('Price', pageWidth - margin - 90, y + 15, { align: 'center' });
+      doc.text('Total', pageWidth - margin - 8, y + 15, { align: 'right' });
+      y += 22;
+
+      doc.setFontSize(9);
+      doc.setTextColor(40);
+      (order.order_items || []).forEach(item => {
+        // FIX: PDF fonts افتراضياً مش بتدعم عربي — بنستخدم الاسم
+        // الإنجليزي لو موجود، وإلا بنعرض اسم عام بدل حروف مشوهة
+        const safeName = item.products?.name || 'Product';
+        doc.text(safeName.slice(0, 40), margin + 8, y + 15);
+        doc.text(String(item.quantity), pageWidth - margin - 160, y + 15, { align: 'center' });
+        doc.text(String(item.price_at_time), pageWidth - margin - 90, y + 15, { align: 'center' });
+        doc.text(String((item.price_at_time * item.quantity).toFixed(2)), pageWidth - margin - 8, y + 15, { align: 'right' });
+        y += 20;
+        doc.setDrawColor(230);
+        doc.line(margin, y - 6, pageWidth - margin, y - 6);
+      });
+
+      y += 15;
+
+      const productsTotal = order.total - (order.delivery_fee || 0);
+      doc.setFontSize(9);
+      doc.setTextColor(80);
+      doc.text('Subtotal:', pageWidth - margin - 140, y);
+      doc.text(productsTotal.toFixed(2) + ' EGP', pageWidth - margin - 8, y, { align: 'right' });
+      y += 16;
+
+      if (order.delivery_fee > 0) {
+        doc.text('Delivery Fee:', pageWidth - margin - 140, y);
+        doc.text(order.delivery_fee.toFixed(2) + ' EGP', pageWidth - margin - 8, y, { align: 'right' });
+        y += 16;
+      }
+
+      doc.setDrawColor(201, 168, 76);
+      doc.line(pageWidth - margin - 140, y, pageWidth - margin, y);
+      y += 14;
+
+      doc.setFontSize(12);
+      doc.setTextColor(0);
+      doc.text('Total:', pageWidth - margin - 140, y);
+      doc.text(order.total.toFixed(2) + ' EGP', pageWidth - margin - 8, y, { align: 'right' });
+      y += 40;
+
+      if (invoiceSettings.footerNote) {
+        doc.setFontSize(9);
+        doc.setTextColor(120);
+        doc.text(invoiceSettings.footerNote, pageWidth / 2, y, { align: 'center' });
+      }
+
+      doc.save(`invoice-${order.id.slice(0, 8)}.pdf`);
     }
 
-    // ── Init ──────────────────────────────────────────────────────
-    (function init() {
-      // FIX: تحقق من success state قادم من checkout.html
+    // ══════════════════════════════════════════════════════════════
+    // Init
+    // ══════════════════════════════════════════════════════════════
+    async function initUserArea() {
+      const area = document.getElementById('user-area');
+      area.innerHTML = `<a href="/profile.html" class="btn btn-ghost btn-sm">${l === 'ar' ? 'حسابي' : 'My Account'}</a>`;
+    }
+
+    async function loadInvoiceSettings() {
+      invoiceSettings = {
+        storeName:  await getSetting('invoice_store_name') || 'Antika Gallery',
+        address:    await getSetting('invoice_address')    || '',
+        phone:      await getSetting('invoice_phone')       || '',
+        email:      await getSetting('invoice_email')       || '',
+        taxNumber:  await getSetting('invoice_tax_number')  || '',
+        footerNote: await getSetting('invoice_footer_note') || '',
+      };
+    }
+
+    (async function init() {
+      checkMaintenance();
+      applyLang();
+      updateCartCount();
+      document.getElementById('theme-toggle').innerHTML = getTheme() === 'dark' ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
+      window.addEventListener('scroll', () => document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 20));
+
+      // FIX: لازم تسجيل دخول — مفيش تتبع بدون حساب
+      currentUser = await requireAuth('/auth.html?redirect=/track.html');
+      if (!currentUser) return;
+
+      await initUserArea();
+      await loadInvoiceSettings();
+
       const urlParams = new URLSearchParams(window.location.search);
       if (urlParams.get('success') === '1') {
         const orderId = urlParams.get('order');
-        document.getElementById('success-box').style.display    = 'block';
-        document.getElementById('track-form-wrap').style.display = 'none';
+        document.getElementById('success-box').style.display = 'block';
         if (orderId) {
           document.getElementById('success-id-val').textContent =
             '#' + decodeURIComponent(orderId).slice(0,8).toUpperCase();
         } else {
           document.getElementById('success-order-id').style.display = 'none';
         }
-        // مسح الـ URL params بدون reload
         window.history.replaceState({}, '', '/track.html');
       }
 
-      checkMaintenance();
-      applyLang();
-      updateCartCount();
-      initUserArea();
-      document.getElementById('theme-toggle').innerHTML = getTheme() === 'dark' ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
-      window.addEventListener('scroll', () => document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 20));
+      await loadMyOrders();
     })();
   </script>
 </body>

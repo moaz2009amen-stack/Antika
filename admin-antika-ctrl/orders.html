@@ -236,9 +236,24 @@
               <img src="${escapeHtml(o.payment_proof_url)}" style="width:100%;border-radius:var(--radius);border:1px solid var(--border)">
             </a>
           </div>` : ''}
-        <div style="padding:1rem;background:var(--bg-secondary);border-radius:var(--radius);display:flex;justify-content:space-between;font-weight:700">
-          <span>الإجمالي</span>
-          <span style="color:var(--gold)">${formatPrice(o.total)}</span>
+        <div style="padding:1rem;background:var(--bg-secondary);border-radius:var(--radius)">
+          ${(() => {
+            const deliveryFee = o.delivery_fee || 0;
+            const productsTotal = o.total - deliveryFee;
+            return `
+              <div style="display:flex;justify-content:space-between;font-size:.85rem;color:var(--text-secondary);margin-bottom:.4rem">
+                <span>قيمة المنتجات</span>
+                <span>${formatPrice(productsTotal)}</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;font-size:.85rem;color:var(--text-secondary);margin-bottom:.6rem;padding-bottom:.6rem;border-bottom:1px solid var(--border)">
+                <span>رسوم التوصيل</span>
+                <span>${deliveryFee > 0 ? formatPrice(deliveryFee) : 'مجاني'}</span>
+              </div>`;
+          })()}
+          <div style="display:flex;justify-content:space-between;font-weight:700">
+            <span>الإجمالي</span>
+            <span style="color:var(--gold)">${formatPrice(o.total)}</span>
+          </div>
         </div>
         ${o.notes ? `<div style="margin-top:1rem;padding:.75rem;background:rgba(201,168,76,.08);border-radius:var(--radius-sm);font-size:.85rem"><strong>ملاحظات:</strong> ${escapeHtml(o.notes)}</div>` : ''}
         <div style="margin-top:1.5rem">

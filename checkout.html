@@ -52,6 +52,9 @@
     let proofUrl      = null;
     let paymentMethod = 'cash';
     let waNum         = null;
+    // FIX: رسوم التوصيل والحد الأدنى للتوصيل المجاني
+    let deliveryFee     = 0;
+    let freeDeliveryMin = null;
 
     function applyLang() {
       document.querySelectorAll('[data-ar]').forEach(el => {
@@ -102,6 +105,12 @@
       const { data: profile } = await db.from('profiles').select('*').eq('id', currentUser.id).single();
       waNum = await getSetting('whatsapp_number');
 
+      // FIX: تحميل رسوم التوصيل والحد الأدنى للتوصيل المجاني
+      const feeSetting = await getSetting('delivery_fee');
+      deliveryFee = feeSetting ? parseFloat(feeSetting) || 0 : 0;
+      const freeMinSetting = await getSetting('free_delivery_min');
+      freeDeliveryMin = (freeMinSetting && freeMinSetting !== '') ? parseFloat(freeMinSetting) : null;
+
       renderCheckout(cart, profile);
     }
 
@@ -122,6 +131,8 @@
     function renderCheckout(cart, profile) {
       const subtotal = cart.reduce((s, i) => s + i.price * i.quantity, 0);
       const placeholder = 'https://res.cloudinary.com/df3ffyrsg/image/upload/q_auto,f_auto,w_52/v1/antika/placeholder';
+      // FIX: حساب رسوم التوصيل الفعلية (مع مراعاة الشحن المجاني لو موجود)
+      const currentDeliveryFee = calcDeliveryFee(subtotal);
 
       document.getElementById('checkout-content').innerHTML = `
         <div class="checkout-layout">
@@ -238,12 +249,12 @@
               </div>
               <div class="summary-row">
                 <span style="color:var(--text-secondary)">${l === 'ar' ? 'التوصيل' : 'Delivery'}</span>
-                <span style="color:#16a34a;font-weight:600">${l === 'ar' ? 'عند الاستلام' : 'On delivery'}</span>
+                <span id="sum-delivery" style="${currentDeliveryFee === 0 ? 'color:#16a34a;font-weight:600' : ''}">${currentDeliveryFee === 0 ? (l === 'ar' ? 'مجاني' : 'Free') : formatPrice(currentDeliveryFee)}</span>
               </div>
               <div class="summary-divider"></div>
               <div class="summary-row summary-total">
                 <span>${l === 'ar' ? 'الإجمالي' : 'Total'}</span>
-                <span id="sum-total">${formatPrice(subtotal)}</span>
+                <span id="sum-total">${formatPrice(subtotal + currentDeliveryFee)}</span>
               </div>
 
               <button class="btn btn-primary btn-block btn-lg" style="margin-top:1.25rem" onclick="placeOrder()" id="place-btn">
@@ -313,7 +324,10 @@
 
       const cart     = getCart();
       const subtotal = cart.reduce((s, i) => s + i.price * i.quantity, 0);
-      const result   = await validateCoupon(code, subtotal);
+      // FIX: رسوم التوصيل بتتحسب على أساس الـ subtotal الأصلي قبل الخصم
+      // (مش بتتأثر بالكوبون) — عشان يكون واضح ومتوقع للعميل
+      const currentDeliveryFee = calcDeliveryFee(subtotal);
+      const result = await validateCoupon(code, subtotal);
 
       btn.disabled  = false;
       btn.innerHTML = l === 'ar' ? 'تطبيق' : 'Apply';
@@ -323,7 +337,7 @@
         msgEl.style.color   = '#dc2626';
         msgEl.textContent   = result.msg;
         document.getElementById('sum-discount-row').style.display = 'none';
-        document.getElementById('sum-total').textContent = formatPrice(subtotal);
+        document.getElementById('sum-total').textContent = formatPrice(subtotal + currentDeliveryFee);
         return;
       }
 
@@ -331,10 +345,18 @@
       msgEl.style.color = '#16a34a';
       msgEl.textContent = result.msg;
 
-      const discounted = subtotal - result.discount;
+      const discounted = subtotal - result.discount + currentDeliveryFee;
       document.getElementById('sum-discount-row').style.display = 'flex';
       document.getElementById('sum-discount').textContent  = `−${formatPrice(result.discount)}`;
       document.getElementById('sum-total').textContent     = formatPrice(discounted);
+    }
+
+    // FIX: حساب رسوم التوصيل — بيرجع 0 لو الطلب وصل للحد الأدنى
+    // للتوصيل المجاني (لو الأدمن فعّل الميزة دي)، وإلا بيرجع
+    // القيمة الثابتة المحددة من لوحة التحكم
+    function calcDeliveryFee(subtotal) {
+      if (freeDeliveryMin !== null && subtotal >= freeDeliveryMin) return 0;
+      return deliveryFee;
     }
 
     async function placeOrder() {
@@ -372,7 +394,10 @@
       const cart     = getCart();
       const subtotal = cart.reduce((s, i) => s + i.price * i.quantity, 0);
       const discount = couponData?.discount || 0;
-      const total    = Math.max(0, subtotal - discount);
+      // FIX: إضافة رسوم التوصيل للإجمالي النهائي — قبل كده كان
+      // الـ total بيتحسب من قيمة المنتجات بس، من غير أي رسوم توصيل
+      const currentDeliveryFee = calcDeliveryFee(subtotal);
+      const total    = Math.max(0, subtotal - discount) + currentDeliveryFee;
 
       try {
         // ═══════════════════════════════════════════════════════
@@ -454,7 +479,8 @@
           status:            'pending',
           payment_method:    paymentMethod,
           payment_proof_url: proofUrl || null,
-          notes:             notes || null
+          notes:             notes || null,
+          delivery_fee:      currentDeliveryFee
         }).select().single();
 
         // FIX: لو إنشاء الطلب فشل بعد ما المخزون اتخصم، نرجّع المخزون

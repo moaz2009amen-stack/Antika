@@ -8,5 +8,9 @@ Disallow: /admin-antika-ctrl/
 Disallow: /auth.html
 Disallow: /reset-password.html
 
+# منع صفحات خاصة بالحساب (بتحتاج تسجيل دخول)
+Disallow: /profile.html
+Disallow: /track.html
+
 # السيت ماب
 Sitemap: https://antika-store.vercel.app/sitemap.xml

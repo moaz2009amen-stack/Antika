@@ -147,6 +147,58 @@
             </div>
           </div>
 
+          <!-- FIX: رسوم التوصيل -->
+          <div class="s-section">
+            <div class="s-head"><i class="fas fa-truck"></i><div class="s-head-title">رسوم التوصيل</div></div>
+            <div class="s-body">
+              <div class="form-group">
+                <label class="form-label">رسوم التوصيل (جنيه)</label>
+                <input type="number" class="form-control" id="delivery-fee" min="0" max="9999" step="0.5" placeholder="50">
+                <div class="form-hint">اتركه 0 لو التوصيل مجاني</div>
+              </div>
+              <div class="form-group" style="margin-bottom:1rem">
+                <label class="form-label">حد أدنى للتوصيل المجاني (جنيه) <span style="color:var(--text-muted);font-weight:400">(اختياري)</span></label>
+                <input type="number" class="form-control" id="free-delivery-min" min="0" max="99999" step="1" placeholder="مثال: 500">
+                <div class="form-hint">لو الطلب أكبر من أو يساوي المبلغ ده، التوصيل بيبقى مجاني — اتركه فاضي لو مش عايز الميزة دي</div>
+              </div>
+              <button class="btn btn-primary btn-sm" onclick="saveDeliveryFee()"><i class="fas fa-save"></i> حفظ</button>
+            </div>
+          </div>
+
+          <!-- FIX: بيانات الفاتورة -->
+          <div class="s-section">
+            <div class="s-head"><i class="fas fa-file-invoice"></i><div class="s-head-title">بيانات الفاتورة</div></div>
+            <div class="s-body">
+              <div class="form-group">
+                <label class="form-label">اسم المتجر على الفاتورة</label>
+                <input type="text" class="form-control" id="inv-store-name" maxlength="100" placeholder="أنتيكا جاليري">
+              </div>
+              <div class="form-group">
+                <label class="form-label">العنوان</label>
+                <input type="text" class="form-control" id="inv-address" maxlength="200" placeholder="المحافظة، المدينة، الشارع...">
+              </div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">
+                <div class="form-group">
+                  <label class="form-label">رقم التليفون</label>
+                  <input type="tel" class="form-control" id="inv-phone" dir="ltr" maxlength="20" placeholder="01000000000">
+                </div>
+                <div class="form-group">
+                  <label class="form-label">الإيميل</label>
+                  <input type="email" class="form-control" id="inv-email" dir="ltr" maxlength="100" placeholder="info@antika.com">
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="form-label">الرقم الضريبي <span style="color:var(--text-muted);font-weight:400">(اختياري)</span></label>
+                <input type="text" class="form-control" id="inv-tax-number" dir="ltr" maxlength="50" placeholder="اتركه فاضي لو مش مسجل ضريبياً">
+              </div>
+              <div class="form-group" style="margin-bottom:1rem">
+                <label class="form-label">ملاحظة أسفل الفاتورة <span style="color:var(--text-muted);font-weight:400">(اختياري)</span></label>
+                <textarea class="form-control" id="inv-footer-note" rows="2" maxlength="300" placeholder="مثال: شكراً لتعاملكم معنا 🩷"></textarea>
+              </div>
+              <button class="btn btn-primary btn-sm" onclick="saveInvoiceSettings()"><i class="fas fa-save"></i> حفظ بيانات الفاتورة</button>
+            </div>
+          </div>
+
           <div class="s-section">
             <div class="s-head"><i class="fas fa-toggle-on"></i><div class="s-head-title">التشغيل</div></div>
             <div class="s-body" style="padding-top:.5rem;padding-bottom:.5rem">
@@ -333,6 +385,16 @@
       document.getElementById('site-en').value      = s['site_name_en']  || '';
       document.getElementById('announcement').value = s['announcement']  || '';
       document.getElementById('wa-num').value       = s['whatsapp_number']|| '';
+      // FIX: تحميل رسوم التوصيل
+      document.getElementById('delivery-fee').value      = s['delivery_fee']       || '';
+      document.getElementById('free-delivery-min').value = s['free_delivery_min']  || '';
+      // FIX: تحميل بيانات الفاتورة
+      document.getElementById('inv-store-name').value  = s['invoice_store_name']  || '';
+      document.getElementById('inv-address').value     = s['invoice_address']     || '';
+      document.getElementById('inv-phone').value       = s['invoice_phone']       || '';
+      document.getElementById('inv-email').value       = s['invoice_email']       || '';
+      document.getElementById('inv-tax-number').value  = s['invoice_tax_number']  || '';
+      document.getElementById('inv-footer-note').value = s['invoice_footer_note'] || '';
       if(s['maintenance_mode']==='true') document.getElementById('t-maintenance').classList.add('on');
       if(s['orders_enabled']==='false')  document.getElementById('t-orders').classList.remove('on');
     }
@@ -369,6 +431,55 @@
       const n=document.getElementById('wa-num').value.trim();
       if(!n){showToast('اكتب الرقم الأول','error');return;}
       window.open(`https://wa.me/2${n}`,'_blank');
+    }
+
+    // FIX: حفظ رسوم التوصيل والحد الأدنى للتوصيل المجاني
+    async function saveDeliveryFee() {
+      const feeInput = document.getElementById('delivery-fee').value.trim();
+      const minInput  = document.getElementById('free-delivery-min').value.trim();
+
+      const fee = feeInput === '' ? 0 : parseFloat(feeInput);
+      if (isNaN(fee) || fee < 0) {
+        showToast('اكتب رسوم توصيل صحيحة (0 أو أكبر)', 'error');
+        return;
+      }
+
+      let freeMin = null;
+      if (minInput !== '') {
+        freeMin = parseFloat(minInput);
+        if (isNaN(freeMin) || freeMin < 0) {
+          showToast('اكتب حد أدنى صحيح للتوصيل المجاني', 'error');
+          return;
+        }
+      }
+
+      await Promise.all([
+        db.from('settings').upsert({ key: 'delivery_fee', value: fee.toString() }, { onConflict: 'key' }),
+        db.from('settings').upsert({ key: 'free_delivery_min', value: freeMin !== null ? freeMin.toString() : '' }, { onConflict: 'key' }),
+      ]);
+      clearSettingsCache();
+      showToast('✓ تم حفظ رسوم التوصيل');
+    }
+
+    // FIX: حفظ بيانات الفاتورة
+    async function saveInvoiceSettings() {
+      const storeName  = document.getElementById('inv-store-name').value.trim();
+      const address    = document.getElementById('inv-address').value.trim();
+      const phone      = document.getElementById('inv-phone').value.trim();
+      const email      = document.getElementById('inv-email').value.trim();
+      const taxNumber  = document.getElementById('inv-tax-number').value.trim();
+      const footerNote = document.getElementById('inv-footer-note').value.trim();
+
+      await Promise.all([
+        db.from('settings').upsert({ key: 'invoice_store_name',  value: storeName  }, { onConflict: 'key' }),
+        db.from('settings').upsert({ key: 'invoice_address',     value: address    }, { onConflict: 'key' }),
+        db.from('settings').upsert({ key: 'invoice_phone',       value: phone      }, { onConflict: 'key' }),
+        db.from('settings').upsert({ key: 'invoice_email',       value: email      }, { onConflict: 'key' }),
+        db.from('settings').upsert({ key: 'invoice_tax_number',  value: taxNumber  }, { onConflict: 'key' }),
+        db.from('settings').upsert({ key: 'invoice_footer_note', value: footerNote }, { onConflict: 'key' }),
+      ]);
+      clearSettingsCache();
+      showToast('✓ تم حفظ بيانات الفاتورة');
     }
 
     async function loadRevenue(period, btn) {

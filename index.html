@@ -69,7 +69,7 @@
     <ul class="navbar-nav" id="nav-menu">
       <li><a href="/" data-ar="الرئيسية" data-en="Home">الرئيسية</a></li>
       <li><a href="/shop.html" data-ar="المتجر" data-en="Shop">المتجر</a></li>
-      <li><a href="/track.html" data-ar="تتبع طلبك" data-en="Track Order">تتبع طلبك</a></li>
+      <li><a href="/track.html" data-ar="طلباتي" data-en="My Orders">تتبع طلبك</a></li>
     </ul>
     <div class="navbar-actions">
       <button class="navbar-icon-btn" onclick="toggleTheme()" id="theme-toggle" title="Theme">
@@ -224,7 +224,7 @@
           <h4 style="font-size:0.9rem;font-weight:700;margin-bottom:1rem;color:var(--text-secondary)" data-ar="روابط سريعة" data-en="Quick Links">روابط سريعة</h4>
           <div style="display:flex;flex-direction:column;gap:0.6rem">
             <a href="/shop.html" style="font-size:0.9rem;color:var(--text-muted);transition:color var(--transition)" onmouseover="this.style.color='var(--gold)'" onmouseout="this.style.color='var(--text-muted)'" data-ar="المتجر" data-en="Shop">المتجر</a>
-            <a href="/track.html" style="font-size:0.9rem;color:var(--text-muted);transition:color var(--transition)" onmouseover="this.style.color='var(--gold)'" onmouseout="this.style.color='var(--text-muted)'" data-ar="تتبع طلبك" data-en="Track Order">تتبع طلبك</a>
+            <a href="/track.html" style="font-size:0.9rem;color:var(--text-muted);transition:color var(--transition)" onmouseover="this.style.color='var(--gold)'" onmouseout="this.style.color='var(--text-muted)'" data-ar="طلباتي" data-en="My Orders">تتبع طلبك</a>
             <a href="/profile.html" style="font-size:0.9rem;color:var(--text-muted);transition:color var(--transition)" onmouseover="this.style.color='var(--gold)'" onmouseout="this.style.color='var(--text-muted)'" data-ar="حسابي" data-en="My Account">حسابي</a>
           </div>
         </div>
@@ -348,14 +348,20 @@
     }
 
     async function loadStats() {
-      const [{ count: products }, { count: orders }, { count: customers }] = await Promise.all([
-        db.from('products').select('*', { count: 'exact', head: true }).eq('is_published', true),
-        db.from('orders').select('*', { count: 'exact', head: true }).eq('status', 'delivered'),
-        db.from('profiles').select('*', { count: 'exact', head: true })
-      ]);
-      document.getElementById('stat-products').textContent  = products  || 0;
-      document.getElementById('stat-orders').textContent    = orders    || 0;
-      document.getElementById('stat-customers').textContent = customers || 0;
+      // FIX: استخدام get_public_stats RPC بدل 3 استعلامات مباشرة —
+      // الاستعلامات المباشرة كانت بترجع 0 دايماً للزوار الغير
+      // مسجلين بعد إضافة RLS على profiles/orders
+      const { data, error } = await db.rpc('get_public_stats');
+      if (error || !data?.length) {
+        document.getElementById('stat-products').textContent  = 0;
+        document.getElementById('stat-orders').textContent    = 0;
+        document.getElementById('stat-customers').textContent = 0;
+        return;
+      }
+      const stats = data[0];
+      document.getElementById('stat-products').textContent  = stats.published_products || 0;
+      document.getElementById('stat-orders').textContent    = stats.delivered_orders    || 0;
+      document.getElementById('stat-customers').textContent = stats.total_customers     || 0;
     }
 
     async function initUserArea() {

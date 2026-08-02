@@ -103,7 +103,6 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
   <script src="/js/config.js"></script>
   <script src="/admin-antika-ctrl/admin-shared.js"></script>
-  <script src="/js/config.js"></script>
   <script>
     function openSidebar()  { document.getElementById('admin-sidebar').classList.add('open'); document.getElementById('sidebar-overlay').classList.add('active'); }
     function closeSidebar() { document.getElementById('admin-sidebar').classList.remove('open'); document.getElementById('sidebar-overlay').classList.remove('active'); }
@@ -207,6 +206,9 @@
         .eq('id', id).single();
       if (!o) return;
 
+      // خزّن الطلب الحالي عشان printInvoice تقدر توصله بدون استعلام تاني
+      window._currentOrderDetail = o;
+
       document.getElementById('detail-content').innerHTML = `
         <div style="margin-bottom:1.25rem;padding:1rem;background:var(--bg-secondary);border-radius:var(--radius)">
           <div style="font-size:.75rem;color:var(--text-muted);margin-bottom:.25rem">رقم الطلب</div>
@@ -256,6 +258,11 @@
           </div>
         </div>
         ${o.notes ? `<div style="margin-top:1rem;padding:.75rem;background:rgba(201,168,76,.08);border-radius:var(--radius-sm);font-size:.85rem"><strong>ملاحظات:</strong> ${escapeHtml(o.notes)}</div>` : ''}
+        <div style="margin-top:1.25rem">
+          <button class="btn btn-outline btn-block" onclick="printInvoice('${encodeURIComponent(o.id)}')">
+            <i class="fas fa-file-invoice"></i> طباعة الفاتورة
+          </button>
+        </div>
         <div style="margin-top:1.5rem">
           <label class="form-label">تغيير الحالة</label>
           <select class="form-control" onchange="updateStatus('${encodeURIComponent(o.id)}', this.value); closeDetail()">
@@ -267,6 +274,164 @@
     }
 
     function closeDetail() { document.getElementById('detail-panel').classList.remove('open'); }
+
+    // ══════════════════════════════════════════════════════════════
+    // طباعة الفاتورة — HTML→Print بدل PDF نصي
+    // العربي بيظهر صح 100% لأنها صفحة HTML حقيقية بتتفتح في نافذة
+    // جديدة وبتتطبع من المتصفح مباشرة (المستخدم يقدر "Save as PDF"
+    // من نافذة الطباعة نفسها لو حابب يحفظها كملف)
+    // ══════════════════════════════════════════════════════════════
+    async function printInvoice(encodedId) {
+      const id = decodeURIComponent(encodedId);
+      const o = window._currentOrderDetail;
+      if (!o || o.id !== id) { showToast('حصل خطأ، افتحي تفاصيل الطلب تاني', 'error'); return; }
+
+      // جلب بيانات الفاتورة من الإعدادات
+      const [storeName, address, phone, email, taxNumber, footerNote] = await Promise.all([
+        getSetting('invoice_store_name'),
+        getSetting('invoice_address'),
+        getSetting('invoice_phone'),
+        getSetting('invoice_email'),
+        getSetting('invoice_tax_number'),
+        getSetting('invoice_footer_note'),
+      ]);
+
+      const deliveryFee   = o.delivery_fee || 0;
+      const productsTotal = o.total - deliveryFee;
+      const orderDate     = new Date(o.created_at).toLocaleDateString('ar-EG', { year: 'numeric', month: 'long', day: 'numeric' });
+
+      const statusArLabel = STATUS_LABELS[o.status] || o.status;
+
+      const itemsRows = (o.order_items || []).map(item => {
+        const pname = escapeHtml(item.products?.name_ar || item.products?.name || 'منتج محذوف');
+        const lineTotal = item.price_at_time * item.quantity;
+        return `
+          <tr>
+            <td>${pname}</td>
+            <td style="text-align:center">${item.quantity}</td>
+            <td style="text-align:center">${formatPrice(item.price_at_time)}</td>
+            <td style="text-align:left">${formatPrice(lineTotal)}</td>
+          </tr>`;
+      }).join('');
+
+      const invoiceHtml = `
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<title>فاتورة #${o.id.slice(0,8).toUpperCase()}</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&family=Playfair+Display:ital@1&display=swap');
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Cairo', sans-serif;
+    color: #1A1510;
+    padding: 40px;
+    max-width: 800px;
+    margin: 0 auto;
+    line-height: 1.7;
+  }
+  .inv-header { text-align: center; margin-bottom: 32px; padding-bottom: 24px; border-bottom: 2px solid #C9A84C; }
+  .inv-store-name { font-family: 'Playfair Display', serif; font-style: italic; font-size: 28px; color: #A07830; margin-bottom: 8px; }
+  .inv-contact { font-size: 13px; color: #6B5E4A; margin-top: 4px; }
+  .inv-top-row { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 28px; flex-wrap: wrap; gap: 16px; }
+  .inv-box { background: #F8F6F0; border-radius: 10px; padding: 16px 20px; flex: 1; min-width: 220px; }
+  .inv-box-title { font-size: 12px; font-weight: 700; color: #A07830; text-transform: uppercase; letter-spacing: .05em; margin-bottom: 8px; }
+  .inv-box p { font-size: 14px; margin-bottom: 4px; color: #333; }
+  table { width: 100%; border-collapse: collapse; margin-bottom: 24px; }
+  th { background: #F5F0E1; padding: 10px 12px; font-size: 13px; text-align: right; border-bottom: 2px solid #C9A84C; }
+  th:nth-child(2), th:nth-child(3) { text-align: center; }
+  th:nth-child(4) { text-align: left; }
+  td { padding: 10px 12px; font-size: 14px; border-bottom: 1px solid #E0D4B8; }
+  .inv-totals { margin-left: auto; margin-right: 0; width: 280px; }
+  .inv-totals-row { display: flex; justify-content: space-between; padding: 6px 0; font-size: 14px; color: #555; }
+  .inv-totals-row.final { border-top: 2px solid #C9A84C; margin-top: 8px; padding-top: 12px; font-size: 18px; font-weight: 700; color: #1A1510; }
+  .inv-footer { margin-top: 40px; text-align: center; font-size: 13px; color: #9A8A76; padding-top: 20px; border-top: 1px solid #E0D4B8; }
+  .inv-status-badge { display: inline-block; padding: 4px 14px; border-radius: 20px; font-size: 12px; font-weight: 700; background: #F5F0E1; color: #A07830; }
+  @media print {
+    body { padding: 20px; }
+    @page { margin: 1.5cm; }
+  }
+</style>
+</head>
+<body>
+  <div class="inv-header">
+    <div class="inv-store-name">${escapeHtml(storeName || 'Antika Gallery')}</div>
+    ${address ? `<div class="inv-contact">${escapeHtml(address)}</div>` : ''}
+    ${(phone || email) ? `<div class="inv-contact">${[phone, email].filter(Boolean).map(escapeHtml).join('  •  ')}</div>` : ''}
+    ${taxNumber ? `<div class="inv-contact">الرقم الضريبي: ${escapeHtml(taxNumber)}</div>` : ''}
+  </div>
+
+  <div class="inv-top-row">
+    <div class="inv-box">
+      <div class="inv-box-title">فاتورة رقم</div>
+      <p style="font-weight:700;font-size:16px;color:#A07830">#${o.id.slice(0,8).toUpperCase()}</p>
+      <p>${orderDate}</p>
+      <p style="margin-top:8px"><span class="inv-status-badge">${statusArLabel}</span></p>
+    </div>
+    <div class="inv-box">
+      <div class="inv-box-title">بيانات العميل</div>
+      <p style="font-weight:600">${escapeHtml(o.profiles?.full_name || '—')}</p>
+      <p>${escapeHtml(o.profiles?.phone || '')}</p>
+      <p>${escapeHtml(o.profiles?.address || '')}</p>
+    </div>
+  </div>
+
+  <table>
+    <thead>
+      <tr>
+        <th>المنتج</th>
+        <th>الكمية</th>
+        <th>السعر</th>
+        <th>الإجمالي</th>
+      </tr>
+    </thead>
+    <tbody>
+      ${itemsRows}
+    </tbody>
+  </table>
+
+  <div class="inv-totals">
+    <div class="inv-totals-row">
+      <span>قيمة المنتجات</span>
+      <span>${formatPrice(productsTotal)}</span>
+    </div>
+    <div class="inv-totals-row">
+      <span>رسوم التوصيل</span>
+      <span>${deliveryFee > 0 ? formatPrice(deliveryFee) : 'مجاني'}</span>
+    </div>
+    <div class="inv-totals-row final">
+      <span>الإجمالي</span>
+      <span>${formatPrice(o.total)}</span>
+    </div>
+  </div>
+
+  ${footerNote ? `<div class="inv-footer">${escapeHtml(footerNote)}</div>` : ''}
+
+  <script>
+    // FIX: التأكد من تحميل خط Cairo كامل قبل الطباعة — لو الطباعة
+    // بدأت قبل ما الخط يتحمّل، النص العربي بيطلع بخط افتراضي بايظ
+    if (document.fonts && document.fonts.ready) {
+      document.fonts.ready.then(function() {
+        setTimeout(function() { window.print(); }, 150);
+      });
+    } else {
+      window.onload = function() {
+        setTimeout(function() { window.print(); }, 400);
+      };
+    }
+  </script>
+</body>
+</html>`;
+
+      const printWindow = window.open('', '_blank');
+      if (!printWindow) {
+        showToast('يرجى السماح بالنوافذ المنبثقة للطباعة', 'error');
+        return;
+      }
+      printWindow.document.write(invoiceHtml);
+      printWindow.document.close();
+    }
 
     function filterOrders(status, btn) {
       currentFilter = status;

@@ -260,7 +260,13 @@
     }
 
     async function loadProds(){
-      const{data}=await db.from('products').select('*,categories(name,name_ar)').order('created_at',{ascending:false});
+      const{data,error}=await db.from('products').select('*,categories(name,name_ar)').order('created_at',{ascending:false});
+      if(error){
+        console.error('loadProds error:', error);
+        document.getElementById('pcontainer').innerHTML=`<div style="text-align:center;padding:4rem;color:#dc2626"><i class="fas fa-exclamation-triangle" style="font-size:2rem;display:block;margin-bottom:1rem"></i><p>حصل خطأ في تحميل المنتجات — تأكد إن صلاحية الأدمن مفعّلة صح</p></div>`;
+        showToast('فشل تحميل المنتجات','error');
+        return;
+      }
       allProds=data||[]; filter();
     }
 

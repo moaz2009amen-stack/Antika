@@ -378,7 +378,8 @@
     }
 
     async function loadSettings() {
-      const{data}=await db.from('settings').select('*');
+      const{data,error}=await db.from('settings').select('*');
+      if(error) console.error('loadSettings error:', error);
       const s={};
       (data||[]).forEach(r=>s[r.key]=r.value);
       document.getElementById('site-ar').value      = s['site_name_ar']  || '';

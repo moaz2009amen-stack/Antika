@@ -114,7 +114,7 @@
     }
 
     async function loadStats() {
-      const [{ count: to }, { count: us }, { count: pr }, { count: pn }, { count: dv }, { data: od }] = await Promise.all([
+      const results = await Promise.all([
         db.from('orders').select('*', { count: 'exact', head: true }),
         db.from('profiles').select('*', { count: 'exact', head: true }),
         db.from('products').select('*', { count: 'exact', head: true }),
@@ -122,6 +122,14 @@
         db.from('orders').select('*', { count: 'exact', head: true }).eq('status', 'delivered'),
         db.from('orders').select('total').eq('status', 'delivered')
       ]);
+      // FIX: تحقق من الأخطاء — لو كل الاستعلامات فشلت (مشكلة صلاحيات)
+      // نبلّغ الأدمن بدل ما نعرض أصفار بصمت وكأن مفيش بيانات فعلاً
+      const anyError = results.some(r => r.error);
+      if (anyError) {
+        console.error('loadStats errors:', results.filter(r => r.error).map(r => r.error));
+        showToast('حصل خطأ في تحميل بعض الإحصائيات — تأكد إن صلاحية الأدمن مفعّلة صح', 'error');
+      }
+      const [{ count: to }, { count: us }, { count: pr }, { count: pn }, { count: dv }, { data: od }] = results;
       const rev = od?.reduce((s, o) => s + (o.total || 0), 0) || 0;
       document.getElementById('s-orders').textContent   = to || 0;
       document.getElementById('s-revenue').textContent  = formatPrice(rev);
@@ -146,8 +154,13 @@
     }
 
     async function loadRecentOrders() {
-      const { data: orders } = await db.from('orders').select('*,profiles(full_name,phone)').order('created_at', { ascending: false }).limit(10);
+      const { data: orders, error } = await db.from('orders').select('*,profiles(full_name,phone)').order('created_at', { ascending: false }).limit(10);
       const tb = document.getElementById('recent-tbody');
+      if (error) {
+        console.error('loadRecentOrders error:', error);
+        tb.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:2rem;color:#dc2626">حصل خطأ في تحميل الطلبات — تأكد إن صلاحية الأدمن مفعّلة صح</td></tr>';
+        return;
+      }
       if (!orders?.length) { tb.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:2rem;color:var(--text-muted)">مفيش طلبات لحد دلوقتي</td></tr>'; return; }
       tb.innerHTML = orders.map(o => `
         <tr style="cursor:pointer" onclick="location.href='/admin-antika-ctrl/orders.html?id=${encodeURIComponent(o.id)}'">

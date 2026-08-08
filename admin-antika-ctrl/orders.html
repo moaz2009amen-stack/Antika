@@ -139,11 +139,29 @@
     let currentUserId = '';  // FIX: للـ user filter
 
     async function loadOrders() {
+      const tbody = document.getElementById('orders-tbody');
+      tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:2rem"><div class="spinner" style="margin:0 auto"></div></td></tr>';
+
       let q = db.from('orders').select('*,profiles(full_name,phone)').order('created_at', { ascending: false });
       if (currentFilter) q = q.eq('status', currentFilter);
       // FIX: لو فيه user filter نطبقه
       if (currentUserId) q = q.eq('user_id', currentUserId);
-      const { data } = await q;
+
+      const { data, error } = await q;
+
+      // FIX: لازم نتحقق من الـ error — قبل كده لو الاستعلام فشل
+      // (زي مشكلة RLS أو صلاحيات) كانت الصفحة بتفضل عالقة على
+      // الـ spinner للأبد من غير أي رسالة توضح إيه المشكلة
+      if (error) {
+        console.error('loadOrders error:', error);
+        tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:2rem;color:#dc2626">
+          <i class="fas fa-exclamation-triangle" style="display:block;margin-bottom:.5rem;font-size:1.5rem"></i>
+          حصل خطأ في تحميل الطلبات — تأكد إن صلاحية الأدمن مفعّلة صح (${escapeHtml(error.message || error.code || 'خطأ غير معروف')})
+        </td></tr>`;
+        showToast('فشل تحميل الطلبات', 'error');
+        return;
+      }
+
       allOrders = data || [];
       renderOrders();
     }

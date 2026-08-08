@@ -136,7 +136,8 @@
       const week    = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
       const newUsers = allUsers.filter(u => u.created_at > week).length;
 
-      const { data: orders } = await db.from('orders').select('user_id');
+      const { data: orders, error: ordersErr } = await db.from('orders').select('user_id');
+      if (ordersErr) console.error('loadUsers orders count error:', ordersErr);
       const orderMap = {};
       orders?.forEach(o => { orderMap[o.user_id] = (orderMap[o.user_id] || 0) + 1; });
       allUsers = allUsers.map(u => ({ ...u, order_count: orderMap[u.id] || 0 }));

@@ -40,19 +40,25 @@
     }
 
     async function runDiagnostics() {
+      document.getElementById('results').innerHTML = '<div style="color:#B8A888">جاري الفحص...</div>';
+
+      // FIX: نفس الـ retry logic المستخدمة في باقي صفحات الأدمن —
+      // Supabase أحياناً بياخد وقت يحمّل الـ session من localStorage
+      // خصوصاً لو الصفحة اتفتحت في تاب جديد
+      let { data: { session } } = await db.auth.getSession();
+      if (!session) {
+        await new Promise(r => setTimeout(r, 900));
+        const retry = await db.auth.getSession();
+        session = retry.data.session;
+      }
+
       document.getElementById('results').innerHTML = '';
 
-      // 1) هل فيه session أصلاً
-      const { data: { session } } = await db.auth.getSession();
       if (!session) {
         addCheck('تسجيل الدخول', false, 'مفيش session — سجّل دخول من /admin-antika-ctrl/login.html الأول');
         return;
       }
       addCheck('تسجيل الدخول', true, `مسجل دخول بإيميل: ${session.user.email}`);
-
-      // FIX: الصفحة دي أداة تشخيص داخلية — لازم تسجيل دخول على الأقل
-      // (مش لازم يكون admin بالضرورة، عشان نقدر نشخّص مشكلة الـ role
-      // نفسها، بس أي حد يوصل هنا لازم يكون عنده حساب مسجل دخول)
 
       // 2) هل الـ role = admin في الـ JWT
       const role = session.user.app_metadata?.role;

@@ -192,6 +192,10 @@ grant execute on function increment_coupon_usage to authenticated;
 
 -- ── track_order_by_phone() — بديل احتياطي (مش مستخدم حالياً بعد
 -- التحويل لصفحة "طلباتي" التلقائية، لكن موجود لأي استخدام مستقبلي)
+-- FIX: drop صريح قبل create — نفس مشكلة get_all_users ممكن تحصل
+-- لأي دالة returns table لو كانت موجودة قبل كده بنوع مختلف
+drop function if exists track_order_by_phone(text);
+
 create or replace function track_order_by_phone(search_phone text)
 returns table(
   order_id uuid,
@@ -240,6 +244,9 @@ $$ language plpgsql security definer;
 grant execute on function track_order_by_phone to anon, authenticated;
 
 -- ── get_public_stats() — أرقام الصفحة الرئيسية ──
+-- FIX: drop صريح قبل create لنفس السبب
+drop function if exists get_public_stats();
+
 create or replace function get_public_stats()
 returns table(
   published_products bigint,
@@ -258,6 +265,12 @@ $$ language plpgsql security definer;
 grant execute on function get_public_stats to anon, authenticated;
 
 -- ── get_all_users() ──
+-- FIX: DROP صريح قبل CREATE — لو الدالة كانت موجودة قبل كده بـ
+-- return type مختلف (حتى لو بسيط زي varchar بدل text)، CREATE OR
+-- REPLACE مش بيقدر يغيّر نوع الإرجاع ده وبيدّي error وقت التشغيل:
+-- "structure of query does not match function result type"
+drop function if exists get_all_users();
+
 create or replace function get_all_users()
 returns table(
   id uuid,
@@ -276,14 +289,14 @@ begin
 
   return query
   select
-    p.id,
-    u.email,
-    p.full_name,
-    p.phone,
-    p.address,
-    p.avatar_url,
-    p.is_banned,
-    p.created_at
+    p.id::uuid,
+    u.email::text,
+    p.full_name::text,
+    p.phone::text,
+    p.address::text,
+    p.avatar_url::text,
+    coalesce(p.is_banned, false)::boolean,
+    p.created_at::timestamptz
   from profiles p
   join auth.users u on u.id = p.id
   order by p.created_at desc;
@@ -338,6 +351,9 @@ grant execute on function set_user_role       to authenticated;
 grant execute on function set_user_role_by_id to authenticated;
 
 -- ── get_moderators() ──
+-- FIX: drop صريح قبل create لنفس السبب
+drop function if exists get_moderators();
+
 create or replace function get_moderators()
 returns table(id uuid, email text, full_name text, created_at timestamptz) as $$
 begin

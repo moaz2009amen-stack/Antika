@@ -237,6 +237,19 @@ body.with-notif {
   flex-shrink: 0;
 }
 
+/* FIX: user-area (صورة البروفايل/زرار دخول) — flex + align-items:center
+   عشان تتمحور عمودياً بالظبط زي باقي أيقونات الـ navbar على كل الأحجام،
+   مش بس على الموبايل */
+#user-area {
+  display: flex;
+  align-items: center;
+}
+
+#user-area > div {
+  display: flex;
+  align-items: center;
+}
+
 .navbar-icon-btn {
   width: 40px;
   height: 40px;
@@ -1005,9 +1018,19 @@ textarea.form-control {
     display: none;
   }
 
-  /* FIX: user-area (صورة البروفايل/زرار دخول) — تحديد حجم ثابت صغير */
+  /* FIX: user-area (صورة البروفايل/زرار دخول) — تحديد حجم ثابت صغير
+     + FIX: display:flex + align-items:center عشان الصورة/الزرار
+     جواها يتمحوروا عمودياً بالظبط زي باقي أيقونات الـ navbar —
+     قبل كده كانت بتاخد سلوك block الافتراضي وتنزل شوية تحت */
   #user-area {
     flex-shrink: 0;
+    display: flex;
+    align-items: center;
+  }
+
+  #user-area > div {
+    display: flex;
+    align-items: center;
   }
 
   #user-area .navbar-icon-btn,
